@@ -1,0 +1,13 @@
+{
+    "lognet": [
+        {
+            "id": "BUG-001",
+            "pattern": "connection refused"
+        },
+        {
+            "id": "BUG-002",
+            "pattern": "file not found"
+        }
+    ]
+}
+

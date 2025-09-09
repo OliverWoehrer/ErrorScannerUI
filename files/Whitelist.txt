@@ -1,0 +1,4 @@
+generator-loggen-app-1
+generator-loggen-app-2
+generator-loggen-app-lost-1
+generator-loggen-app-lost-2
