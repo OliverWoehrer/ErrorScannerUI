@@ -206,51 +206,73 @@ class Scanner():
         shared_items = whitelist & blacklist
         if shared_items: # share items between whitelist and blacklists is bad practive
             error_message = "Whitelist and Blacklist share items, which is bad practice:"
-            for item in shared_items: #TODO: sorted(list(conflicting_items))
+            for item in shared_items:
                 error_message = f"\r\n{item}"
             raise RuntimeError(error_message) # inform user about which filter items are shared
         
-
         # Initalize Docker Client:
         try:
             client = docker.from_env()
-            universe = client.containers # all containers are our universe now
         except docker.errors.DockerException:
             print(f"Could not connect to docker daemon!")
             return
-
-        # Access Docker Network:
-        if network_name:
+        
+        # Find Docker Network(s):
+        network_names = set()
+        if network_name: # network is given, only use this network
+            network_names.add(network_name)
+        else: # no network given, use all networks this containers is part of
+            try: # find different file
+                file = open("/etc/hostname", "r")
+                container_id = file.read().strip()
+            except FileNotFoundError:
+                print("Not running inside a Docker container or could not get container ID. Scanning all networks...\r\nTo prevent this pass a network name.")
+            else: # find networks for this container ID
+                try:
+                    container = client.containers.get(container_id)
+                except docker.errors.NotFound:
+                    print(f"Could not find container '{container_id}'")
+                else:
+                    network_settings = container.attrs['NetworkSettings']['Networks']
+                    print(f"Container '{container.name}' is connected to the following networks:")
+                    for network_name in network_settings.keys():
+                        print(f"- {network_name}")
+                        network_names.add(network_name)
+            
+        # Access Docker Network(s):
+        universe = set() # set of all container collections known to use
+        if network_names:
             try:
-                network = client.networks.get(network_name)
-                universe = network.client.containers # only containers from this network are our universe now
+                for network_name in network_names:
+                    network = client.networks.get(network_name)
+                    galaxy = network.containers # each network has its galaxy of containers
+                    universe = universe | set(galaxy) # add containers from this network to our universe
             except docker.errors.NotFound:
                 print(f"Error: Network {network_name} not found.")
                 return
             except docker.errors.APIError as e:
                 print(f"Error accessing network {network_name}: {e}.")
                 return
+        else: # no networks found, consider all containers as a fallback
+            all_containers = client.containers
+            assert isinstance(all_containers, docker.models.containers.ContainerCollection)
+            universe = set(all_containers.list()) # all running containers are our universe now
 
         # Build Watchlist:
-        watchlist = set() # actually a set without duplicates of all containers to watch/scan
-        if not whitelist: # no whitelist, consider all containers in our universe
-            watchlist = set(universe)
-        for container_name in whitelist: # find whitelisted Docker containers
-            try:
-                container = universe.get(container_name)
+        # [INFO] Containers can be part of multiple galaxies as they are part of multiple networks.
+        watchlist = set() # list of all containers to watch (actually a set so no duplicates)
+        for container in universe: # filter for white- and blacklist
+            if not whitelist: # no whitelist, consider all containers in the universe
                 watchlist.add(container)
-            except docker.errors.NotFound:
-                print(f"Container '{container_name}' not found.")
-            except docker.errors.APIError as e:
-                print(f"Cannot access container '{container_name}': {e}.")
-        for container_name in blacklist: # remove baclklisted containers from watchlist
-            try:
-                container = universe.get(container_name)
+            if container.name in whitelist or container.id in whitelist:
+                watchlist.add(container)
+            if container.name in blacklist or container.id in blacklist:
                 watchlist.discard(container)
-            except docker.errors.NotFound:
-                continue # skip, not on watchlist anyways
-
         
+        # Display Watchlist:
+        print("Watchlist:")
+        for container in watchlist:
+            print(f"- {container.name} [{container.id}]")
 
         if False:
             try:
@@ -298,17 +320,28 @@ class Scanner():
                 print("Bye!")
                 return
 
-    def run(self, interval, network_name):
-        thread = threading.Thread(target=self.main, kwargs={"interval":interval, "network_name":network_name})
-        thread.start()
+    def run(self, interval: int, network_name: str):
+        """
+        Starts a thread in the background that runs the main loop.
 
+        Args:
+            interval (int): scanning interval in seconds (typical 60 sec)
+            network_name (str): name of a Docker network to scan
+        """
+        # Sanity Check (Set Default Arguments):
+        args = {}
+        if isinstance(interval, int):
+            args["interval"] = interval
+        if isinstance(network_name, str):
+            args["network_name"] = network_name
+        
+        # Start Main Loop:
+        thread = threading.Thread(target=self.main, kwargs=args)
+        thread.start()
 
 if __name__ == "__main__":
     # Global Configuration:
-    BUGS_FILE = "bugs.json"  # Replace with your known bugs JSON file name
     NETWORK_NAME = "lognet"  # Replace with your network name
     INTERVAL = 15  # Check every 60 seconds (adjust as needed)
-    scanner = Scanner(bugs=BUGS_FILE)
+    scanner = Scanner()
     scanner.main(interval=INTERVAL, network_name=NETWORK_NAME)
-
-
