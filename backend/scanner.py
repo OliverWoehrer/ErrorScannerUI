@@ -73,6 +73,7 @@ class Scanner():
         self.bugs_filename = bugs
         self.whitelist_filename = whitelist
         self.blacklist_filename = blacklist
+        self.loop = True
 
         # Initialize Docker Client:
         host = os.environ.get("DOCKER_HOST")
@@ -289,7 +290,7 @@ class Scanner():
                 return
 
         last_scanned = {} # store timestamp when each container was last scanned
-        while True:
+        while self.loop:
             # Initialize Iteration:
             all_findings = {}  # Reset findings for each iteration
             container_ids = [container.id for container in watchlist] # get IDs of containers in same network
@@ -336,12 +337,24 @@ class Scanner():
             args["network_name"] = network_name
         
         # Start Main Loop:
+        self.loop = True
         thread = threading.Thread(target=self.main, kwargs=args)
         thread.start()
+
+    def stop(self):
+        self.loop = False
+
+scanner = Scanner(bugs="files/bugs.json", whitelist="files/Whitelist.txt", blacklist="files/Blacklist.txt")
 
 if __name__ == "__main__":
     # Global Configuration:
     NETWORK_NAME = "lognet"  # Replace with your network name
     INTERVAL = 15  # Check every 60 seconds (adjust as needed)
-    scanner = Scanner()
-    scanner.main(interval=INTERVAL, network_name=NETWORK_NAME)
+    try:
+        scanner.main(interval=INTERVAL, network_name=NETWORK_NAME)
+    except KeyboardInterrupt:
+        print("Bye!")
+    except InterruptedError:
+        print("Terminated!")
+    else:
+        print("Shutdown!")
