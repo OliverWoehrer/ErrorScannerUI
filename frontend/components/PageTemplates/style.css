@@ -1,0 +1,62 @@
+/***************************************/
+/* Responsive Navigation Layout:
+	responsive navigation bar
+	screen width > 992px: sidebar
+	screen width < 992px bottombar
+*/
+/***************************************/
+.layout {
+    display: flex;
+    height: 100%;
+}
+.layout > nav {
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+    justify-content: stretch;
+}
+.layout > nav > a {
+    border-radius: 8px;
+    margin: 8px 0px 0px 0px;
+}
+.layout > nav > .selected {
+    color:var(--dark-text-color)!important;
+    background-color:var(--primary-color)!important;
+}
+.layout > main {
+    flex-basis: auto;
+    flex-direction: column;
+    flex-grow: 1;
+    flex-shrink: 1;
+    overflow-y: auto;
+}
+
+@media (max-width: 992px) {
+    .layout {
+        flex-direction: column-reverse;
+    }
+    .layout > nav {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .layout > nav > a {
+        flex: 1 1 auto;
+        vertical-align: middle;
+        margin: 0px 0px 0px 8px;
+    }
+}
+
+
+/***************************************/
+/* Centered Layout: */
+/***************************************/
+.special-page {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+}

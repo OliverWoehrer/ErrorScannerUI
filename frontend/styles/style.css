@@ -1,0 +1,156 @@
+/***************************************/
+/* Global Properties: */
+/***************************************/
+:root {
+    --mdui-color-primary: 42 99 139;
+    --mdui-color-surface-tint: 42 99 139;
+    --mdui-color-on-primary: 255 255 255;
+    --mdui-color-primary-container: 204 229 255;
+    --mdui-color-on-primary-container: 3 75 113;
+    --mdui-color-secondary: 80 96 111;
+    --mdui-color-on-secondary: 255 255 255;
+    --mdui-color-secondary-container: 212 228 246;
+    --mdui-color-on-secondary-container: 57 72 86;
+    --mdui-color-tertiary: 102 88 123;
+    --mdui-color-on-tertiary: 255 255 255;
+    --mdui-color-tertiary-container: 236 220 255;
+    --mdui-color-on-tertiary-container: 78 65 98;
+    --mdui-color-error: 186 26 26;
+    --mdui-color-on-error: 255 255 255;
+    --mdui-color-error-container: 255 218 214;
+    --mdui-color-on-error-container: 147 0 10;
+    --mdui-color-background: 247 249 255;
+    --mdui-color-on-background: 24 28 32;
+    --mdui-color-surface: 247 249 255;
+    --mdui-color-on-surface: 24 28 32;
+    --mdui-color-surface-variant: 222 227 234;
+    --mdui-color-on-surface-variant: 66 71 77;
+    --mdui-color-outline: 114 120 126;
+    --mdui-color-outline-variant: 194 199 206;
+    --mdui-color-shadow: 0 0 0;
+    --mdui-color-scrim: 0 0 0;
+    --mdui-color-inverse-surface: 45 49 53;
+    --mdui-color-inverse-on-surface: 238 241 246;
+    --mdui-color-inverse-primary: 152 204 249;
+    --mdui-color-primary-fixed: 204 229 255;
+    --mdui-color-on-primary-fixed: 0 30 49;
+    --mdui-color-primary-fixed-dim: 152 204 249;
+    --mdui-color-on-primary-fixed-variant: 3 75 113;
+    --mdui-color-secondary-fixed: 212 228 246;
+    --mdui-color-on-secondary-fixed: 13 29 42;
+    --mdui-color-secondary-fixed-dim: 184 200 217;
+    --mdui-color-on-secondary-fixed-variant: 57 72 86;
+    --mdui-color-tertiary-fixed: 236 220 255;
+    --mdui-color-on-tertiary-fixed: 33 21 52;
+    --mdui-color-tertiary-fixed-dim: 209 191 231;
+    --mdui-color-on-tertiary-fixed-variant: 78 65 98;
+    --mdui-color-surface-dim: 215 218 223;
+    --mdui-color-surface-bright: 247 249 255;
+    --mdui-color-surface-container-lowest: 255 255 255;
+    --mdui-color-surface-container-low: 241 244 249;
+    --mdui-color-surface-container: 235 238 243;
+    --mdui-color-surface-container-high: 230 232 238;
+    --mdui-color-surface-container-highest: 224 227 232;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --mdui-color-primary: 152 204 249;
+        --mdui-color-surface-tint: 152 204 249;
+        --mdui-color-on-primary: 0 51 80;
+        --mdui-color-primary-container: 3 75 113;
+        --mdui-color-on-primary-container: 204 229 255;
+        --mdui-color-secondary: 184 200 217;
+        --mdui-color-on-secondary: 34 50 63;
+        --mdui-color-secondary-container: 57 72 86;
+        --mdui-color-on-secondary-container: 212 228 246;
+        --mdui-color-tertiary: 209 191 231;
+        --mdui-color-on-tertiary: 55 42 74;
+        --mdui-color-tertiary-container: 78 65 98;
+        --mdui-color-on-tertiary-container: 236 220 255;
+        --mdui-color-error: 255 180 171;
+        --mdui-color-on-error: 105 0 5;
+        --mdui-color-error-container: 147 0 10;
+        --mdui-color-on-error-container: 255 218 214;
+        --mdui-color-background: 16 20 23;
+        --mdui-color-on-background: 224 227 232;
+        --mdui-color-surface: 16 20 23;
+        --mdui-color-on-surface: 224 227 232;
+        --mdui-color-surface-variant: 66 71 77;
+        --mdui-color-on-surface-variant: 194 199 206;
+        --mdui-color-outline: 140 145 152;
+        --mdui-color-outline-variant: 66 71 77;
+        --mdui-color-shadow: 0 0 0;
+        --mdui-color-scrim: 0 0 0;
+        --mdui-color-inverse-surface: 224 227 232;
+        --mdui-color-inverse-on-surface: 45 49 53;
+        --mdui-color-inverse-primary: 42 99 139;
+        --mdui-color-primary-fixed: 204 229 255;
+        --mdui-color-on-primary-fixed: 0 30 49;
+        --mdui-color-primary-fixed-dim: 152 204 249;
+        --mdui-color-on-primary-fixed-variant: 3 75 113;
+        --mdui-color-secondary-fixed: 212 228 246;
+        --mdui-color-on-secondary-fixed: 13 29 42;
+        --mdui-color-secondary-fixed-dim: 184 200 217;
+        --mdui-color-on-secondary-fixed-variant: 57 72 86;
+        --mdui-color-tertiary-fixed: 236 220 255;
+        --mdui-color-on-tertiary-fixed: 33 21 52;
+        --mdui-color-tertiary-fixed-dim: 209 191 231;
+        --mdui-color-on-tertiary-fixed-variant: 78 65 98;
+        --mdui-color-surface-dim: 16 20 23;
+        --mdui-color-surface-bright: 54 58 62;
+        --mdui-color-surface-container-lowest: 11 15 18;
+        --mdui-color-surface-container-low: 24 28 32;
+        --mdui-color-surface-container: 28 32 36;
+        --mdui-color-surface-container-high: 39 42 46;
+        --mdui-color-surface-container-highest: 49 53 57;
+    }
+}
+
+/***************************************/
+/* Overwrite Default Styles: */
+/***************************************/
+html,
+body {
+    font-family: "Ubuntu";
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+h2 {
+    margin: 0;
+}
+
+h4 {
+    margin: 0;
+}
+
+Form section {
+    padding: 12px 0;
+}
+
+Form section > div {
+    margin: 12px 0;
+}
+
+mdui-card {
+    padding: 12px;
+}
+
+mdui-tabs::part(container) {
+    background-color: inherit;
+}
+
+mdui-top-app-bar {
+    background-color: inherit;
+    position: relative; 
+}
+
+mdui-dialog::part(overlay) {
+    background-color: rgba(0,0,0,0.4);
+}
+
+mdui-dialog::part(panel) {
+    width: 90%;
+}
