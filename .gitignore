@@ -1,9 +1,5 @@
 # Development Environment:
-.venv
 .vscode
-
-# Cache and Build Files:
-__pycache__
 
 # Testing:
 /generator

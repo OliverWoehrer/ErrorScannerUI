@@ -1,0 +1,5 @@
+# Development Environment:
+.venv
+
+# Cache and Build Files:
+__pycache__
