@@ -1,289 +1,57 @@
-const template = document.createElement("template")
-template.innerHTML = `
-<style>
-    #calContainer {
-      border:1px solid black;
-      position:absolute;
-      background-color:white;
-      z-index:1000;
-    }
-    #calHeader {
-      display:flex;
-      align-items:center;
-      justify-content:space-around;
-      margin-top:5px;
-    }
-    #calGrid {
-      display:grid;
-      grid-template-columns:auto auto auto auto auto auto auto;
-      padding:10px;
-    }
-    .calDayName, .calDayStyle, .calAdjacentMonthDay, #calTitle {
-      padding:5px;
-      font-size:20px;
-      text-align:center;
-    }
-    .calDayStyle:hover, .calCtrl:hover {
-      color:white;
-      background-color:black;
-      cursor:default;
-    }
-    .calHiddenRow {
-      display:none;
-    }
-    .calAdjacentMonthDay {
-      color:lightgray;
-    }
-    .calSelectedDay {
-      color:red;
-      font-weight:bold;
-    }
-    #calTitle {
-      width:110px;
-    }
-    .calCtrl {
-      font-size:20px;
-      padding:0px 8px;
-      user-select:none;
-    }
-</style>
-<div id="calContainer" tabindex="0">
-    <div id="calHeader">
-        <div id="calCtrlPrevYear" class="calCtrl">&#9668;&#9668;</div>
-        <div id="calCtrlPrevMonth" class="calCtrl">&#9668;</div>
-        <div id="calTitle"></div>
-        <div id="calCtrlNextMonth" class="calCtrl">&#9658;</div>
-        <div id="calCtrlNextYear" class="calCtrl">&#9658;&#9658;</div>
-        <div id="calCtrlHideCal" class="calCtrl">&#10005;</div>
-    </div>
-    <div id="calGrid">
-        <div class="calDayName"></div>
-        <div class="calDayName"></div>
-        <div class="calDayName"></div>
-        <div class="calDayName"></div>
-        <div class="calDayName"></div>
-        <div class="calDayName"></div>
-        <div class="calDayName"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-    </div>
-</div>
-`
-
 class DateTimePicker extends HTMLElement {
     constructor() {
         super()
-        // Regardless of sundayFirst value, set monday as first, sunday as last, always:
-        this.dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-        this.sundayFirst = false
-        this.persistOnSelect = false
-        this.longPressThreshold = 500
-        this.longPressInterval = 150
-        this.initDate = null
-        this.ignoreOnFocus = false
-        this.showCloseIcon = false
-        this._inputStrIsValidDate = false
-        this._longPressIntervalIds = []
-        this._longPressTimerIds = []
-        this._calTemplate = `
-    <style>
-    #calContainer {
-      border:1px solid black;
-      position:absolute;
-      background-color:white;
-      z-index:1000;
-    }
-    #calHeader {
-      display:flex;
-      align-items:center;
-      justify-content:space-around;
-      margin-top:5px;
-    }
-    #calGrid {
-      display:grid;
-      grid-template-columns:auto auto auto auto auto auto auto;
-      padding:10px;
-    }
-    .calDayName, .calDayStyle, .calAdjacentMonthDay, #calTitle {
-      padding:5px;
-      font-size:20px;
-      text-align:center;
-    }
-    .calDayStyle:hover, .calCtrl:hover {
-      color:white;
-      background-color:black;
-      cursor:default;
-    }
-    .calHiddenRow {
-      display:none;
-    }
-    .calAdjacentMonthDay {
-      color:lightgray;
-    }
-    .calSelectedDay {
-      color:red;
-      font-weight:bold;
-    }
-    #calTitle {
-      width:110px;
-    }
-    .calCtrl {
-      font-size:20px;
-      padding:0px 8px;
-      user-select:none;
-    }
-    </style>
-    <div id="calContainer" tabindex="0">
-      <div id="calHeader">
-        <div id="calCtrlPrevYear" class="calCtrl">&#9668;&#9668;</div>
-        <div id="calCtrlPrevMonth" class="calCtrl">&#9668;</div>
-        <div id="calTitle"></div>
-        <div id="calCtrlNextMonth" class="calCtrl">&#9658;</div>
-        <div id="calCtrlNextYear" class="calCtrl">&#9658;&#9658;</div>
-        <div id="calCtrlHideCal" class="calCtrl">&#10005;</div>
-      </div>
-      <div id="calGrid">
-        <div class="calDayName"></div>
-        <div class="calDayName"></div>
-        <div class="calDayName"></div>
-        <div class="calDayName"></div>
-        <div class="calDayName"></div>
-        <div class="calDayName"></div>
-        <div class="calDayName"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-        <div class="calDay"></div>
-      </div>
-    </div>`
+        // Set Default Properties:
+        this.dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        this.sundayFirst = false;
+        this.persistOnSelect = false;
+        this.longPressThreshold = 500;
+        this.longPressInterval = 150;
+        this.initDate = null;
+        this.ignoreOnFocus = false;
+        this.showCloseIcon = false;
+        this._inputStrIsValidDate = false;
+        this._longPressIntervalIds = [];
+        this._longPressTimerIds = [];
+
+        // Setup Shadow DOM:
+        const template = document.getElementById("datepicker-template");
+        if(!template) {
+            console.error("Template 'datepicker-template' not found!");
+            return;
+        }
+        this.shadow = this.attachShadow({ mode:"closed" });
+        this.shadow.append(template.content.cloneNode(true));
     }
 
-    static get observedAttributes() {
-        return ['init-date',
-            'ignore-on-focus',
-            'sunday-first',
-            'persist-on-select',
-            'show-close-icon']
-    }
+    static observedAttributes = ["init-date", "ignore-on-focus", "persist-on-select", "show-close-icon"];
 
     attributeChangedCallback(name, oldValue, newValue) {
         if (name === 'init-date') {
-            this.initDate = newValue
+            this.initDate = newValue;
         } else if (name === 'ignore-on-focus') {
-            this.ignoreOnFocus = true
-        } else if (name === 'sunday-first') {
-            this.sundayFirst = true
+            this.ignoreOnFocus = true;
         } else if (name === 'persist-on-select') {
-            this.persistOnSelect = true
+            this.persistOnSelect = true;
         } else if (name === 'show-close-icon') {
-            this.showCloseIcon = true
+            this.showCloseIcon = true;
         }
     }
 
     connectedCallback() {
-        setTimeout(() => { this.init() }, 0) // https://stackoverflow.com/questions/58676021/accessing-custom-elements-child-element-without-using-slots-shadow-dom
-    }
-
-    init() {
-        this.textInputElement = this.querySelector('input')
-        if (this.textInputElement === null) {
-            return
+        // Find Internal Shadow DOM Elements:
+        this.calContainer = this.shadow.querySelector("#calContainer");
+        this.calTitle = this.shadow.querySelector("#calTitle");
+        
+        // Initialize Slotted Elements:
+        const dateInputSlot = this.shadow.querySelector("slot[name='date-input']"); // slot reference
+        this.dateInputElement = dateInputSlot.assignedElements()[0]; // returns slotted element or default element from template
+        if(!this.dateInputElement) {
+            return;
         }
-        var mainContainer = document.createElement('div')
-        mainContainer.style.display = 'inline-block'
-        if (this.container) {
-            this.container.remove()
-        }
-        this.container = this.appendChild(mainContainer) // The returned value is the appended child
 
-        const template = document.createElement("template")
-        template.innerHTML = this._calTemplate
-
-        this.container.appendChild(this.textInputElement)
-        this.container.appendChild(template.content)
-
-        this.calTitle = this.querySelector('#calTitle')
-        this.calContainer = this.querySelector('#calContainer')
-        this.dateObj = new Date()
+        this.dateObj = new Date(); // this will hold the selected date
         var obj
 
         if (this.initDate !== null) {
@@ -291,13 +59,13 @@ class DateTimePicker extends HTMLElement {
             if (obj.valid) {
                 this.dateObj = new Date(obj.year, obj.month, obj.day)
                 this._inputStrIsValidDate = true
-                this.textInputElement.value = this._returnDateString(this.dateObj)
+                this.dateInputElement.value = this._returnDateString(this.dateObj)
             } else if (this.initDate === 'current') {
                 this._inputStrIsValidDate = true
-                this.textInputElement.value = this._returnDateString(this.dateObj)
+                this.dateInputElement.value = this._returnDateString(this.dateObj)
             }
         } else {
-            obj = this._parseAndValidateInputStr(this.textInputElement.value)
+            obj = this._parseAndValidateInputStr(this.dateInputElement.value)
             if (obj.valid) {
                 this.dateObj = new Date(obj.year, obj.month, obj.day)
                 this._inputStrIsValidDate = true
@@ -310,27 +78,28 @@ class DateTimePicker extends HTMLElement {
         this.displayedMonth = this.dateObj.getMonth()
         this.displayedYear = this.dateObj.getFullYear()
 
-        this.calContainer.style.display = 'none'
+        this.calContainer.style.display = 'none' // Already hidden by CSS, but good to be explicit
         this._populateDayNames()
         this._addHeaderEventHandlers()
         this._renderCalendar()
 
         if (!this.ignoreOnFocus) {
-            this.textInputElement.onfocus = this._inputOnFocusHandler
-            this.textInputElement.onfocus = this.textInputElement.onfocus.bind(this)
+            // The original used 'onfocus', which is good.
+            this.dateInputElement.onfocus = this._inputOnFocusHandler.bind(this)
         }
+        
+        // This is what you asked for: open the picker on click.
+        // We'll just trigger the same 'onfocus' handler.
+        this.dateInputElement.addEventListener("click", this._inputOnFocusHandler.bind(this));
 
-        this.textInputElement.oninput = this._inputOnInputHandler
-        this.textInputElement.oninput = this.textInputElement.oninput.bind(this)
+        this.dateInputElement.oninput = this._inputOnInputHandler.bind(this)
+        this.dateInputElement.onblur = this._blurHandler.bind(this)
 
-        this.textInputElement.onblur = this._blurHandler
-        this.textInputElement.onblur = this.textInputElement.onblur.bind(this)
-
-        this.calContainer.onblur = this._blurHandler
-        this.calContainer.onblur = this.calContainer.onblur.bind(this)
+        this.calContainer.onblur = this._blurHandler.bind(this)
 
         if (!this.showCloseIcon) {
-            this.querySelector('#calCtrlHideCal').style.display = 'none'
+            // *** FIXED SELECTOR ***
+            this.shadow.querySelector('#calCtrlHideCal').style.display = 'none'
         }
     }
 
@@ -341,11 +110,13 @@ class DateTimePicker extends HTMLElement {
         }
     }
 
+    // --- All original methods copied below, with selector fixes ---
+    
     _dayClickedEventHandler(event) {
         this._inputStrIsValidDate = true
         this._setNewDateValue(event.target.innerHTML, this.displayedMonth, this.displayedYear)
-        this.textInputElement.value = this._returnDateString(this.dateObj)
-        this.textInputElement.dispatchEvent(new CustomEvent('dateselect'))
+        this.dateInputElement.value = this._returnDateString(this.dateObj)
+        this.dateInputElement.dispatchEvent(new CustomEvent('dateselect'))
         this._renderCalendar()
         if (!this.persistOnSelect) {
             this._hideCalendar()
@@ -353,7 +124,10 @@ class DateTimePicker extends HTMLElement {
     }
 
     _hideCalendar() {
-        document.activeElement.blur()
+        if (document.activeElement === this.dateInputElement) {
+             this.dateInputElement.blur();
+        }
+        this.calContainer.style.display = 'none'
     }
 
     _calKeyDownEventHandler(event) {
@@ -363,11 +137,10 @@ class DateTimePicker extends HTMLElement {
     }
 
     _blurHandler() {
-        // When the input element loses focus due to click on calContainer, new focus won't be directly set to calContainer, it is set to body.
-        // After calContainer onclick, focus will be on body unless following delay is introduced:
         setTimeout(() => { checkActiveElement(this) }, 0)
         function checkActiveElement(ctx) {
-            if (!(document.activeElement.id === 'calContainer' || document.activeElement.classList.contains('calCtrl') || document.activeElement.classList.contains('calDay') || document.activeElement.isSameNode(ctx.textInputElement))) {
+            // Check if the new active element is *outside* the component's shadow DOM
+            if (ctx.shadow.activeElement === null) {
                 ctx.calContainer.style.display = 'none'
                 ctx._mouseUpEventHandler()
                 if (!ctx._inputStrIsValidDate) {
@@ -378,42 +151,33 @@ class DateTimePicker extends HTMLElement {
     }
 
     _addHeaderEventHandlers() {
-        var entries = this.calContainer.querySelectorAll('.calCtrl').entries()
+        // This is OK, as this.calContainer is already scoped to shadow DOM
+        var entries = this.calContainer.querySelectorAll('.calCtrl').entries() 
         var entry = entries.next()
         while (entry.done === false) {
             entry.value[1].tabIndex = 0
-            entry.value[1].onblur = this._blurHandler
-            entry.value[1].onblur = entry.value[1].onblur.bind(this)
-            entry.value[1].onclick = this._controlKeyDownEventHandler
-            entry.value[1].onclick = entry.value[1].onclick.bind(this)
-            entry.value[1].onkeydown = this._controlKeyDownEventHandler
-            entry.value[1].onkeydown = entry.value[1].onkeydown.bind(this)
-            entry.value[1].onmousedown = this._mouseDownEventHandler
-            entry.value[1].onmousedown = entry.value[1].onmousedown.bind(this)
-            entry.value[1].onmouseup = this._mouseUpEventHandler
-            entry.value[1].onmouseup = entry.value[1].onmouseup.bind(this)
-            entry.value[1].onmouseleave = this._mouseUpEventHandler
-            entry.value[1].onmouseleave = entry.value[1].onmouseleave.bind(this)
-            entry.value[1].ontouchstart = this._mouseDownEventHandler
-            entry.value[1].ontouchstart = entry.value[1].ontouchstart.bind(this)
-            entry.value[1].ontouchend = this._mouseUpEventHandler
-            entry.value[1].ontouchend = entry.value[1].ontouchend.bind(this)
-            entry.value[1].ontouchcancel = this._mouseUpEventHandler
-            entry.value[1].ontouchcancel = entry.value[1].ontouchcancel.bind(this)
+            entry.value[1].onblur = this._blurHandler.bind(this)
+            entry.value[1].onclick = this._controlKeyDownEventHandler.bind(this)
+            entry.value[1].onkeydown = this._controlKeyDownEventHandler.bind(this)
+            entry.value[1].onmousedown = this._mouseDownEventHandler.bind(this)
+            entry.value[1].onmouseup = this._mouseUpEventHandler.bind(this)
+            entry.value[1].onmouseleave = this._mouseUpEventHandler.bind(this)
+            entry.value[1].ontouchstart = this._mouseDownEventHandler.bind(this)
+            entry.value[1].ontouchend = this._mouseUpEventHandler.bind(this)
+            entry.value[1].ontouchcancel = this._mouseUpEventHandler.bind(this)
             entry = entries.next()
         }
     }
 
     _startLongPressAction(event) {
         this._longPressIntervalIds.push(setInterval(() => { this._controlKeyDownEventHandler(event) }, this.longPressInterval))
-        this.querySelector('#' + event.target.id).onclick = () => { this._onClickHandlerAfterLongPress(event, this) }
+        // *** FIXED SELECTOR ***
+        this.shadow.querySelector('#' + event.target.id).onclick = () => { this._onClickHandlerAfterLongPress(event, this) }
     }
 
-    // For better UX, after long press, onclick must be discarded once,
-    // thus do nothing with the event and set clickhandler back to the real one:
     _onClickHandlerAfterLongPress(event, ctx) {
-        ctx.querySelector('#' + event.target.id).onclick = ctx._controlKeyDownEventHandler
-        ctx.querySelector('#' + event.target.id).onclick = ctx.querySelector('#' + event.target.id).onclick.bind(ctx)
+        // *** FIXED SELECTOR ***
+        ctx.shadow.querySelector('#' + event.target.id).onclick = ctx._controlKeyDownEventHandler.bind(ctx)
     }
 
     _mouseDownEventHandler(event) {
@@ -450,13 +214,13 @@ class DateTimePicker extends HTMLElement {
     }
 
     _inputOnInputHandler() {
-        var obj = this._parseAndValidateInputStr(this.textInputElement.value)
+        var obj = this._parseAndValidateInputStr(this.dateInputElement.value)
         if (obj.valid) {
             this._inputStrIsValidDate = true
             this._setNewDateValue(obj.day, obj.month, obj.year)
             this.displayedMonth = obj.month
             this.displayedYear = obj.year
-            this.textInputElement.dispatchEvent(new CustomEvent('dateselect'))
+            this.dateInputElement.dispatchEvent(new CustomEvent('dateselect'))
             this._renderCalendar()
         } else {
             this._inputStrIsValidDate = false
@@ -496,6 +260,7 @@ class DateTimePicker extends HTMLElement {
         }
     }
 
+    // This is the method you wanted to call "openPicker"
     _inputOnFocusHandler() {
         this._inputOnInputHandler()
         this.calContainer.style.display = 'block'
@@ -538,6 +303,8 @@ class DateTimePicker extends HTMLElement {
         var dayNumbers = []
         var adjacentMonthDays = []
         this._generateDayArray(tempDate, dayNumbers, adjacentMonthDays)
+        
+        // This is OK, as this.calContainer is already scoped to shadow DOM
         var entries = this.calContainer.querySelectorAll('.calDay').entries()
         var entry = entries.next()
         while (entry.done === false) {
@@ -558,20 +325,16 @@ class DateTimePicker extends HTMLElement {
                 entry.value[1].classList.add('calSelectedDay')
             }
             if (!adjacentMonthDays[entry.value[0]]) {
-                entry.value[1].onclick = this._dayClickedEventHandler
-                entry.value[1].onclick = entry.value[1].onclick.bind(this)
-                entry.value[1].onkeydown = this._calKeyDownEventHandler
-                entry.value[1].onkeydown = entry.value[1].onkeydown.bind(this)
+                entry.value[1].onclick = this._dayClickedEventHandler.bind(this)
+                entry.value[1].onkeydown = this._calKeyDownEventHandler.bind(this)
                 entry.value[1].tabIndex = 0
-                entry.value[1].onblur = this._blurHandler
-                entry.value[1].onblur = entry.value[1].onblur.bind(this)
+                entry.value[1].onblur = this._blurHandler.bind(this)
             } else {
                 entry.value[1].removeAttribute('tabindex')
             }
             entry = entries.next()
         }
 
-        // checking if last (=lowest) row of days are all adjacent month days:
         var lastSeven = adjacentMonthDays.slice(35, 42)
         if (lastSeven.every(x => x === true)) {
             entries = this.calContainer.querySelectorAll('.calDay').entries()
@@ -604,20 +367,16 @@ class DateTimePicker extends HTMLElement {
         month = Number(month)
         year = Number(year)
         if (day !== this.dateObj.getDate() || month !== this.dateObj.getMonth() || year !== this.dateObj.getFullYear()) {
-            // Order is important, always set year first:
             this.dateObj.setFullYear(year)
-            // Do not use setDate here:
-            // this.dateObj.setDate(day) <-- https://stackoverflow.com/questions/14680396/the-date-getmonth-method-has-bug
-            // Use setMonth with 2 params instead:
             this.dateObj.setMonth(month, day)
         }
     }
 
     _returnDateString(date) {
-        var year = date.getFullYear()
-        var month = date.getMonth() + 1
-        var day = date.getDate()
-        return day + '.' + month + '.' + year
+        const split = date.toISOString().split('T')
+        const dateString = split[0]
+        const timeString = split[1]
+        return dateString
     }
 
     _populateDayNames() {
@@ -627,6 +386,7 @@ class DateTimePicker extends HTMLElement {
             dayNameArray.pop()
             dayNameArray.unshift(this.dayNames[6])
         }
+        // This is OK, as this.calContainer is already scoped to shadow DOM
         var entries = this.calContainer.querySelectorAll('.calDayName').entries()
         var entry = entries.next()
         while (entry.done === false) {
@@ -647,7 +407,6 @@ class DateTimePicker extends HTMLElement {
         var prevMonthYear = date.getFullYear()
         var daysInPrevMonth = this._daysInMonth(prevMonth, prevMonthYear)
 
-        // prev month day filling:
         if (this.sundayFirst) {
             for (index = 0; index < dateDay; index++) {
                 dayArray.unshift(daysInPrevMonth)
@@ -670,13 +429,11 @@ class DateTimePicker extends HTMLElement {
             }
         }
 
-        // current month day filling:
         for (index = 0; index < daysInMonth; index++) {
             dayArray.push(index + 1)
             adjacentMonthDaysArray.push(false)
         }
 
-        // next month day filling:
         var numberOfNextMonthDays = 42 - dayArray.length
         for (index = 0; index < numberOfNextMonthDays; index++) {
             dayArray.push(index + 1)
@@ -701,4 +458,5 @@ class DateTimePicker extends HTMLElement {
     }
 }
 
-customElements.define("datetime-picker", DateTimePicker)
+// Define the new component
+customElements.define('datetime-picker', DateTimePicker);
