@@ -7,16 +7,19 @@
  * <script src="https://unpkg.com/mdui@2/mdui.global.js"></script>
  */
 class DateTimePicker extends HTMLElement {
-    static observedAttributes = ["init-date", "ignore-on-focus", "persist-on-select"];
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // Web Component Lifecycle Hooks:
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    static observedAttributes = ["init-date", "confirm-on-select"];
 
     constructor() {
         super()
         // Set Default Properties:
         this.dayNames = ["M","T","W","T","F","S","S"];
         this.monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-        this.closeOnSelect = false;
+        this.confirmOnSelect = false;
         this.initDate = null;
-        this.ignoreOnFocus = false;
 
         // Setup Shadow DOM:
         const template = document.getElementById("datepicker-template");
@@ -31,179 +34,128 @@ class DateTimePicker extends HTMLElement {
     attributeChangedCallback(name, oldValue, newValue) {
         if(name === "init-date") {
             this.initDate = newValue;
-        } else if(name === "ignore-on-focus") {
-            this.ignoreOnFocus = true;
-        } else if(name === "close-on-select") {
-            this.closeOnSelect = true;
+        } else if(name === "confirm-on-select") {
+            this.confirmOnSelect = true;
         }
     }
 
     connectedCallback() {
         // Find Internal Shadow DOM Elements:
-        this.containerElement = this.shadow.querySelector("#date-picker");
-        this.headline = this.shadow.querySelector("#headline");
-        this.headlineMonth = this.shadow.querySelector("#headlineMonth");
-        this.headlineYear = this.shadow.querySelector("#headlineYear");
+        this.containerElement = this.shadow.querySelector("#container");
 
         // Initialize Date Object (holds picked datetime):
         if(this.initDate === null) {
-            this.dateObj = new Date(); // use current datetime
-            this.confirmedDateObj = new Date();
+            this.selectedDate = new Date(); // use current datetime
+            this.confirmedDate = new Date();
         } else if(this.#isValidDatetimeString(this.initDate)) {
-            this.dateObj = new Date(this.initDate); // use ISO datetime string
-            this.confirmedDateObj = new Date(this.initDate);
+            this.selectedDate = new Date(this.initDate); // use ISO datetime string
+            this.confirmedDate = new Date(this.initDate);
         } else { // invalid datetime string
             throw new Error(`Attribute 'init-date' has an invalid string format: "${this.initDate}". Use ISO format YYYY-MM-DDThh:mm:ss.zzz`);
         }
         
-        // Initialize Slotted Elements:
-        const dateInputSlot = this.shadow.querySelector("slot[name='date-input']"); // slot reference
-        this.dateInputElement = dateInputSlot.assignedElements()[0]; // returns slotted element or default element from template
-        if(!this.dateInputElement) {
-            return;
-        }
-        this.dateInputElement.value = this.#toDateString(this.dateObj);
-
-        const timeInputSlot = this.shadow.querySelector("slot[name='time-input']");
-        this.timeInputElement = timeInputSlot.assignedElements()[0];
-        if(!this.timeInputElement) {
-            return;
-        }
-        this.timeInputElement.value = this.#toTimeString(this.dateObj);
-        
         // Initialize Internal State:
-        this.displayedMonth = this.dateObj.getMonth();
-        this.displayedYear = this.dateObj.getFullYear();
-        this.containerElement.style.display = "none";
+        this.displayedMonth = this.selectedDate.getMonth();
+        this.displayedYear = this.selectedDate.getFullYear();
         this.#populateDayNames();
         this.#renderCalendar();
 
-        // Setup Event Handlers:
-        if(!this.ignoreOnFocus) {
-            this.dateInputElement.onfocus = () => { this.#openDatePicker() };
-        }
-        this.dateInputElement.addEventListener("click", () => { this.#openDatePicker() });
-        this.dateInputElement.oninput = () => { this.#onInputHandler() };
-        this.dateInputElement.onblur = () => { this.#blurHandler() };
-        this.containerElement.onblur = () => { this.#blurHandler() };
-
         // Setup Control Buttons:
         const btnNextYear = this.shadow.querySelector("#btnNextYear");
-        if(btnNextYear) { btnNextYear.addEventListener("click", () => { this.#showNextYear(); }); }
+        if(btnNextYear) { btnNextYear.addEventListener("click", () => { this.showNextYear() }); }
         const btnPrevYear = this.shadow.querySelector("#btnPrevYear");
-        if(btnPrevYear) { btnPrevYear.addEventListener("click", () => { this.#showPrevYear(); }); }
+        if(btnPrevYear) { btnPrevYear.addEventListener("click", () => { this.showPrevYear() }); }
         const btnNextMonth = this.shadow.querySelector("#btnNextMonth");
-        if(btnNextMonth) { btnNextMonth.addEventListener("click", () => { this.#showNextMonth(); }); }
+        if(btnNextMonth) { btnNextMonth.addEventListener("click", () => { this.showNextMonth() }); }
         const btnPrevMonth = this.shadow.querySelector("#btnPrevMonth");
-        if(btnPrevMonth) { btnPrevMonth.addEventListener("click", () => { this.#showPrevMonth(); }); }
+        if(btnPrevMonth) { btnPrevMonth.addEventListener("click", () => { this.showPrevMonth() }); }
         const btnCancelDatePicker = this.shadow.querySelector("#btnCancelDatePicker");
-        if(btnCancelDatePicker) { btnCancelDatePicker.addEventListener("click", () => { this.#closeDatePicker(); }); }
+        if(btnCancelDatePicker) { btnCancelDatePicker.addEventListener("click", () => { this.resetDateValue() }); }
         const btnConfirmDatePicker = this.shadow.querySelector("#btnConfirmDatePicker");
-        if(btnConfirmDatePicker) { btnConfirmDatePicker.addEventListener("click", () => { this.#confirmDatePicker(); }); }
+        if(btnConfirmDatePicker) { btnConfirmDatePicker.addEventListener("click", () => { this.confirmDateValue() }); }
     }
 
-    setFocusOnCal() {
-        if(this.containerElement) {
-            this.containerElement.style.display = "block";
-            this.containerElement.focus();
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // Getters and Setters:
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Returns the currently selected date
+     * @returns Date() object
+     */
+    get selectedDateObj() {
+        return this.selectedDate;
+    }
+
+    /**
+     * Updates the currenlty selected date. The 'select' event is emitted depending on the given
+     * setting of 'fireSelectEvent'.
+     * @param {Date} date selected object to update
+     */
+    set selectedDateObj(date) {
+        console.assert(date instanceof Date, "Given date has to be of type 'Date'");
+        this.selectedDate = new Date(date); // clone date object
+        this.#selectDateValue(this.selectedDate.getDate(), this.selectedDate.getMonth(), this.selectedDate.getFullYear());
+    }
+
+    /**
+     * Returns the currently confirmed date
+     * @returns Date() object
+     */
+    get confirmedDateObj() {
+        return this.confirmedDate;
+    }
+
+    /**
+     * Updates the currenlty confirmed date. Updating the confirmed date automatically updates the
+     * selected date. The events 'select' and 'confirm' are emitted based on the given parameters.
+     * @param {Date} date confirmedDate date object
+     */
+    set confirmedDateObj(date) {
+        console.assert(date instanceof Date, "Given date has to be of type 'Date'");
+        this.#selectDateValue(this.selectedDate.getDate(), this.selectedDate.getMonth(), this.selectedDate.getFullYear());
+        this.confirmDateValue();
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // Public Methods:
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * This function takes the currently selected date and confirms it. A confirmed date cannot be
+     * reset to any previous date. See 'resetDateValue()' for more details. The 'confirm' event is
+     * emitted depending on the given parameter.
+     * @param {Boolean} fireConfirmEvent if true the 'confirm' event is emitted, otherwise not
+     * @info Call this function if the 'OK' button is clicked
+     */
+    confirmDateValue(fireConfirmEvent = true) {
+        this.confirmedDate = new Date(this.selectedDate);
+        if(fireConfirmEvent) {
+            this.dispatchEvent(new CustomEvent("confirm"));
         }
     }
 
-    getDateString() {
-        return this.#toDateString(this.dateObj);
-    }
-
-    getDateObject() {
-        return this.dateObj;
-    }
-
-    #openDatePicker() {
-        this.containerElement.style.display = "block";
-    }
-
-    #closeDatePicker() {
-        if(document.activeElement === this.dateInputElement) {
-            this.dateInputElement.blur();
-        }
-        this.#resetDateValue();
-        this.containerElement.style.display = "none";
-    }
-
-    #confirmDatePicker() {
-        this.#confirmDateValue();
-        this.#closeDatePicker();
-    }
-
-    #setDateValue(day, month, year) {
-        this.dateObj.setFullYear(Number(year));
-        this.dateObj.setMonth(Number(month), Number(day));
-        this.dateInputElement.value = this.#toDateString(this.dateObj);
+    /**
+     * This function resets the currently selected date to the last confirmed date. A selected but
+     * not yet confirmed date can be reset to the las confirmed date. The 'select' event is
+     * emitted because the selection is updated.
+     * @param {Boolean} fireResetEvent if true the 'reset' event is emitted, otherwise not
+     * @info Call this function if the 'Cancel' button is clicked
+     */
+    resetDateValue(fireResetEvent = true) {
+        this.selectedDate = new Date(this.confirmedDate); // reset to prev confirmed date
+        this.#selectDateValue(this.confirmedDate.getDate(), this.confirmedDate.getMonth(), this.confirmedDate.getFullYear());
         this.#renderCalendar();
-        this.dateInputElement.dispatchEvent(new CustomEvent("dateselect"));
-    }
-
-    #resetDateValue() {
-        this.dateObj = new Date(this.confirmedDateObj); // reset to prev confirmed date
-        this.dateInputElement.value = this.#toDateString(this.dateObj);
-        this.#renderCalendar();
-    }
-
-    #confirmDateValue() {
-        this.confirmedDateObj = new Date(this.dateObj);
-        this.dateInputElement.dispatchEvent(new CustomEvent("dateconfirm"));
-    }
-
-    #dayClickedEventHandler(event) {
-        const clickedDay = event.target.innerHTML;
-        this.#setDateValue(clickedDay, this.displayedMonth, this.displayedYear);
-        // this.dateInputElement.value = this.#toDateString(this.dateObj);
-        // this.dateInputElement.dispatchEvent(new CustomEvent("dateselect"));
-        // this.#renderCalendar();
-        if(this.closeOnSelect) {
-            this.#confirmDateValue(this.dateObj);
-            this.#closeDatePicker();
+        if(fireResetEvent) {
+            this.dispatchEvent(new CustomEvent("reset"));
         }
     }
 
-    #blurHandler() {
-        const checkActiveElement = () => {
-            if(this.shadow.activeElement === null) { // check if new active element is outside the component's shadow DOM
-                console.log("Checked: active element not in shadow DOM");
-                this.containerElement.style.display = "none";
-            }
-        }
-        setTimeout(() => { /*checkActiveElement()*/ }, 0); // wait for all async blur events to fire
-    }
-
-    #isValidDatetimeString(str) {
-        const ISO_FORMAT = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(?:\.\d{3})?)?$/;
-        return ISO_FORMAT.test(str);
-    }
-
-    #onInputHandler() {
-        if(!this.#isValidDatetimeString(this.dateInputElement.value)) {
-            throw new Error(`Input value "${this.dateInputElement}" has an invalid string format: "${this.initDate}". Use ISO format YYYY-MM-DDThh:mm:ss.zzz`);
-        }
-        const obj = new Date(this.dateInputElement.value);
-        this.#setDateValue(obj.getDate(), obj.getMonth(), obj.getFullYear());
-        this.#confirmDateValue();
-        this.displayedMonth = obj.month;
-        this.displayedYear = obj.year;
-        this.dateInputElement.dispatchEvent(new CustomEvent("dateselect"));
-        this.#renderCalendar();
-    }
-
-    #showNextYear() {
-        this.displayedYear++;
-        this.#renderCalendar();
-    }
-
-    #showPrevYear() {
-        this.displayedYear--;
-        this.#renderCalendar();
-    }
-
-    #showNextMonth() {
+    /**
+     * This function increments the currently shown month
+     * @info Call this function if the 'nextMonth' button is clicked
+     */
+    showNextMonth() {
         if(this.displayedMonth === 11) {
             this.displayedMonth = 0;
             this.displayedYear++;
@@ -213,7 +165,11 @@ class DateTimePicker extends HTMLElement {
         this.#renderCalendar();
     }
 
-    #showPrevMonth() {
+    /**
+     * This function decrements the currently shown month
+     * @info Call this function if the 'prevMonth' button is clicked
+     */
+    showPrevMonth() {
         if(this.displayedMonth === 0) {
             this.displayedMonth = 11;
             this.displayedYear--;
@@ -223,12 +179,50 @@ class DateTimePicker extends HTMLElement {
         this.#renderCalendar();
     }
 
-    #renderCalendar() {
-        // Set Headline:
-        this.headline.innerHTML = ("0"+this.dateObj.getDate()).slice(-2)+"."+("0"+this.displayedMonth).slice(-2)+"."+this.displayedYear;
-        this.headlineMonth.innerHTML = this.monthNames[this.displayedMonth];
-        this.headlineYear.innerHTML = this.displayedYear;
+    /**
+     * This function increments the currently shown year
+     * @info Call this function if the 'nextYear' button is clicked
+     */
+    showNextYear() {
+        this.displayedYear++;
+        this.#renderCalendar();
+    }
 
+    /**
+     * This function decrements the currently shown year
+     * @info Call this function if the 'prevYear' button is clicked
+     */
+    showPrevYear() {
+        this.displayedYear--;
+        this.#renderCalendar();
+    }
+
+    getMonthLabel() {
+        return this.monthNames[this.displayedMonth];
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // Private Methods:
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    #selectDateValue(day, month, year, fireSelectEvent = true) {
+        this.selectedDate.setFullYear(Number(year));
+        this.selectedDate.setMonth(Number(month), Number(day));
+        this.#renderCalendar();
+        if(fireSelectEvent) {
+            this.dispatchEvent(new CustomEvent("select"));
+        }
+    }
+
+    #dayClickedEventHandler(event) {
+        const clickedDay = event.target.innerHTML;
+        this.#selectDateValue(clickedDay, this.displayedMonth, this.displayedYear);
+        if(this.confirmOnSelect) {
+            this.confirmDateValue();
+        }
+    }
+
+    #renderCalendar() {
         // Generate Day Array:
         let dayNumbers = [];
         let adjacentMonthDays = [];
@@ -250,15 +244,11 @@ class DateTimePicker extends HTMLElement {
                 dayElement.classList.add("hover");
             }
             dayElement.innerHTML = dayNumbers[idx]
-            if (this.displayedMonth === this.dateObj.getMonth() && this.displayedYear === this.dateObj.getFullYear() && dayNumbers[idx] === this.dateObj.getDate() && !adjacentMonthDays[idx]) {
+            if (this.displayedMonth === this.selectedDate.getMonth() && this.displayedYear === this.selectedDate.getFullYear() && dayNumbers[idx] === this.selectedDate.getDate() && !adjacentMonthDays[idx]) {
                 dayElement.classList.add("selectedDay");
             }
             if(!adjacentMonthDays[idx]) {
-                dayElement.onclick = this.#dayClickedEventHandler.bind(this);
-                dayElement.tabIndex = 0;
-                dayElement.onblur = () => { this.#blurHandler() };
-            } else {
-                dayElement.removeAttribute("tabindex");
+                dayElement.onclick = (event) => { this.#dayClickedEventHandler(event) };
             }
         }
 
@@ -268,24 +258,10 @@ class DateTimePicker extends HTMLElement {
             const dayElements = this.containerElement.querySelectorAll(".day")
             for(const [idx,dayElement] of dayElements.entries()) {
                 if(idx > 34) {
-                    dayElement.classList.add("hidden")
+                    dayElement.classList.add("hidden");
                 }
             }
         }
-    }
-
-    #toDateString(date) {
-        const split = date.toISOString().split("T");
-        const dateString = split[0];
-        const timeString = split[1].slice(0, -1);
-        return dateString;
-    }
-
-    #toTimeString(date) {
-        const split = date.toISOString().split("T");
-        const dateString = split[0];
-        const timeString = split[1].slice(0, -1);
-        return timeString;
     }
 
     #populateDayNames() {
@@ -355,6 +331,11 @@ class DateTimePicker extends HTMLElement {
         } else if(month === 2 && !(this.#isLeapYear(year))) {
             return 28;
         }
+    }
+
+    #isValidDatetimeString(str) {
+        const ISO_FORMAT = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(?:\.\d{3})?)?$/;
+        return ISO_FORMAT.test(str);
     }
 }
 
