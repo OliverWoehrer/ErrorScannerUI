@@ -24,7 +24,7 @@
  * 'confirm-on-select' is true, both events 'select' and 'confirm' are emitted.
  * 
  * Here is a list of all events:
- * "select":    Emitted when the user selects a date
+ * "select":    Emitted when the user selects a date or the user discards any selection.
  * "confirmed": Emitted when a date is confirmed. This usually means the user has decided on a date
  *              and clicked on the 'confirm' element. Otherwise the user selected a date and the
  *              'confirm-on-select' attribute is true.
@@ -98,6 +98,33 @@
  *  <html>
  *  <head>
  *      <script defer src="DatePicker.js"></script>
+ *      <style>
+ *          date-picker {
+ *              --color-selected: darkblue;
+ *              --color-on-selected: white;
+ *              --shape-corner: 1000rem;
+ *          }
+ *          date-picker::part(day) {
+ *              border-radius: var(--shape-corner);
+ *          }
+ *          date-picker::part(inactive) {
+ *              color: green;
+ *          }
+ *          date-picker::part(selected) {
+ *              background-color: rgb(var(--color-selected));
+ *              border-color: rgb(var(--color-selected));
+ *              color: rgb(var(--color-on-selected));
+ *          }
+ *          date-picker::part(active):hover {
+ *              border-color: rgb(var(--color-selected));
+ *              border-style: solid;
+ *              border-width: 1px;
+ *          }
+ *          date-picker::part(selected):hover {
+ *              background-color: inherit;
+ *              color: inherit;
+ *          }
+ *      </style>
  *  </head>
  *  <body>
  *      <date-picker init-date="2025-10-18" confirm-on-select>
