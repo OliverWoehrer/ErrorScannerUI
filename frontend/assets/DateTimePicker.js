@@ -1,12 +1,205 @@
 /**
- * This component is based on <wc-datepicker> from https://github.com/vanillawc/wc-datepicker
- * It is intendet to extend the Material Design User Interface library (https://www.mdui.org)
+ * This component implements a calendar like date picker. The is always a confirmed date and a
+ * selected date. The selected date is the last date, the user clicked on. The selected date
+ * becomes confirmed when the user clicks on the 'confirm' button. If the user clicks on the
+ * 'cancel' button the selected date gets reset to the last confirmed date. This allows the user
+ * to discard any changes they made when selecting a new date.
+ *  
+ * [Attributes]
+ * Attributes are used to set or change the default behavior of the component
+ * "init-date":         The initial date that is displayed when the component is loaded. Has to be
+ *                      a string in ISO format YYYY-MM-DD. If the initial date is not set, the
+ *                      current date is used.
+ * "confirm-on-select": If this attribute is true, the selected date gets immediately confirmed
+ *                      when the user selects a date and both events 'select' and 'confirm' get
+ *                      emitted. If the attribute is false, the date only gets confirmed, when
+ *                      the user clicks the 'confirm' element. This allows the user to reset any
+ *                      selection previously made, by clicking the 'cancel' element.
+ *
  * 
- * Link MDUI styles sheet and MDUI components in your HTML head
- * <link rel="stylesheet" href="https://unpkg.com/mdui@2/mdui.css">
- * <script src="https://unpkg.com/mdui@2/mdui.global.js"></script>
+ * [Events]
+ * The component emits events every time the user selects, confirms or discards(=reset) a date. Use
+ * the 'select' and 'reset' event to update other parts of the UI, to reflect visual changes. Use
+ * the 'confirm' event to update functional parts of the application. If the attribute
+ * 'confirm-on-select' is true, both events 'select' and 'confirm' are emitted.
+ * 
+ * Here is a list of all events:
+ * "select":    Emitted when the user selects a date
+ * "confirmed": Emitted when a date is confirmed. This usually means the user has decided on a date
+ *              and clicked on the 'confirm' element. Otherwise the user selected a date and the
+ *              'confirm-on-select' attribute is true.
+ * "reset":     Emitted when the user discards any changes. This means the user clicked the
+ *              'cancel' element.
+ * 
+ * 
+ * [Slots]
+ * The component offers control elements for example to switch months, confirm a selection, etc.
+ * when they are clicked. These control elements can be slotted, which means custom component
+ * libraries can be used to implement click-able elements. The available slots and what happens
+ * when they are clicked by the user, can be seen below. If no element is slotted, a default
+ * <button> element is created instead.
+ * 
+ * All available slots are:
+ * "supporting-text":   Text to be displayed at the top, to help the user
+ * "prev-month-btn":    The previous month is displayed when this element is clicked
+ * "next-month-btn":    The next month is displayed when this element is clicked
+ * "prev-year-btn":     The previous year is displayed when this element is clicked
+ * "next-year-btn":     The next year is displayed when this element is clicked
+ * "cancel-btn":        The selected date is reset to the last confirmed date, when this element is
+ *                      clicked. The 'reset' event is emitted.
+ * "confirm-btn"        The selected date is confirmed when this element is clicked. The 'confirm'
+ *                      event is emitted.
+ * 
+ * 
+ * [Style]
+ * The style of the calendar grid itself can be customized, by using the available ::part()
+ * selectors in the style section.
+ * 
+ * All part-selector:
+ * "label":     Selects all weekday label elements (mon,tue,...)
+ * "day":       Selects all day elements of the main calendar grid. The calendar grid shows days of
+ *              the previous month, the current month and next month.
+ * "active":    Selects all days of the current month. Every 'active' part is also a 'day' part.
+ * "inactive":  Selects all day elements that are not active, so from the previous and next month.
+ *              Every 'inactive' part is also a 'day' part.
+ * "selected":  Selects the day element that is currently selected by the user
+ * 
+ *                      ╔═══════════════════════════════════════════════╗
+ *                      ║  ┌─────────────┐                              ║
+ *                      ║  │Select a date│◀──slot=supporting-text       ║
+ *                      ║  └─────────────┘                              ║
+ *                      ║  18. Oct 2025                                 ║
+ *                      ║                                               ║
+ *                      ║  ┌─┐     ┌─┐                    ┌─┐      ┌─┐  ║
+ * slot=next-month-btn──║─▶│<│ Oct │>│                    │<│ 2025 │>│◀─║──slot=next-year-btn
+ *                      ║  └─┘     └─┘                    └─┘      └─┘  ║
+ *                      ║  ┌─────────────────────────────────────────┐  ║
+ *                      ║  │ Mon   Tue   Wed   Thu   Fri   Sat   Sun │◀─║──part:label
+ *                      ║  ├────────────┬────────────────────────────┤  ║
+ *       part:inactive──║─▶│  29    30  │  1     2     3     4     5 │◀─║──part:day
+ *                      ║  ├────────────┘                            │  ║
+ *         part:active──║─▶│   6     7     8     9    10    11    12 │  ║
+ *                      ║  │                              ┌────┐◀────│──║──part:selected
+ *                      ║  │  13    14    15    16    17  │ 18 │  19 │  ║
+ *                      ║  │                              └────┘     │  ║
+ *                      ║  │  20    21    21    23    24    25    26 │  ║
+ *                      ║  │                             ┌───────────┤  ║
+ *                      ║  |  27    28    29    30    31 │   1     2 │  ║
+ *                      ║  ├─────────────────────────────┘           │  ║
+ *       part:inactive──║─▶|   3     4     5     6     7     8     9 │  ║
+ *                      ║  └─────────────────────────────────────────┘  ║
+ *                      ║                       ┌────────┐ ┌─────────┐  ║
+ * slot=cancel-btn──────║──────────────────────▶│ Cancel │ │ Confirm │◀─║──slot=confirm-button
+ *                      ║                       └────────┘ └─────────┘  ║
+ *                      ╚═══════════════════════════════════════════════╝
+ * 
+ * [Usage]
+ * This shows example usage of this component:
+ *  <html>
+ *  <head>
+ *      <script defer src="DatePicker.js"></script>
+ *  </head>
+ *  <body>
+ *      <date-picker init-date="2025-10-18" confirm-on-select>
+ *          <my-button slot="prev-month-btn">Prev Month</my-button>
+ *          <my-button slot="next-month-btn">Next Month</my-button>
+ *          <my-button slot="prev-year-btn">Prev Year</my-button>
+ *          <my-button slot="next-year-btn">Next Year</my-button>
+ *          <my-button slot="cancel-btn">Cancel</my-button>
+ *          <my-button slot="confirm-btn">OK</my-button>
+ *      </date-picker>
+ *  </body>
+ *  <script>
+ *      window.onload = () => {
+ *          const dayPicker = document.querySelector("date-picker");
+ *          if(dayPicker) {
+ *              datetimePicker.addEventListener("select", () => { console.log("onselect"); });
+ *              datetimePicker.addEventListener("confirm", () => { console.log("onconfirm"); });
+ *              datetimePicker.addEventListener("reset", reset() => { console.log("onreset"); });
+ *          }
+ *      }
+ *  </script>
+ *  <html>
+ * 
+ * 
+ * 
+ * This implementation is based on <wc-datepicker> from https://github.com/vanillawc/wc-datepicker
  */
-class DateTimePicker extends HTMLElement {
+const template = document.createElement("template");
+template.innerHTML = `
+<style>
+    :host {
+        --grid-margin: 10px;
+        display: block;
+        width: 100vw;
+        max-width: 100%;
+    }
+    header {
+        margin-bottom: 12px;
+    }
+    main {
+        display: grid;
+        grid-gap: var(--grid-margin);
+        grid-template-columns: repeat(7, 1fr);
+        margin-bottom: var(--grid-margin);
+    }
+    footer {
+        display: flex;
+        gap: var(--grid-margin);
+        justify-content: flex-end;
+    }
+    .flexRow {
+        align-items: center;
+        display: flex;
+        gap: var(--grid-margin);
+        justify-content: space-between;
+    }
+    .gridItem {
+        aspect-ratio: 1 / 1;
+        box-sizing: border-box;
+        cursor: default;
+        display: grid;
+        height: auto;
+        place-items: center;
+    }
+    [part~="selected"] {
+        border-style: solid;
+        border-width: 1px;   
+    }
+    [part~="inactive"] {
+        opacity: 0.4;
+    }
+</style>
+<div id="container">
+    <header>
+        <div style="opacity: 0.4">
+            <slot name="supporting-text"></slot>
+        </div>
+        <div id="headline"></div>
+        <div class="flexRow">
+            <div class="flexRow">
+                <slot name="prev-month-btn"><button>&#11207;</button></slot>
+                <span id="month">Month</span>
+                <slot name="next-month-btn"><button>&#11208;</button></slot>
+            </div>
+            <div class="flexRow">
+                <slot name="prev-year-btn"><button>&#11207;</button></slot>
+                <span id="year">Year</span>
+                <slot name="next-year-btn"><button>&#11208;</button></slot>
+            </div>
+        </div>
+    </header>
+    <main>
+        <!-- filled by'createGridItems()' on initialization -->
+    </main>
+    <footer class="footer">
+        <slot name="cancel-btn"><button>Cancel</button></slot>
+        <slot name="confirm-btn"><button>OK</button></slot>
+    </footer>
+</div>
+`;
+
+class DatePicker extends HTMLElement {
     //////////////////////////////////////////////////////////////////////////////////////////
     // Web Component Lifecycle Hooks:
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -22,11 +215,7 @@ class DateTimePicker extends HTMLElement {
         this.initDate = null;
 
         // Setup Shadow DOM:
-        const template = document.getElementById("datepicker-template");
-        if(!template) {
-            console.error("Template 'datepicker-template' not found!");
-            return;
-        }
+        if(!template) { throw new Error("No template found"); }
         this.shadow = this.attachShadow({ mode:"closed" });
         this.shadow.append(template.content.cloneNode(true));
     }
@@ -40,39 +229,47 @@ class DateTimePicker extends HTMLElement {
     }
 
     connectedCallback() {
-        // Find Internal Shadow DOM Elements:
-        this.containerElement = this.shadow.querySelector("#container");
+        // Build Template Structure:
+        this.#createGridItems();
 
         // Initialize Date Object (holds picked datetime):
         if(this.initDate === null) {
-            this.selectedDate = new Date(); // use current datetime
-            this.confirmedDate = new Date();
+            this.confirmedDateObj = new Date(); // use current datetime
         } else if(this.#isValidDatetimeString(this.initDate)) {
-            this.selectedDate = new Date(this.initDate); // use ISO datetime string
-            this.confirmedDate = new Date(this.initDate);
+            this.confirmedDateObj = new Date(this.initDate); // use ISO datetime string
         } else { // invalid datetime string
             throw new Error(`Attribute 'init-date' has an invalid string format: "${this.initDate}". Use ISO format YYYY-MM-DDThh:mm:ss.zzz`);
         }
-        
+
         // Initialize Internal State:
         this.displayedMonth = this.selectedDate.getMonth();
         this.displayedYear = this.selectedDate.getFullYear();
-        this.#populateDayNames();
         this.#renderCalendar();
+        
+        // Initialize Slotted Elements:
+        const prevMonthSlot = this.shadow.querySelector("slot[name='prev-month-btn']");
+        const prevMonthButton = prevMonthSlot.assignedNodes({ flatten:true })[0];
+        prevMonthButton.onclick = () => { this.#showPrevMonth() };
 
-        // Setup Control Buttons:
-        const btnNextYear = this.shadow.querySelector("#btnNextYear");
-        if(btnNextYear) { btnNextYear.addEventListener("click", () => { this.showNextYear() }); }
-        const btnPrevYear = this.shadow.querySelector("#btnPrevYear");
-        if(btnPrevYear) { btnPrevYear.addEventListener("click", () => { this.showPrevYear() }); }
-        const btnNextMonth = this.shadow.querySelector("#btnNextMonth");
-        if(btnNextMonth) { btnNextMonth.addEventListener("click", () => { this.showNextMonth() }); }
-        const btnPrevMonth = this.shadow.querySelector("#btnPrevMonth");
-        if(btnPrevMonth) { btnPrevMonth.addEventListener("click", () => { this.showPrevMonth() }); }
-        const btnCancelDatePicker = this.shadow.querySelector("#btnCancelDatePicker");
-        if(btnCancelDatePicker) { btnCancelDatePicker.addEventListener("click", () => { this.resetDateValue() }); }
-        const btnConfirmDatePicker = this.shadow.querySelector("#btnConfirmDatePicker");
-        if(btnConfirmDatePicker) { btnConfirmDatePicker.addEventListener("click", () => { this.confirmDateValue() }); }
+        const nextMonthSlot = this.shadow.querySelector("slot[name='next-month-btn']");
+        const nextMonthButton = nextMonthSlot.assignedNodes({ flatten:true })[0];
+        nextMonthButton.onclick = () => { this.#showNextMonth() };
+
+        const prevYearSlot = this.shadow.querySelector("slot[name='prev-year-btn']");
+        const prevYearButton = prevYearSlot.assignedNodes({ flatten:true })[0];
+        prevYearButton.onclick = () => { this.#showPrevYear() };
+
+        const nextYearSlot = this.shadow.querySelector("slot[name='next-year-btn']");
+        const nextYearButton = nextYearSlot.assignedNodes({ flatten:true })[0];
+        nextYearButton.onclick = () => { this.#showNextYear() };
+
+        const cancelSlot = this.shadow.querySelector("slot[name='cancel-btn']");
+        const cancelButton = cancelSlot.assignedNodes({ flatten:true })[0];
+        cancelButton.onclick = () => { this.#resetDateValue() };
+
+        const confirmSlot = this.shadow.querySelector("slot[name='confirm-btn']");
+        const confirmButton = confirmSlot.assignedNodes({ flatten:true })[0];
+        confirmButton.onclick = () => { this.#confirmDateValue() };
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -113,22 +310,45 @@ class DateTimePicker extends HTMLElement {
      */
     set confirmedDateObj(date) {
         console.assert(date instanceof Date, "Given date has to be of type 'Date'");
-        this.#selectDateValue(this.selectedDate.getDate(), this.selectedDate.getMonth(), this.selectedDate.getFullYear());
-        this.confirmDateValue();
+        this.#selectDateValue(date.getDate(), date.getMonth(), date.getFullYear());
+        this.#confirmDateValue();
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
-    // Public Methods:
+    // Private Methods:
     //////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Takes the given date parameters and sets the selected date object
+     * @param {Number} day date number
+     * @param {Number} month month index
+     * @param {Number} year full year number
+     * @param {Boolean} fireSelectEvent if true the 'select' event is emitted, otherwise not
+     */
+    #selectDateValue(day, month, year, fireSelectEvent = true) {
+        if(this.selectedDate) {
+            this.selectedDate.setFullYear(year);
+            this.selectedDate.setMonth(month, day);
+        } else {
+            this.selectedDate = new Date(year, month, day);
+        }
+        
+        const headline = this.shadow.querySelector("#headline");
+        if(headline) { headline.textContent = this.#toDateString(this.selectedDate); }
+        this.#renderCalendar();
+        if(fireSelectEvent) {
+            this.dispatchEvent(new CustomEvent("select"));
+        }
+    }
 
     /**
      * This function takes the currently selected date and confirms it. A confirmed date cannot be
      * reset to any previous date. See 'resetDateValue()' for more details. The 'confirm' event is
      * emitted depending on the given parameter.
      * @param {Boolean} fireConfirmEvent if true the 'confirm' event is emitted, otherwise not
-     * @info Call this function if the 'OK' button is clicked
+     * @info Call this function if the confirm button is clicked
      */
-    confirmDateValue(fireConfirmEvent = true) {
+    #confirmDateValue(fireConfirmEvent = true) {
         this.confirmedDate = new Date(this.selectedDate);
         if(fireConfirmEvent) {
             this.dispatchEvent(new CustomEvent("confirm"));
@@ -142,7 +362,7 @@ class DateTimePicker extends HTMLElement {
      * @param {Boolean} fireResetEvent if true the 'reset' event is emitted, otherwise not
      * @info Call this function if the 'Cancel' button is clicked
      */
-    resetDateValue(fireResetEvent = true) {
+    #resetDateValue(fireResetEvent = true) {
         this.selectedDate = new Date(this.confirmedDate); // reset to prev confirmed date
         this.#selectDateValue(this.confirmedDate.getDate(), this.confirmedDate.getMonth(), this.confirmedDate.getFullYear());
         this.#renderCalendar();
@@ -152,10 +372,23 @@ class DateTimePicker extends HTMLElement {
     }
 
     /**
+     * This function is called when the user clicks on a day element. Updates the selected date
+     * object.
+     * @param {Object} event Event object passed by the 'click' event
+     */
+    #dayClickedEventHandler(event) {
+        const clickedDay = event.target.innerHTML;
+        this.#selectDateValue(clickedDay, this.displayedMonth, this.displayedYear);
+        if(this.confirmOnSelect) {
+            this.#confirmDateValue();
+        }
+    }
+
+    /**
      * This function increments the currently shown month
      * @info Call this function if the 'nextMonth' button is clicked
      */
-    showNextMonth() {
+    #showNextMonth() {
         if(this.displayedMonth === 11) {
             this.displayedMonth = 0;
             this.displayedYear++;
@@ -169,7 +402,7 @@ class DateTimePicker extends HTMLElement {
      * This function decrements the currently shown month
      * @info Call this function if the 'prevMonth' button is clicked
      */
-    showPrevMonth() {
+    #showPrevMonth() {
         if(this.displayedMonth === 0) {
             this.displayedMonth = 11;
             this.displayedYear--;
@@ -183,7 +416,7 @@ class DateTimePicker extends HTMLElement {
      * This function increments the currently shown year
      * @info Call this function if the 'nextYear' button is clicked
      */
-    showNextYear() {
+    #showNextYear() {
         this.displayedYear++;
         this.#renderCalendar();
     }
@@ -192,135 +425,133 @@ class DateTimePicker extends HTMLElement {
      * This function decrements the currently shown year
      * @info Call this function if the 'prevYear' button is clicked
      */
-    showPrevYear() {
+    #showPrevYear() {
         this.displayedYear--;
         this.#renderCalendar();
     }
 
-    getMonthLabel() {
-        return this.monthNames[this.displayedMonth];
-    }
+    /**
+     * Creates the elements of the calendar grid. Only called once during initialization.
+     */
+    #createGridItems() {
+        const main = this.shadow.querySelector("main");
+        if(!main) { throw new Error("Could not query grid element. Template needs an element 'main'."); }
 
-    //////////////////////////////////////////////////////////////////////////////////////////
-    // Private Methods:
-    //////////////////////////////////////////////////////////////////////////////////////////
+        // Create Weekday Labels:
+        const weekdays = this.dayNames;
+        for(const weekday of weekdays) {
+            const labelElement = document.createElement("div");
+            labelElement.className = "gridItem"; // class 'gridItem' used for grid styling
+            labelElement.setAttribute("part", "label");
+            labelElement.innerHTML = weekday;
+            main.appendChild(labelElement);
+        }
 
-    #selectDateValue(day, month, year, fireSelectEvent = true) {
-        this.selectedDate.setFullYear(Number(year));
-        this.selectedDate.setMonth(Number(month), Number(day));
-        this.#renderCalendar();
-        if(fireSelectEvent) {
-            this.dispatchEvent(new CustomEvent("select"));
+        // Create Days:
+        for(let idx = 0; idx < 42; idx++) {
+            const dayElement = document.createElement("div");
+            dayElement.className = "gridItem"; // class 'gridItem' used for grid styling
+            dayElement.setAttribute("part", "day");
+            main.appendChild(dayElement);
         }
     }
 
-    #dayClickedEventHandler(event) {
-        const clickedDay = event.target.innerHTML;
-        this.#selectDateValue(clickedDay, this.displayedMonth, this.displayedYear);
-        if(this.confirmOnSelect) {
-            this.confirmDateValue();
-        }
-    }
-
+    /**
+     * Renders the calendar grid with the currently displayed month and year
+     */
     #renderCalendar() {
         // Generate Day Array:
-        let dayNumbers = [];
-        let adjacentMonthDays = [];
-        this.#generateDayArray(dayNumbers, adjacentMonthDays);
+        let dayNumbers = []; // numbers of dates
+        let activeDays = []; // boolean values, if the daynumber with the same index is active or not
+        this.#generateDayArray(dayNumbers, activeDays);
+
+        const main = this.shadow.querySelector("main");
+        if(!main) { throw new Error("Could not query grid element. Template needs an element 'main'."); }
 
         // Style Day Elements:
-        const dayElements = this.containerElement.querySelectorAll(".day");
-        for(const [idx,dayElement] of dayElements.entries()) {
-            dayElement.classList.remove("adjacentMonthDay");
-            dayElement.classList.remove("selectedDay");
-            dayElement.classList.remove("hidden");
-            dayElement.classList.remove("hover");
-            dayElement.onclick = null;
-            dayElement.onblur = null;
-            dayElement.onkeydown = null;
-            if (adjacentMonthDays[idx]) {
-                dayElement.classList.add("adjacentMonthDay");
-            } else {
-                dayElement.classList.add("hover");
-            }
-            dayElement.innerHTML = dayNumbers[idx]
-            if (this.displayedMonth === this.selectedDate.getMonth() && this.displayedYear === this.selectedDate.getFullYear() && dayNumbers[idx] === this.selectedDate.getDate() && !adjacentMonthDays[idx]) {
-                dayElement.classList.add("selectedDay");
-            }
-            if(!adjacentMonthDays[idx]) {
-                dayElement.onclick = (event) => { this.#dayClickedEventHandler(event) };
-            }
-        }
-
-        // Style Last Row:
-        const lastSeven = adjacentMonthDays.slice(35, 42);
-        if(lastSeven.every(x => x === true)) {
-            const dayElements = this.containerElement.querySelectorAll(".day")
-            for(const [idx,dayElement] of dayElements.entries()) {
-                if(idx > 34) {
-                    dayElement.classList.add("hidden");
+        const gridElements = main.querySelectorAll("[part~='day']"); // the '~=' attribute selector matches the specified word delimited by spaces
+        for(const [idx,gridElement] of gridElements.entries()) {
+            gridElement.innerHTML = dayNumbers[idx];
+            gridElement.removeAttribute("part"); // clean any parts
+            gridElement.onclick = null; // remove any event listeners
+            let attributeString = "day";
+            if(activeDays[idx]) {
+                gridElement.onclick = (event) => { this.#dayClickedEventHandler(event) };
+                attributeString += " active";
+                if(this.displayedMonth === this.selectedDate.getMonth() && this.displayedYear === this.selectedDate.getFullYear() && dayNumbers[idx] === this.selectedDate.getDate()) {
+                    attributeString += " selected";
                 }
+            } else {
+                attributeString += " inactive";
             }
+            gridElement.setAttribute("part", attributeString);
         }
+
+        // Update Text:
+        const month = this.shadow.querySelector("#month");
+        if(month) { month.innerHTML = this.monthNames[this.displayedMonth]; }
+        const year = this.shadow.querySelector("#year");
+        if(year) { year.innerHTML = this.displayedYear; }
     }
 
-    #populateDayNames() {
-        const dayNameArray = this.dayNames.slice();
-        const days = this.containerElement.querySelectorAll(".name");
-        for(const [idx,day] of days.entries()) {
-            day.innerHTML = dayNameArray[idx];
-        }
-    }
-
-    #generateDayArray(dayArray, adjacentMonthDaysArray) {
+    /**
+     * Generates the array of days for the currently displayed month and year. The day array is
+     * essentially a list (=Array) starting with the last monday of the previous month. Followed
+     * by the days of the current month. Ending with the first few days of the next month.
+     * @param {Array} dayArray Array of numbers that holds the date numbers of the days to render
+     * @param {Array} activeDays Array of booleans with same length as 'dayArray'. Active days with
+     * the same index are set 'true', inactive days are set 'false'.
+     */
+    #generateDayArray(dayArray, activeDays) {
         // Date Obj For Rendering Calendar Grid:
         const displayedDate = new Date(this.displayedYear, this.displayedMonth);
         displayedDate.setDate(1);
 
-        // Setup Date Index:
-        let index;
-        let dateDay = displayedDate.getDay();
-        let dateMonth = displayedDate.getMonth() + 1;
-        let dateYear = displayedDate.getFullYear();
-        let daysInMonth = this.#daysInMonth(dateMonth, dateYear);
-        displayedDate.setDate(displayedDate.getDate() - 1);
-        let prevMonth = displayedDate.getMonth() + 1;
-        let prevMonthYear = displayedDate.getFullYear();
-        let daysInPrevMonth = this.#daysInMonth(prevMonth, prevMonthYear);
+        // Current Date:
+        const weekday = displayedDate.getDay();
+        const month = displayedDate.getMonth() + 1;
+        const year = displayedDate.getFullYear();
+        let daysInMonth = this.#daysInMonth(month, year);
 
-        // Iterate Days of Previous Month:
-        if(dateDay === 0) {
-            for (index = 0; index < 6; index++) {
-                dayArray.unshift(daysInPrevMonth);
-                daysInPrevMonth--;
-                adjacentMonthDaysArray.push(true);
-            }
-        } else {
-            for (index = 0; index < dateDay - 1; index++) {
-                dayArray.unshift(daysInPrevMonth);
-                daysInPrevMonth--;
-                adjacentMonthDaysArray.push(true);
-            }
+        // Previous Date:
+        displayedDate.setDate(displayedDate.getDate() - 1); // decrement date to get yesterday
+        const prevMonth = displayedDate.getMonth() + 1;
+        const prevMonthYear = displayedDate.getFullYear();
+        const daysInPrevMonth = this.#daysInMonth(prevMonth, prevMonthYear);
+
+        // Build Day Array:
+        const offset = ((weekday == 0) ? 6 : (weekday-1)); // sunday: weekday=0, monday: weekday=1
+        const firstMonday = daysInPrevMonth - (offset - 1); // date of the first monday to generate (= last monday of prev month)
+        for(let day = firstMonday; day <= daysInPrevMonth; day++) { // append days of prev month (=non-active days)
+            dayArray.push(day);
+            activeDays.push(false);
         }
-
-        // Iterate Days of This Month:
-        for (index = 0; index < daysInMonth; index++) {
-            dayArray.push(index + 1);
-            adjacentMonthDaysArray.push(false);
+        for(let day = 1; day <= daysInMonth; day++) { // append days of this month (=active-days)
+            dayArray.push(day);
+            activeDays.push(true);
         }
-
-        // Iterate Days of Next Month:
-        let numberOfNextMonthDays = 42 - dayArray.length
-        for (index = 0; index < numberOfNextMonthDays; index++) {
-            dayArray.push(index + 1)
-            adjacentMonthDaysArray.push(true)
+        const numberOfNextMonthDays = 42 - dayArray.length;
+        for(let day = 1; day <= numberOfNextMonthDays; day++) { // append days of next month (=non-active days)
+            dayArray.push(day);
+            activeDays.push(false);
         }
     }
 
+    /**
+     * Tells if the given year is a leap year
+     * @param {Number} year 
+     * @returns 'true' if the year is a leap year, false otherwise
+     */
     #isLeapYear(year) {
         return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)
     }
 
+    /**
+     * Tells how many days there are in the given month of the year
+     * @param {Number} month month to inspect
+     * @param {Number} year year of the month
+     * @returns Number of days of the given month
+     */
     #daysInMonth(month, year) {
         if(month === 1 || month === 3 || month === 5 || month === 7 || month === 8 || month === 10 || month === 12) {
             return 31;
@@ -333,11 +564,34 @@ class DateTimePicker extends HTMLElement {
         }
     }
 
+    /**
+     * Tells if the given string is a date or datetime in ISO format. Valid is either the short
+     * format (only date, YYYY-MM-DD), standard format (date and time, YYYY-MM-DDThh:mm:ss) or the
+     * long format (with milliseconds, YYYY-MM-DDThh:mm:ss.zzz).
+     * @param {String} str String to check
+     * @returns 'true' if the string is a valid format
+     */
     #isValidDatetimeString(str) {
         const ISO_FORMAT = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(?:\.\d{3})?)?$/;
         return ISO_FORMAT.test(str);
     }
+
+    /**
+     * Extracts a readble string from the the given date
+     * @param {Date} date date object to stringify
+     * @returns string in format "18. Oct 2025"
+     */
+    #toDateString(date) {
+        console.assert(date instanceof Date, "Given parameter has to be of Type 'Date'");
+        const day = date.getDate();
+        const month = this.monthNames[date.getMonth()];
+        const year = date.getFullYear();
+        const split = date.toISOString().split("T");
+        const dateString = split[0];
+        const timeString = split[1].slice(0, -1);
+        return day+". "+month+" "+year;
+    }
 }
 
 // Define the new component
-customElements.define("datetime-picker", DateTimePicker);
+customElements.define("date-picker", DatePicker);
