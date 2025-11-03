@@ -4,7 +4,7 @@ from scanner import scanner
 from app import app
 
 
-CONFIG_FILE = "files/config.json"
+CONFIG_FILE = "data/config.json"
 
 if __name__ == "__main__":
     # Parse Input Argument:
