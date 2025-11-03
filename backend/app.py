@@ -11,7 +11,7 @@ app = Flask(__name__, template_folder="./templates", static_folder="./static")
 app.secret_key = "t0ps3cr3t"
 
 # Register Blueprint Hierarchy:
-app.register_blueprint(api)
+app.register_blueprint(api, url_prefix="/api")
 
 
 @app.route("/", methods=["GET"])
