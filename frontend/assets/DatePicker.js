@@ -65,10 +65,9 @@
  * "selected":  Selects the day element that is currently selected by the user
  * 
  *                      ╔═══════════════════════════════════════════════╗
- *                      ║  ┌─────────────┐                              ║
- *                      ║  │Select a date│◀──slot=supporting-text       ║
- *                      ║  └─────────────┘                              ║
- *                      ║  18. Oct 2025                                 ║
+ *                      ║                                               ║
+ *                      ║  Select a date ◀──slot=supporting-text        ║
+ *                      ║  18. Oct 2025 ◀───slot=headline               ║
  *                      ║                                               ║
  *                      ║  ┌─┐     ┌─┐                    ┌─┐      ┌─┐  ║
  * slot=next-month-btn──║─▶│<│ Oct │>│                    │<│ 2025 │>│◀─║──slot=next-year-btn
@@ -140,8 +139,8 @@
  *      window.onload = () => {
  *          const dayPicker = document.querySelector("date-picker");
  *          if(dayPicker) {
- *              datetimePicker.addEventListener("select", () => { console.log("onselect"); });
- *              datetimePicker.addEventListener("confirm", () => { console.log("onconfirm"); });
+ *              datetimePicker.addEventListener("select", () => { console.log("onselect"+datetimePicker.selectedDateObj); });
+ *              datetimePicker.addEventListener("confirm", () => { console.log("onconfirm"+datetimePicker.confirmedDateObj); });
  *              datetimePicker.addEventListener("reset", reset() => { console.log("onreset"); });
  *          }
  *      }
@@ -202,7 +201,9 @@ template.innerHTML = `
         <div style="opacity: 0.4">
             <slot name="supporting-text"></slot>
         </div>
-        <div id="headline"></div>
+        <div id="headline">
+            <slot name=headline></slot>
+        </div>
         <div class="flexRow">
             <div class="flexRow">
                 <slot name="prev-month-btn"><button>&#11207;</button></slot>
@@ -259,21 +260,10 @@ class DatePicker extends HTMLElement {
         // Build Template Structure:
         this.#createGridItems();
 
-        // Initialize Date Object (holds picked datetime):
-        if(this.initDate === null) {
-            this.confirmedDateObj = new Date(); // use current datetime
-        } else if(this.#isValidDatetimeString(this.initDate)) {
-            this.confirmedDateObj = new Date(this.initDate); // use ISO datetime string
-        } else { // invalid datetime string
-            throw new Error(`Attribute 'init-date' has an invalid string format: "${this.initDate}". Use ISO format YYYY-MM-DDThh:mm:ss.zzz`);
-        }
-
-        // Initialize Internal State:
-        this.displayedMonth = this.selectedDate.getMonth();
-        this.displayedYear = this.selectedDate.getFullYear();
-        this.#renderCalendar();
-        
         // Initialize Slotted Elements:
+        const headlineSlot = this.shadow.querySelector("slot[name='headline']");
+        this.headlineText = headlineSlot.assignedNodes({ flatten:true })[0];
+
         const prevMonthSlot = this.shadow.querySelector("slot[name='prev-month-btn']");
         const prevMonthButton = prevMonthSlot.assignedNodes({ flatten:true })[0];
         prevMonthButton.onclick = () => { this.#showPrevMonth() };
@@ -297,6 +287,20 @@ class DatePicker extends HTMLElement {
         const confirmSlot = this.shadow.querySelector("slot[name='confirm-btn']");
         const confirmButton = confirmSlot.assignedNodes({ flatten:true })[0];
         confirmButton.onclick = () => { this.#confirmDateValue() };
+
+        // Initialize Date Object (holds picked datetime):
+        if(this.initDate === null) {
+            this.confirmedDateObj = new Date(); // use current datetime
+        } else if(this.#isValidDatetimeString(this.initDate)) {
+            this.confirmedDateObj = new Date(this.initDate); // use ISO datetime string
+        } else { // invalid datetime string
+            throw new Error(`Attribute 'init-date' has an invalid string format: "${this.initDate}". Use ISO format YYYY-MM-DDThh:mm:ss.zzz`);
+        }
+
+        // Initialize Internal State:
+        this.displayedMonth = this.selectedDate.getMonth();
+        this.displayedYear = this.selectedDate.getFullYear();
+        this.#renderCalendar();
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -360,7 +364,8 @@ class DatePicker extends HTMLElement {
             this.selectedDate = new Date(year, month, day);
         }
         
-        const headline = this.shadow.querySelector("#headline");
+        // const headline = this.shadow.querySelector("#headline");
+        const headline = this.headlineText;
         if(headline) { headline.textContent = this.#toDateString(this.selectedDate); }
         this.#renderCalendar();
         if(fireSelectEvent) {
