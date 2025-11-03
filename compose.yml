@@ -1,0 +1,17 @@
+services:
+    error_scanner:
+        build: . # Points to the Dockerfile in the directory
+        container_name: error_scanner
+        volumes:
+        - .:/app # mount project directory during development, TODO: remove for production
+        - /var/run/docker.sock:/var/run/docker.sock
+        environment:
+        - DOCKER_HOST=unix:///var/run/docker.sock
+        network_mode: host
+        # networks:
+            # - lognet
+
+networks:
+    lognet:
+        driver: bridge
+        external: true # connect to an existing external network

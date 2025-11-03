@@ -1,11 +1,9 @@
 // React Components:
-import { useEffect, useState } from 'react';
-import { useSearchParams } from "react-router"
+import { useEffect, useState, useRef } from 'react';
 import { ListDetailLayout } from '../Layouts';
-import Form from '../Form';
-import LogView from '../LogView';
+import RecordForm from '../RecordForm';
+import LogItemView from '../LogItemView.jsx';
 import DetailsView from '../DetailsView';
-import InputRow from '../InputRow';
 import TopBar from '../TopBar';
 
 // Material Components:
@@ -14,81 +12,180 @@ import 'mdui/components/button-icon.js';
 import 'mdui/components/card.js';
 import 'mdui/components/chip.js';
 import 'mdui/components/list.js';
+import 'mdui/components/range-slider.js';
 import 'mdui/components/text-field.js';
+import 'mdui/components/tooltip.js';
 
 // Local Imports:
-import { openDialog, closeDialog } from '../../scripts/scripts.js'
+import { openDialog, closeDialog, searchFunction, toDateString, isInsideInterval } from '../../assets/scripts.js'
+import HorizontalRow from '../HorizontalRow.jsx';
+import { useFilteredData } from '../../assets/useFilteredData.js';
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+// Internal Components:
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 
 function Logs() {
-    const [selectedId, setSelectedId] = useState(null);
-    const [items, setItems] = useState([]);
-    const [searchParams, setSearchParams] = useSearchParams();
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Global Properties
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    const {isLoading,filters,items,filteredItems,updateFilter,reloadItems} = useFilteredData("/api/logs");
+    const snackBarRef = useRef(null);
+    const [selectedItem, setSelectedItem] = useState(null);
 
-    const selectedString = searchParams.get('selected');
-    const selectedItem = items.find(item => item.id === selectedString);
-
-    useEffect(() => {
-        async function fetchLogs() {
-            const fetched = [
-                {id:"2001", time:"1970-01-01 00:00:00.000", category:"Info", source:"Default Docker Container", message:"Lorem ipsum dolor sit amet consectetur adipiscing elit. Lorem ipsum dolor sit amet.", solution:null},
-                {id:"2002", time:"2025-10-07 13:36:03.000", category:"Error", source:"Docker Container One", message:"Lorem ipsum dolor sit amet consectetur adipiscing elit.", solution:"just pray at this point"},
-                {id:"2003", time:"2025-10-07 13:36:03.000", category:"Error", source:"Docker Container Two", message:"Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.", solution:null},
-                {id:"2004", time:"2025-10-07 13:36:03.000", category:"Error", source:"Docker Container One", message:"Lorem ipsum dolor sit amet consectetur adipiscing elit.", solution:"just pray at this point"},
-                {id:"2005", time:"2025-10-07 13:36:03.000", category:"Error", source:"Docker Container One", message:"Lorem ipsum dolor sit amet consectetur adipiscing elit.", solution:"just pray at this point"},
-                {id:"2006", time:"1970-01-01 00:00:00.000", category:"Info", source:"Default Docker Container", message:"Lorem ipsum dolor sit amet consectetur adipiscing elit. Lorem ipsum dolor sit amet.", solution:null},
-                {id:"2007", time:"1970-01-01 00:00:00.000", category:"Info", source:"Default Docker Container", message:"Lorem ipsum dolor sit amet consectetur adipiscing elit. Lorem ipsum dolor sit amet.", solution:null},
-                {id:"2008", time:"2025-10-07 13:36:03.000", category:"Error", source:"Docker Container One", message:"Lorem ipsum dolor sit amet consectetur adipiscing elit.", solution:"just pray at this point"},
-                {id:"2009", time:"2025-10-07 13:36:03.000", category:"Error", source:"Docker Container Two", message:"Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.", solution:null},
-                {id:"2010", time:"2025-10-07 13:36:03.000", category:"Error", source:"Docker Container Two", message:"Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.", solution:null},
-                {id:"2011", time:"2025-10-07 13:36:03.000", category:"Error", source:"Docker Container Two", message:"Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.", solution:null},
-                {id:"2012", time:"2025-10-07 13:36:03.000", category:"Error", source:"Docker Container One", message:"Lorem ipsum dolor sit amet consectetur adipiscing elit.", solution:"just pray at this point"},
-                {id:"2013", time:"2025-10-07 13:36:03.000", category:"Error", source:"Docker Container Two", message:"Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.", solution:null},
-                {id:"2014", time:"1970-01-01 00:00:00.000", category:"Info", source:"Default Docker Container", message:"Lorem ipsum dolor sit amet consectetur adipiscing elit. Lorem ipsum dolor sit amet.", solution:null},
-            ];
-            setItems(fetched);
-        }
-        fetchLogs();
-    }, []); // fetch data only once
-
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Event Handler (triggered on user interactions):
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     function openDetails(id) {
-        setSelectedId(id);
-        setSearchParams({ selected: id });
+        setSelectedItem(items.find(item => item.id === id));
     };
 
     function closeDetails() {
-        setSelectedId(null);
-        setSearchParams({}, { replace:true });
+        setSelectedItem(null);
     };
 
+    const textSearchRef = useRef(null);
+    function updateSearchQuery() {
+        const query = textSearchRef.current.value;
+        updateFilter("searchQuery", String(query));
+    }
+
+    function updateCategory(category) {
+        let selectedCategories = [];
+        if(filters.categories.includes(category)) {
+            selectedCategories = filters.categories.filter(c => c !== category); // remove category
+        } else {
+            selectedCategories = [...filters.categories, category]; // add category
+        }
+        updateFilter("categories", selectedCategories);
+    };
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Hooks:
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    const categoryRef = useRef(null);
+    useEffect(() => {
+        // Initialize Search Function:
+        if(textSearchRef.current) {
+            textSearchRef.current.addEventListener("input", updateSearchQuery);
+        }
+
+        // Initialize Search Query Filter:
+        updateFilter("searchQuery", "");
+
+        // Initialize Date Picker:
+        // TODO
+        
+        // Initialze Category Filter:
+        // const NodesList = categoryRef.current.querySelectorAll("mdui-chip[variant='filter']");
+        // const chips = Array.from(NodesList);
+        const chips = Array.from(document.querySelectorAll("mdui-chip[variant='filter']"));
+        const selectedChips = chips.filter(chip => chip.hasAttribute('selected'));
+        const categories = chips.map(chip => chip.textContent.trim());
+        const selectedCategories = selectedChips.map(chip => chip.textContent.trim());
+        updateFilter("categories", selectedCategories);
+
+        // Initialize Datetime Filter:
+        updateFilter("startDatetime", new Date());
+        updateFilter("endDatetime", new Date());
+
+        // Initialze ESC Key:
+        document.body.addEventListener("keydown", function(event) {
+            if (event.key === "Escape") {
+                closeDetails();
+            }
+        });
+    }, []);
+
+    const loadingAnimationRef = useRef(null);
+    useEffect(() => {
+        loadingAnimationRef.current.loading = isLoading;
+    }, [isLoading]);    
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Sub-Elements:
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     const ListHeader = (
         <>
-            {/* <mdui-card variant="filled" style={{width:'100%'}} className="">
-                <mdui-text-field label="Search" type="search" enterkeyhint="search" inputmode="search">
-                <mdui-button-icon slot="icon" icon="search"></mdui-button-icon>
+            <HorizontalRow>
+                <mdui-tooltip content="Refresh logs">
+                    <mdui-fab ref={loadingAnimationRef} onClick={() => {reloadItems()}} icon="refresh">Refresh logs</mdui-fab>
+                </mdui-tooltip>
+                <mdui-text-field ref={textSearchRef} type="search" label="Search for logs or container names" clearable helper-on-focus>
+                    <mdui-icon slot="icon" name="search"></mdui-icon>
                 </mdui-text-field>
-            </mdui-card> */}
-            <InputRow>
-                <mdui-chip variant="filter" selectable selected>Critical</mdui-chip>
-                <mdui-chip variant="filter" selectable selected>Error</mdui-chip>
-                <mdui-chip variant="filter" selectable selected>Warning</mdui-chip>
-                <mdui-chip variant="filter" selectable>Info</mdui-chip>
-                <mdui-chip variant="filter" selectable>Debug</mdui-chip>
-            </InputRow>
+            </HorizontalRow>
+            <HorizontalRow>
+                <mdui-card variant="filled" style={{width:"100%"}}>
+                    <mdui-text-field label="Starting Date" helper-on-focus readonly>
+                        <mdui-icon slot="icon" name="calendar_month"></mdui-icon>
+                    </mdui-text-field>
+                    <mdui-dialog>
+                        <date-picker>
+                            <span slot="supporting-text">Select a date</span>
+                            <mdui-top-app-bar-title slot="headline"></mdui-top-app-bar-title>
+                            <mdui-button-icon slot="prev-month-btn" icon="keyboard_arrow_left"></mdui-button-icon>
+                            <mdui-button-icon slot="next-month-btn" icon="keyboard_arrow_right"></mdui-button-icon>
+                            <mdui-button-icon slot="prev-year-btn" icon="keyboard_arrow_left"></mdui-button-icon>
+                            <mdui-button-icon slot="next-year-btn" icon="keyboard_arrow_right"></mdui-button-icon>
+                            <mdui-button slot="cancel-btn" variant="text">Cancel</mdui-button>
+                            <mdui-button slot="confirm-btn">OK</mdui-button>
+                        </date-picker>
+                    </mdui-dialog>
+                    <mdui-text-field type="time" label="Starting Time" helper-on-focus>
+                        <mdui-icon slot="icon" name="access_time"></mdui-icon>
+                    </mdui-text-field>
+                </mdui-card>
+                <mdui-card variant="filled" style={{width:"100%"}}>
+                     <mdui-text-field label="Ending Date" helper-on-focus readonly>
+                        <mdui-icon slot="icon" name="calendar_month"></mdui-icon>
+                    </mdui-text-field>
+                    <mdui-dialog>
+                        <date-picker>
+                            <span slot="supporting-text">Select a date</span>
+                            <mdui-top-app-bar-title slot="headline"></mdui-top-app-bar-title>
+                            <mdui-button-icon slot="prev-month-btn" icon="keyboard_arrow_left"></mdui-button-icon>
+                            <mdui-button-icon slot="next-month-btn" icon="keyboard_arrow_right"></mdui-button-icon>
+                            <mdui-button-icon slot="prev-year-btn" icon="keyboard_arrow_left"></mdui-button-icon>
+                            <mdui-button-icon slot="next-year-btn" icon="keyboard_arrow_right"></mdui-button-icon>
+                            <mdui-button slot="cancel-btn" variant="text">Cancel</mdui-button>
+                            <mdui-button slot="confirm-btn">OK</mdui-button>
+                        </date-picker>
+                    </mdui-dialog>
+                    <mdui-text-field type="time" label="Ending Time" helper-on-focus readonly>
+                        <mdui-icon slot="icon" name="access_time"></mdui-icon>
+                    </mdui-text-field>
+                </mdui-card>
+            </HorizontalRow>
+            <HorizontalRow overflow>
+                <mdui-chip variant="filter" onClick={() => updateCategory("Critical")} selectable selected>Critical</mdui-chip>
+                <mdui-chip variant="filter" onClick={() => updateCategory("Error")} selectable selected>Error</mdui-chip>
+                <mdui-chip variant="filter" onClick={() => updateCategory("Warning")} selectable selected>Warning</mdui-chip>
+                <mdui-chip variant="filter" onClick={() => updateCategory("Info")} selectable>Info</mdui-chip>
+                <mdui-chip variant="filter" onClick={() => updateCategory("Debug")} selectable>Debug</mdui-chip>
+            </HorizontalRow>
+            <section style={{display:"flex", gap:"8px", overflowX:"auto", justifyContent:"center"}}>
+                
+            </section>
+            <span className="info-text">Showing {filteredItems.length} of {items.length}</span>
         </>
     );
 
-    const ListPane = (
+    const ListPane = filteredItems.length > 0 ? (
         <>
-            {items ? (
-                <mdui-list>
-                    {items.map(item => (<LogView key={item.id} log={item} onClick={openDetails} isSelected={item.id === selectedId} />))}
-                </mdui-list>
-            ) : (
-                <div style={{alignItems:'center', display:'flex', flexDirection:'column'}}>
-                    <mdui-button-icon loading icon="search" variant="standard"></mdui-button-icon>
-                </div>
-            )}
+            <mdui-list>
+                {filteredItems.map(item => (<LogItemView key={item.id} log={item} onClick={openDetails} isSelected={item === selectedItem} />))}
+            </mdui-list>
         </>
+    ) : (
+        <div style={{alignItems:'center', display:'flex', justifyContent:'center', margin:'auto'}}>
+            <mdui-button-icon icon="search_off" variant="standard"></mdui-button-icon>
+            <span>No logs found for the selected filters.</span>
+        </div>
     );
 
     const TopBarElement = selectedItem && (
@@ -100,29 +197,8 @@ function Logs() {
                 </mdui-button>
             </TopBar>
             <mdui-dialog id="add-to-records" close-on-esc close-on-overlay-click>
-                <TopBar title="Add log to record" closeFunction={() => (closeDialog("add-to-records"))}></TopBar>
-                <Form action="#">
-                    <section>
-                        <div>
-                            <mdui-text-field label="Log seen" value={selectedItem.time} defaultValue={selectedItem.time} name="time"></mdui-text-field>
-                        </div>
-                        <div>
-                            <mdui-select label="Select Category" value={selectedItem.category} defaultValue={selectedItem.category} name="category">
-                                <mdui-menu-item value="Critical">Critical</mdui-menu-item>
-                                <mdui-menu-item value="Error">Error</mdui-menu-item>
-                                <mdui-menu-item value="Warning">Warning</mdui-menu-item>
-                                <mdui-menu-item value="Info">Info</mdui-menu-item>
-                                <mdui-menu-item value="Debug">Debug</mdui-menu-item>
-                            </mdui-select>
-                        </div>
-                        <div>
-                            <mdui-text-field label="Docker Container" value={selectedItem.source} defaultValue={selectedItem.source} name="source"></mdui-text-field>
-                        </div>
-                        <div>
-                            <mdui-text-field label="Log Message" value={selectedItem.message} defaultValue={selectedItem.message} name="message" autosize max-rows="7" enterkeyhint="enter"></mdui-text-field>
-                        </div>
-                    </section>
-                </Form>
+                <TopBar title="Add log to records" closeFunction={() => (closeDialog("add-to-records"))}></TopBar>
+                <RecordForm action="#" record={selectedItem}></RecordForm>
             </mdui-dialog>
         </>
     );
@@ -132,7 +208,10 @@ function Logs() {
     );
 
     return(
-        <ListDetailLayout listHeader={ListHeader} list={ListPane} detail={DetailPane} />
+        <>
+            <mdui-snackbar ref={snackBarRef}></mdui-snackbar>
+            <ListDetailLayout listHeader={ListHeader} list={ListPane} detail={DetailPane} />
+        </>
     );
 }
 

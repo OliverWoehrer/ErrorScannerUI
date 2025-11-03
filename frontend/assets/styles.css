@@ -1,0 +1,85 @@
+:root {
+    --mdui-color-shadow-dark: 255, 255, 255!important;
+}
+
+/***************************************/
+/* Overwrite Default Styles: */
+/***************************************/
+html,
+body {
+    font-family: "Ubuntu";
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+h2 {
+    margin: 0;
+}
+
+h4 {
+    margin: 0;
+}
+
+section {
+    /* margin: 0.5rem; */
+    padding: 0.5rem;
+}
+
+Form section > div {
+    margin: 12px 0;
+}
+
+date-picker {
+    --color-selected: var(--mdui-color-primary);
+    --color-on-selected: var(--mdui-color-on-primary);
+    --shape-corner: var(--mdui-shape-corner-full);
+}
+date-picker::part(day) {
+    border-radius: var(--shape-corner);
+}
+date-picker::part(selected) {
+    background-color: rgb(var(--color-selected));
+    border-color: rgb(var(--color-selected));
+    color: rgb(var(--color-on-selected));
+}
+date-picker::part(active):hover {
+    border-color: rgb(var(--color-selected));
+    border-style: solid;
+    border-width: 1px;
+}
+date-picker::part(selected):hover {
+    background-color: inherit;
+    color: inherit;
+}
+
+mdui-card {
+    padding: 12px;
+}
+
+mdui-tabs::part(container) {
+    background-color: inherit;
+}
+
+mdui-top-app-bar {
+    background-color: inherit;
+    position: relative; 
+}
+
+mdui-text-field[variant="filled"]::part(container) {
+    box-shadow: 0px 0px;
+    border-radius: var(--mdui-shape-corner-large);
+}
+
+mdui-dialog::part(overlay) {
+    background-color: rgba(0,0,0,0.4);
+}
+mdui-dialog::part(panel) {
+    width: 100%;
+}
+
+.info-text {
+    color: rgb(var(--mdui-color-outline-dark));
+    font-size: 0.8rem;
+    margin-left: 15px;
+}

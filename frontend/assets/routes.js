@@ -3,5 +3,4 @@ export const ROUTES = {
     logs: "/logs",
     records: "/records",
     settings: "/settings",
-    error: "/error"
 };

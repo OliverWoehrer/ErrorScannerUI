@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="mdui-theme-auto">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no"/>
@@ -7,13 +7,89 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap');
     </style>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" />
-    <link rel="stylesheet" href="./styles/w3.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"></link>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"></link>
     <script type="module" src="./index.jsx" defer></script>
+    <script defer src="./assets/DatePicker.js"></script>
     <title>Error Scanner</title>
 </head>
 <body id="root">
     <!-- filled by React -->
+
+
+    
+
+    
+    <!-- <mdui-button onclick="openDialog('myDialog')">Open date picker</mdui-button>
+    <mdui-dialog id="myDialog">
+        <date-picker init-date="2025-10-23T12:35:19">
+            <span slot="supporting-text">Select a date</span>
+            <mdui-button-icon slot="prev-month-btn" icon="keyboard_arrow_left"></mdui-button-icon>
+            <mdui-button-icon slot="next-month-btn" icon="keyboard_arrow_right"></mdui-button-icon>
+            <mdui-button-icon slot="prev-year-btn" icon="keyboard_arrow_left"></mdui-button-icon>
+            <mdui-button-icon slot="next-year-btn" icon="keyboard_arrow_right"></mdui-button-icon>
+            <mdui-button slot="cancel-btn" variant="text">Cancel</mdui-button>
+            <mdui-button slot="confirm-btn">OK</mdui-button>
+        </date-picker>
+    </mdui-dialog> -->
+
+
+
+
+
 </body>
+<script>
+    /**
+     * TODO: implement ids of label elements as attributes (maybe check what mdui does)
+     */
+    openDialog("myDialog");
+    // window.onload = init;
+
+    function init() {
+        const datetimePicker = getDatepicker();
+        datetimePicker.addEventListener("select", () => { console.log("onselect"); });
+        datetimePicker.addEventListener("confirm", () => { console.log("onconfirm"); });
+        datetimePicker.addEventListener("reset", () => { console.log("onreset"); });
+    }
+
+    function selectDatePicker() {
+        const selectedDate = getDatepicker().selectedDateObj;
+        if(!selectedDate) { return }
+        const headline = document.getElementById("headline");
+        if(headline) {
+            headline.innerHTML = ("0"+selectedDate.getDate()).slice(-2)+"."+("0"+selectedDate.getMonth()).slice(-2)+"."+selectedDate.getYear();
+        }
+    }
+
+    function confirmDatePicker() {
+        const selectedDate = getDatepicker().selectedDateObj;
+        const confirmedDate = getDatepicker().confirmedDateObj;
+        closeDialog("myDialog");
+    }
+
+    function resetDatePicker() {
+        const date = getDatepicker().selectedDateObj;
+        closeDialog("myDialog");
+    }
+
+    function getDatepicker() {
+        const dayPickerElement = document.querySelector("date-picker");
+        if(!dayPickerElement) { throw new Error("Could not query 'day-picker' element"); }
+        return dayPickerElement;
+    }
+
+    function openDialog(id) {
+        const dialog = document.getElementById(id);
+        if(dialog) {
+            dialog.open = true;
+        }
+    }
+
+    function closeDialog(id) {
+        const dialog = document.getElementById(id);
+        if(dialog) {
+            dialog.open = false;
+        }
+    }
+</script>
 </html>

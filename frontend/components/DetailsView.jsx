@@ -17,7 +17,7 @@ function DetailsView({ top, log }) {
                         <tbody>
                             <tr>
                                 <td>Time:</td>
-                                <td>{log.time}</td>
+                                <td>{log.timestamp}</td>
                             </tr>
                             <tr>
                                 <td>Category:</td>

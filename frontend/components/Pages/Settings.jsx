@@ -1,6 +1,6 @@
 // React Components:
 import Form from '../Form';
-import InputRow from '../InputRow';
+import HorizontalRow from '../HorizontalRow';
 import { FeedLayout } from '../Layouts';
 import TopBar from '../TopBar';
 
@@ -17,16 +17,15 @@ import 'mdui/components/tab-panel.js';
 
 function Settings() {
     const DockerNetworkForm = (
-        <mdui-card variant="elevated" >
+        <mdui-card variant="elevated">
             <Form action="#">
-                <TopBar title="Docker Network"></TopBar>
-                <mdui-divider></mdui-divider>
+                <TopBar title="Docker Interface"></TopBar>
                 <section>
                     <div>
                         <h4>Network Interface</h4>
-                        <span>Network interface of this container</span>
+                        <span>Docker network to log messages from</span>
                     </div>
-                    <mdui-text-field value="5000" defaultValue="5000" label="Port Number"></mdui-text-field>
+                    <mdui-text-field label="Docker Network" value="lognet" defaultValue="lognet"></mdui-text-field>
                 </section>
                 <section>
                     <div>
@@ -60,36 +59,52 @@ function Settings() {
         </mdui-card>
     );
 
-    const LoggingForm = (
+    const LogScannerForm = (
         <mdui-card variant="elevated" >
             <Form action="#">
-                <TopBar title="Logging"></TopBar>
-                <mdui-divider></mdui-divider>
+                <TopBar title="Log Scanner"></TopBar>
                 <section>
                     <div>
                         <h4>Logs</h4>
                         <span>Categorize log messages based on their tag and select which ones to log</span>
                     </div>
-                    <InputRow>
+                    <HorizontalRow>
                         <mdui-text-field label="Critical" value="[CRITICAL]" defaultValue="[CRITICAL]" name="critical"></mdui-text-field>
                         <mdui-switch checked defaultChecked name="critical-enabled"></mdui-switch>
-                    </InputRow>
-                    <InputRow>
+                    </HorizontalRow>
+                    <HorizontalRow>
                         <mdui-text-field label="Error" value="[ERROR]" defaultValue="[ERROR]" name="error"></mdui-text-field>
                         <mdui-switch checked defaultChecked name="error-enabled"></mdui-switch>
-                    </InputRow>
-                    <InputRow>
+                    </HorizontalRow>
+                    <HorizontalRow>
                         <mdui-text-field label="Warning" value="[WARNING]" defaultValue="[WARNING]" name="warning"></mdui-text-field>
                         <mdui-switch checked defaultChecked name="warning-enabled"></mdui-switch>
-                    </InputRow>
-                    <InputRow>
+                    </HorizontalRow>
+                    <HorizontalRow>
                         <mdui-text-field label="Info" value="[INFO]" defaultValue="[INFO]" name="warning"></mdui-text-field>
                         <mdui-switch name="info-enabled"></mdui-switch>
-                    </InputRow>
-                    <InputRow>
+                    </HorizontalRow>
+                    <HorizontalRow>
                         <mdui-text-field label="Debug" value="[DEBUG]" defaultValue="[DEBUG]" name="debug"></mdui-text-field>
                         <mdui-switch name="debug-enabled"></mdui-switch>
-                    </InputRow>
+                    </HorizontalRow>
+                </section>
+            </Form>
+        </mdui-card>
+    );
+
+    const DatabaseForm = (
+        <mdui-card variant="elevated" >
+            <Form action="#">
+                <TopBar title="Database"></TopBar>
+                <section>
+                    <div>
+                        <h4>Size</h4>
+                        <span>Set the maximum number of logs to keep</span>
+                    </div>
+                    <HorizontalRow>
+                        <mdui-text-field label="Maximum number of logs" value="80000" defaultValue="80000"></mdui-text-field>
+                    </HorizontalRow>
                 </section>
             </Form>
         </mdui-card>
@@ -98,7 +113,8 @@ function Settings() {
     return(
         <FeedLayout>
             {DockerNetworkForm}
-            {LoggingForm}
+            {LogScannerForm}
+            {DatabaseForm}
         </FeedLayout>
     );
 }
