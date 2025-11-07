@@ -108,6 +108,7 @@ mdui-top-app-bar {
 .feed-layout {
     align-content: flex-start;
     align-items: stretch;
+    box-sizing: border-box;
     display: flex;
     flex-wrap: wrap;
     height: 100%;
