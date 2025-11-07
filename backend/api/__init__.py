@@ -1,7 +1,7 @@
 """
 This module implements the functions to handle routes of /api
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Blueprint, Response, request
 import json
 import os
@@ -42,13 +42,18 @@ def generate_logs(num_items=20, with_solution=False):
     """
     A generator that yields JSON Line strings with a delay.
     """
+    START_DATE = datetime(2025, 10, 25)
+    END_DATE = datetime(2025, 10, 31)
+    TIME_RANGE_SECONDS = int((END_DATE - START_DATE).total_seconds())
+
     for idx in range(0, num_items):
+        random_offset = random.randint(0, TIME_RANGE_SECONDS)
         log_item = {
             "id": str(idx),
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": (START_DATE + timedelta(seconds=random_offset)).isoformat(),
             "category": random.choice(["Critical","Error","Warning","Info","Debug"]),
             "source": random.choice(["Thirsty-Wombat","Jumpy-Giraffe","Sleepy-Koala"]),
-            "message": random.choice(["User 'alice' attempted to access restricted resource /admin/settings.", "Database connection pool initialized successfully with 10 connections.", "Failed to serialize response object for container 'zealous-pony': null value found in required field 'name'.", "Starting garbage collection cycle. Memory usage before: 128MB.", "System wide disk space usage exceeded 95%. Automated cleanup initiated."]),
+            "message": random.choice(["User 'alice' attempted to access restricted resource /admin/settings.", "Database connection pool initialized successfully with 10 connections.", "Failed to serialize response object for container 'zealous-pony': null value found in required field 'name'.", "Starting garbage collection cycle. Memory usage before: 128MB.", "System wide disk space usage exceeded 95%. Automated cleanup initiated.", "Mounted disk with 128MB."]),
             "solution": random.choice(["Just pray at this point", "Try to restart the container", None]) if with_solution else None
         }
         json_line = json.dumps(log_item) + "\r\n"        
@@ -74,7 +79,7 @@ def index():
 def logs():
     num_param = request.args.get("num")
     if num_param is None:
-        num_param = 20
+        num_param = 40
     return Response(generate_logs(num_items=num_param), mimetype="application/json-lines")
 
 @api.route("/records", methods=["GET"])
