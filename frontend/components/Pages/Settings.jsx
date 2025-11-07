@@ -25,7 +25,9 @@ function Settings() {
                         <h4>Network Interface</h4>
                         <span>Docker network to log messages from</span>
                     </div>
-                    <mdui-text-field label="Docker Network" value="lognet" defaultValue="lognet"></mdui-text-field>
+                    <section>
+                        <mdui-text-field label="Docker Network" value="lognet" defaultValue="lognet"></mdui-text-field>
+                    </section>
                 </section>
                 <section>
                     <div>
@@ -60,7 +62,7 @@ function Settings() {
     );
 
     const LogScannerForm = (
-        <mdui-card variant="elevated" >
+        <mdui-card variant="elevated">
             <Form action="#">
                 <TopBar title="Log Scanner"></TopBar>
                 <section>
@@ -68,33 +70,60 @@ function Settings() {
                         <h4>Logs</h4>
                         <span>Categorize log messages based on their tag and select which ones to log</span>
                     </div>
-                    <HorizontalRow>
-                        <mdui-text-field label="Critical" value="[CRITICAL]" defaultValue="[CRITICAL]" name="critical"></mdui-text-field>
-                        <mdui-switch checked defaultChecked name="critical-enabled"></mdui-switch>
-                    </HorizontalRow>
-                    <HorizontalRow>
-                        <mdui-text-field label="Error" value="[ERROR]" defaultValue="[ERROR]" name="error"></mdui-text-field>
-                        <mdui-switch checked defaultChecked name="error-enabled"></mdui-switch>
-                    </HorizontalRow>
-                    <HorizontalRow>
-                        <mdui-text-field label="Warning" value="[WARNING]" defaultValue="[WARNING]" name="warning"></mdui-text-field>
-                        <mdui-switch checked defaultChecked name="warning-enabled"></mdui-switch>
-                    </HorizontalRow>
-                    <HorizontalRow>
-                        <mdui-text-field label="Info" value="[INFO]" defaultValue="[INFO]" name="warning"></mdui-text-field>
-                        <mdui-switch name="info-enabled"></mdui-switch>
-                    </HorizontalRow>
-                    <HorizontalRow>
-                        <mdui-text-field label="Debug" value="[DEBUG]" defaultValue="[DEBUG]" name="debug"></mdui-text-field>
-                        <mdui-switch name="debug-enabled"></mdui-switch>
-                    </HorizontalRow>
+                    <section>
+                        <HorizontalRow>
+                            <div style={{width:"100%"}}></div>
+                            <mdui-tooltip content="Enable which message category should be logged">
+                                <div className="info-text">Logging</div>
+                            </mdui-tooltip>
+                            <mdui-tooltip content="Enable which message category should be automatically added to records if unknown">
+                                <div className="info-text">Record</div>
+                            </mdui-tooltip>
+                        </HorizontalRow>
+                    </section>
+                    <section>
+                        <HorizontalRow>
+                            <mdui-text-field label="Critical" value="[CRITICAL]" defaultValue="[CRITICAL]" name="critical"></mdui-text-field>
+                            <mdui-switch checked defaultChecked name="critical-log"></mdui-switch>
+                            <mdui-switch checked defaultChecked name="critical-record"></mdui-switch>
+                        </HorizontalRow>
+                    </section>
+                    <section>
+                        <HorizontalRow>
+                            <mdui-text-field label="Error" value="[ERROR]" defaultValue="[ERROR]" name="error"></mdui-text-field>
+                            <mdui-switch checked defaultChecked name="error-log"></mdui-switch>
+                            <mdui-switch checked defaultChecked name="error-record"></mdui-switch>
+                        </HorizontalRow>
+                    </section>
+                    <section>
+                        <HorizontalRow>
+                            <mdui-text-field label="Warning" value="[WARNING]" defaultValue="[WARNING]" name="warning"></mdui-text-field>
+                            <mdui-switch checked defaultChecked name="warning-log"></mdui-switch>
+                            <mdui-switch name="warning-record"></mdui-switch>
+                        </HorizontalRow>
+                    </section>
+                    <section>
+                        <HorizontalRow>
+                            <mdui-text-field label="Info" value="[INFO]" defaultValue="[INFO]" name="warning"></mdui-text-field>
+                            <mdui-switch name="info-log"></mdui-switch>
+                            <mdui-switch name="info-record"></mdui-switch>
+                        </HorizontalRow>
+                    </section>
+                    <section>
+                        <HorizontalRow>
+                            <mdui-text-field label="Debug" value="[DEBUG]" defaultValue="[DEBUG]" name="debug"></mdui-text-field>
+                            
+                                <mdui-switch name="debug-enabled"></mdui-switch>
+                                <mdui-switch name="debug-record"></mdui-switch>
+                        </HorizontalRow>
+                    </section>
                 </section>
             </Form>
         </mdui-card>
     );
 
     const DatabaseForm = (
-        <mdui-card variant="elevated" >
+        <mdui-card variant="elevated">
             <Form action="#">
                 <TopBar title="Database"></TopBar>
                 <section>
@@ -102,6 +131,8 @@ function Settings() {
                         <h4>Size</h4>
                         <span>Set the maximum number of logs to keep</span>
                     </div>
+                </section>
+                <section>
                     <HorizontalRow>
                         <mdui-text-field label="Maximum number of logs" value="80000" defaultValue="80000"></mdui-text-field>
                     </HorizontalRow>
