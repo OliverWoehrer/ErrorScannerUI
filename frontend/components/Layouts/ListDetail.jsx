@@ -19,7 +19,7 @@ function ListDetailLayout({listHeader, listFooter, list, detail}) {
         if(isBiggerScreen) {
             if(detail) { // if details displayed, wrap the details within a card element
                 detail = (
-                    <mdui-card variant="filled">
+                    <mdui-card variant="elevated">
                         {detail}
                     </mdui-card>
                 );
