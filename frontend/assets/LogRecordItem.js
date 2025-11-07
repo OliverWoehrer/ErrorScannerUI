@@ -67,7 +67,7 @@ export class LogRecordItem {
     }
 
     get timestamp() {
-        this.date.getTime();
+        return this.date.getTime();
     }
 
     /**
