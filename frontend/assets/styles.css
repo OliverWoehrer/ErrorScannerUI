@@ -22,12 +22,7 @@ h4 {
 }
 
 section {
-    /* margin: 0.5rem; */
-    padding: 0.5rem;
-}
-
-Form section > div {
-    margin: 12px 0;
+    margin: 0.5rem 0;
 }
 
 date-picker {
@@ -55,6 +50,10 @@ date-picker::part(selected):hover {
 
 mdui-card {
     padding: 12px;
+}
+
+mdui-card[variant="elevated"] {
+    box-shadow: var(--mdui-elevation-level3);
 }
 
 mdui-tabs::part(container) {
