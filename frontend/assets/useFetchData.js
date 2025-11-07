@@ -1,25 +1,18 @@
+// React Imports:
 import { useState, useEffect, useMemo, useCallback } from 'react';
-
 import { LogRecordItem } from "./LogRecordItem.js";
 
-
-
-
+// Material Components:
+import { snackbar } from 'mdui/functions/snackbar.js';
 
 /**
- * Custom Hook to handle data fetching, state management, and filtering.
+ * Custom Hook to handle data fetching.
  * @param {String} urlPath path to fetch from
  */
-export const useFilteredData = (urlPath) => {
+export const useFetchData = (urlPath) => {
     const [items, setItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [reloadTrigger, setReloadTrigger] = useState(0);
-    const [filters, setFilters] = useState({
-        categories: [],
-        searchQuery: '',
-        startDatetime: null,
-        endDatetime: null,
-    });
 
     async function fetchItems() {
         // Enable Loading Animation:
@@ -29,8 +22,11 @@ export const useFilteredData = (urlPath) => {
             // Fetch Items:
             const response = await fetch(urlPath);
             if(!response.ok) {
-                throw new Error(`Failed to fetch items [${response.status} ${response.statusText}]`);
-                // TODO: use reference from snackbar
+                snackbar({
+                    message: `Failed to fetch items [${response.status} ${response.statusText}]`,
+                    closeable:true
+                });
+                return;
             }
             const reader = response.body.getReader()// decode bytes to text chungs
             setItems([]); // clear current items after successful request
@@ -38,7 +34,11 @@ export const useFilteredData = (urlPath) => {
             // Read Incoming Stream:
             let buffer = ''; // byte buffer to accumulate chunks
             while(true) {
-                const { done, value } = await reader.read();
+                // const { done, value } = await reader.read();
+                let { value, done } = await Promise.race([
+                    reader.read(),
+                    new Promise((_, reject) => setTimeout(reject, 10000, new Error("Timeout: Did not receive any data.")))
+                ]); // timeout of the response breaks
                 buffer += new TextDecoder().decode(value);
                 let newlineIndex;
                 while((newlineIndex = buffer.indexOf('\n')) !== -1) {
@@ -49,13 +49,18 @@ export const useFilteredData = (urlPath) => {
                     try {
                         const jsonObject = JSON.parse(trimmed);
                         const item = new LogRecordItem(jsonObject);
-                        setItems(prevItems => [...prevItems, item])
+                        setItems(prevItems => [...prevItems, item]);
                     } catch(e) {
                         console.warn(`Error parsing JSON "${trimmed}": ${e}`);
                     }
                 }
                 if(done) { break; }
             }
+        } catch(error) {
+            snackbar({
+                message: `${error} Failed fetch items.`,
+                closeable:true
+            });
         } finally {
             // Disable Loading Animation:
             setIsLoading(false);
@@ -75,47 +80,8 @@ export const useFilteredData = (urlPath) => {
     }, [fetchItemsWrapper, reloadTrigger]);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Shared Memos:
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    
-
-    const filteredItems = useMemo(() => {
-        return items.filter(item => {
-            console.assert(item instanceof LogRecordItem, "'item' has to be of type 'LogRecordItem'");
-
-            // Check Category:
-            if(!filters.categories.includes(item.category)) {
-                return false;
-            }
-
-            // Check Text Search Query:
-            if(!item.search(filters.searchQuery)) {
-                return false;
-            }
-
-            // Check Datetime Range:
-            const start = filters.startDatetime.getTime();
-            const end = filters.endDatetime.getTime();
-            const current = item.timestamp;
-            if(!(start <= current) && (current <= end)) {
-                return false;
-            }
-
-            return true;
-        });
-    }, [items, filters]);
-
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
     // Shared Callbacks:
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    /**
-     * The referenced function updates the filter at the given key with the given value 
-     */
-    const updateFilter = useCallback((key, value) => {
-        setFilters(prev => ({ ...prev, [key]: value }));
-        // setSelectedItem(null); // Clear selection when filters change
-    }, []);
 
     /**
      * Updates the state variable which triggers a reload of items (new fetch)
@@ -127,10 +93,7 @@ export const useFilteredData = (urlPath) => {
 
     return {
         isLoading,
-        filters,
         items,
-        filteredItems,
-        updateFilter,
         reloadItems
     };
 };
