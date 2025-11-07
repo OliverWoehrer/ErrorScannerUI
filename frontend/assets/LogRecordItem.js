@@ -70,26 +70,44 @@ export class LogRecordItem {
         this.date.getTime();
     }
 
+    /**
+     * Return date in format DD.MM.YYYY
+     */
     get dateString() {
         return this.date.toLocaleString("fr-CH").split(" ")[0];
     }
 
+    /**
+     * Return time in format hh:mm:ss
+     */
     get timeString() {
         return this.date.toLocaleString("fr-CH").split(" ")[1];
     }
 
+    /**
+     * Return date and time in format DD.MM.YYYY hh:mm:ss.sss
+     */
     get datetimeString() {
         return this.date.toLocaleString("fr-CH");
     }
 
+    /**
+     * Return date in format YYYY-MM-DD
+     */
     get dateISOString() {
         return this.date.toLocaleString("sv-SE").split(" ")[0];
     }
 
+    /**
+     * Return time in format hh:mm:ss.sss
+     */
     get timeISOString() {
         return this.date.toLocaleString("sv-SE").split(" ")[1];
     }
 
+    /**
+     * Return date and time in format YYYY-MM-DDThh:mm:ss.sss
+     */
     get datetimeISOString() {
         console.assert(date instanceof Date, "Given parameter has to be of Type 'Date'");
         const split = date.toLocaleString("sv-SE").split(" ");
@@ -105,12 +123,18 @@ export class LogRecordItem {
     search(query) {
         if(!query) { return true; }
         query = query.toLocaleLowerCase();
-        if(this.id && String(this.id).toLocaleLowerCase().includes(query)) { return true; }
-        if(this.source && String(this.source).toLocaleLowerCase().includes(query)) { return true; }
-        if(this.message && String(this.message).toLocaleLowerCase().includes(query)) { return true; }
-        if(this.solution && String(this.solution).toLocaleLowerCase().includes(query)) { return true; }
-        if(this.searchkey && String(this.solution).toLocaleLowerCase().includes(query)) { return true; }
-        return false;
+        const words = query.split(/\s+/); // split at any length of whitespace
+        let hasMatch = true; // true if all key words from query had a match
+        for(const word of words) {
+            if(!hasMatch) { break; } // no match on previous key word, stop iteration 
+            if(this.id && String(this.id).toLocaleLowerCase().includes(word)) { hasMatch &= true; continue; }
+            if(this.source && String(this.source).toLocaleLowerCase().includes(word)) { hasMatch &= true; continue; }
+            if(this.message && String(this.message).toLocaleLowerCase().includes(word)) { hasMatch &= true; continue; }
+            if(this.solution && String(this.solution).toLocaleLowerCase().includes(word)) { hasMatch &= true; continue; }
+            if(this.searchkey && String(this.solution).toLocaleLowerCase().includes(word)) { hasMatch &= true; continue; }
+            hasMatch = false; // not match found for this word
+        }
+        return hasMatch;
     }
 
     /**
