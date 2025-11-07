@@ -1,5 +1,5 @@
 /**
- * This component implements a calendar like date picker. The is always a confirmed date and a
+ * This component implements a calendar like date picker. There is always a confirmed date and a
  * selected date. The selected date is the last date, the user clicked on. The selected date
  * becomes confirmed when the user clicks on the 'confirm' button. If the user clicks on the
  * 'cancel' button the selected date gets reset to the last confirmed date. This allows the user
@@ -41,6 +41,7 @@
  * 
  * All available slots are:
  * "supporting-text":   Text to be displayed at the top, to help the user
+ * "headline":          Element to display the currently selected date
  * "prev-month-btn":    The previous month is displayed when this element is clicked
  * "next-month-btn":    The next month is displayed when this element is clicked
  * "prev-year-btn":     The previous year is displayed when this element is clicked
@@ -137,11 +138,11 @@
  *  </body>
  *  <script>
  *      window.onload = () => {
- *          const dayPicker = document.querySelector("date-picker");
- *          if(dayPicker) {
- *              datetimePicker.addEventListener("select", () => { console.log("onselect"+datetimePicker.selectedDateObj); });
- *              datetimePicker.addEventListener("confirm", () => { console.log("onconfirm"+datetimePicker.confirmedDateObj); });
- *              datetimePicker.addEventListener("reset", reset() => { console.log("onreset"); });
+ *          const datePicker = document.querySelector("date-picker");
+ *          if(datePicker) {
+ *              datePicker.addEventListener("select", () => { console.log("onselect"+datePicker.selectedDateObj); });
+ *              datePicker.addEventListener("confirm", () => { console.log("onconfirm"+datePicker.confirmedDateObj); });
+ *              datePicker.addEventListener("reset", () => { console.log("onreset"); });
  *          }
  *      }
  *  </script>
@@ -151,8 +152,8 @@
  * 
  * This implementation is based on <wc-datepicker> from https://github.com/vanillawc/wc-datepicker
  */
-const template = document.createElement("template");
-template.innerHTML = `
+const datePickerTemplate = document.createElement("template");
+datePickerTemplate.innerHTML = `
 <style>
     :host {
         --grid-margin: 10px;
@@ -196,13 +197,13 @@ template.innerHTML = `
         opacity: 0.4;
     }
 </style>
-<div id="container">
+<div>
     <header>
         <div style="opacity: 0.4">
             <slot name="supporting-text"></slot>
         </div>
-        <div id="headline">
-            <slot name=headline></slot>
+        <div>
+            <slot name=headline><span></span></slot>
         </div>
         <div class="flexRow">
             <div class="flexRow">
@@ -220,7 +221,7 @@ template.innerHTML = `
     <main>
         <!-- filled by'createGridItems()' on initialization -->
     </main>
-    <footer class="footer">
+    <footer>
         <slot name="cancel-btn"><button>Cancel</button></slot>
         <slot name="confirm-btn"><button>OK</button></slot>
     </footer>
@@ -243,9 +244,9 @@ class DatePicker extends HTMLElement {
         this.initDate = null;
 
         // Setup Shadow DOM:
-        if(!template) { throw new Error("No template found"); }
+        if(!datePickerTemplate) { throw new Error("No template found"); }
         this.shadow = this.attachShadow({ mode:"closed" });
-        this.shadow.append(template.content.cloneNode(true));
+        this.shadow.append(datePickerTemplate.content.cloneNode(true));
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -316,14 +317,12 @@ class DatePicker extends HTMLElement {
     }
 
     /**
-     * Updates the currenlty selected date. The 'select' event is emitted depending on the given
-     * setting of 'fireSelectEvent'.
+     * Updates the currenlty selected date. The 'select' event is not emitted.
      * @param {Date} date selected object to update
      */
     set selectedDateObj(date) {
         console.assert(date instanceof Date, "Given date has to be of type 'Date'");
-        this.selectedDate = new Date(date); // clone date object
-        this.#selectDateValue(this.selectedDate.getDate(), this.selectedDate.getMonth(), this.selectedDate.getFullYear());
+        this.#selectDateValue(date.getDate(), date.getMonth(), date.getFullYear(), false); // dont emit 'select' event
     }
 
     /**
@@ -336,13 +335,13 @@ class DatePicker extends HTMLElement {
 
     /**
      * Updates the currenlty confirmed date. Updating the confirmed date automatically updates the
-     * selected date. The events 'select' and 'confirm' are emitted based on the given parameters.
+     * selected date. The events 'select' and 'confirm' are not emitted.
      * @param {Date} date confirmedDate date object
      */
     set confirmedDateObj(date) {
         console.assert(date instanceof Date, "Given date has to be of type 'Date'");
-        this.#selectDateValue(date.getDate(), date.getMonth(), date.getFullYear());
-        this.#confirmDateValue();
+        this.#selectDateValue(date.getDate(), date.getMonth(), date.getFullYear(), false); // dont emit 'select' event
+        this.#confirmDateValue(false); // dont emit 'confirm' event
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -357,6 +356,7 @@ class DatePicker extends HTMLElement {
      * @param {Boolean} fireSelectEvent if true the 'select' event is emitted, otherwise not
      */
     #selectDateValue(day, month, year, fireSelectEvent = true) {
+        // Update Internal Date Object:
         if(this.selectedDate) {
             this.selectedDate.setFullYear(year);
             this.selectedDate.setMonth(month, day);
@@ -364,10 +364,13 @@ class DatePicker extends HTMLElement {
             this.selectedDate = new Date(year, month, day);
         }
         
-        // const headline = this.shadow.querySelector("#headline");
-        const headline = this.headlineText;
-        if(headline) { headline.textContent = this.#toDateString(this.selectedDate); }
+        // Update UI: 
+        if(this.headlineText) { this.headlineText.textContent = this.#toDateString(this.selectedDate); }
+        this.displayedMonth = month;
+        this.displayedYear = year;
         this.#renderCalendar();
+
+        // Emit Event:
         if(fireSelectEvent) {
             this.dispatchEvent(new CustomEvent("select"));
         }
