@@ -1,81 +1,229 @@
-
-const template = document.createElement("template");
-template.innerHTML = `
+/**
+ * This component implements a time picker. The time value can be incremented and decremented with
+ * buttons or manually entered. The is always a confirmed time and a selected time. The selected
+ * time is the last time, the user put in. The selected time becomes confirmed when the user clicks
+ * on the 'confirm' button. If the user clicks on the 'cancel' button the selected time gets reset
+ * to the last confirmed time. This allows the user to discard any changes they made setting a new time selecting a new time.
+ *  
+ * [Attributes]
+ * Attributes are used to set or change the default behavior of the component
+ * "init-date":         The initial date that is displayed when the component is loaded. Has to be
+ *                      a string in ISO format YYYY-MM-DDThh:mm:ss. If the initial date is not set, the
+ *                      current date is used.
+ *
+ * 
+ * [Events]
+ * The component emits events every time the user selects, confirms or discards(=reset) a time. Use
+ * the 'select' and 'reset' event to update other parts of the UI, to reflect visual changes. Use
+ * the 'confirm' event to update functional parts of the application.
+ * 
+ * Here is a list of all events:
+ * "select":    Emitted when the user sets a time or the user discards any selection.
+ * "confirmed": Emitted when a time is confirmed. This usually means the user has decided on a time
+ *              and clicked on the 'confirm' element.
+ * "reset":     Emitted when the user discards any changes. This means the user clicked the
+ *              'cancel' element.
+ * 
+ * 
+ * [Slots]
+ * The component offers control elements for example to increment hours, confirm a selection, etc.
+ * when they are clicked. These control elements can be slotted, which means custom component
+ * libraries can be used to implement click-able elements. The available slots and what happens
+ * when they are clicked by the user, can be seen below. If no element is slotted, a default
+ * <button> element is created instead.
+ * 
+ * All available slots are:
+ * "supporting-text":   Text to be displayed at the top, to help the user
+ * "headline":          Element to display currently selected time
+ * "hours":             Input element to display the selected hours
+ * "inc-hours":         The hours are incremented when this element is clicked
+ * "dec-hours":         The hours are decremented when this element is clicked
+ * "minutes":           Input element to display the selected minutes
+ * "inc-minutes":       The minutes are incremented when this element is clicked
+ * "dec-minutes":       The minutes are decremented when this element is clicked
+ * "seconds":           Input element to display the selected seconds
+ * "inc-seconds":       The seconds are incremented when this element is clicked
+ * "dec-seconds":       The seconds are decremented when this element is clicked
+ * "millis":            Input element to display the selected milliseconds
+ * "inc-millis":        The milliseconds are incremented when this element is clicked
+ * "dec-millis":        The milliseconds are decremented when this element is clicked
+ * "cancel-btn":        The selected time is reset to the last confirmed time, when this element is
+ *                      clicked. The 'reset' event is emitted.
+ * "confirm-btn"        The selected time is confirmed when this element is clicked. The 'confirm'
+ *                      event is emitted.
+ * 
+ * 
+ * 
+ *                      ╔═══════════════════════════════════════════════╗
+ *                      ║                                               ║
+ *                      ║  Select a time ◀──slot=supporting-text        ║
+ *                      ║  13:37:01.101 ◀───slot=headline               ║
+ *                      ║                                               ║
+ *                      ║  Hours:          Minutes:      Seconds:       ║
+ *                      ║  ┌────────┐┌─┐  ┌────────┐┌─┐  ┌────────┐┌─┐  ║
+ * slot=hours───────────║─▶│        ││^│  │        ││^│  │        ││^│◀─║──slot=inc-seconds
+ *                      ║  │13      │└─┘  │37      │└─┘  │01      │└─┘  ║
+ *                      ║  │        │┌─┐  │        │┌─┐  │        │┌─┐  ║
+ *                      ║  │        ││v│  │        ││v│  │        ││v│◀─║──slot=dec-seconds
+ *                      ║  └────────┘└─┘  └────────┘└─┘  └────────┘└─┘  ║
+ *                      ║  Milliseconds:                                ║
+ *                      ║  ┌──────────────────────────────────────┐┌─┐  ║
+ *                      ║  │                                      ││^│◀─║──slot=inc-millis
+ *                      ║  │101                                   │└─┘  ║
+ *                      ║  │                                      │┌─┐  ║
+ *                      ║  │                                      ││v│◀─║──slot=dec-millis
+ *                      ║  └──────────────────────────────────────┘└─┘  ║
+ *                      ║                       ┌────────┐ ┌─────────┐  ║
+ * slot=cancel-btn──────║──────────────────────▶│ Cancel │ │ Confirm │◀─║──slot=confirm-button
+ *                      ║                       └────────┘ └─────────┘  ║
+ *                      ╚═══════════════════════════════════════════════╝
+ * 
+ * [Usage]
+ * This shows example usage of this component. If you dont want to use slotted elements, just use
+ * an empty element tag (<time-picker init-date="1970-01-01T13:37:01.101"><time-picker/>):
+ *  <html>
+ *  <head>
+ *      <script defer src="TimePicker.js"></script>
+ *  </head>
+ *  <body>
+ *      <time-picker init-date="1970-01-01T13:37:01.101">
+ *          <my-button slot="inc-hours">Up</my-button>
+ *          <my-button slot="dec-hours">Down</my-button>
+ *          <my-button slot="cancel-btn">Cancel</my-button>
+ *          <my-button slot="confirm-btn">OK</my-button>
+ *      </time-picker>
+ *  </body>
+ *  <script>
+ *      window.onload = () => {
+ *          const timePicker = document.querySelector("time-picker");
+ *          if(timePicker) {
+ *              timePicker.addEventListener("select", () => { console.log("onselect"+timePicker.selectedDateObj); });
+ *              timePicker.addEventListener("confirm", () => { console.log("onconfirm"+timePicker.confirmedDateObj); });
+ *              timePicker.addEventListener("reset", () => { console.log("onreset"); });
+ *          }
+ *      }
+ *  </script>
+ *  <html>
+ * 
+ * 
+ */
+const timePickerTemplate = document.createElement("template");
+timePickerTemplate.innerHTML = `
 <style>
     :host {
         --grid-margin: 10px;
         display: block;
-        width: 100vw;
+        width: 100%;
         max-width: 100%;
     }
     header {
         margin-bottom: 12px;
     }
     main {
-        display: grid;
-        grid-gap: var(--grid-margin);
-        grid-template-columns: repeat(7, 1fr);
-        margin-bottom: var(--grid-margin);
+        align-items: center;
+        box-sizing: border-box;
+        display: flex;
+        flex-flow: row wrap;
+        gap: var(--grid-margin);
+        justify-content: space-between;
+        width: 100%;
+    }
+    main > div {
+        width: 31%;
+    }
+    input {
+        box-sizing: border-box;
+        max-width: vw;
+        padding: 0;
+        width: 100%;
+    }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button { /* hide default buttons of number input */
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type=number] { /* hide default buttons of number input */
+        -moz-appearance: textfield;
     }
     footer {
         display: flex;
         gap: var(--grid-margin);
+        margin: var(--grid-margin) 0;
         justify-content: flex-end;
     }
     .flexRow {
+        align-items: stretch;
+        display: flex;
+        flex-flow: row nowrap;
+        gap: var(--grid-margin);
+        height: 100%;
+        justify-content: space-between;
+    }
+    .flexCol {
         align-items: center;
+        flex-flow: column nowrap;
         display: flex;
         gap: var(--grid-margin);
         justify-content: space-between;
     }
-    .gridItem {
-        aspect-ratio: 1 / 1;
-        box-sizing: border-box;
-        cursor: default;
-        display: grid;
-        height: auto;
-        place-items: center;
-    }
-    [part~="selected"] {
-        border-style: solid;
-        border-width: 1px;   
-    }
-    [part~="inactive"] {
-        opacity: 0.4;
-    }
 </style>
-<div id="container">
-    <header>
-        <div style="opacity: 0.4">
-            <slot name="supporting-text"></slot>
-        </div>
-        <div id="headline">
-            <slot name=headline></slot>
-        </div>
+<header>
+    <div style="opacity: 0.4">
+        <slot name="supporting-text">Select Time</slot>
+    </div>
+    <div>
+        <slot name=headline><span></span></slot>
+    </div>
+</header>
+<main>
+    <div>
+        <div>Hours:</div>
         <div class="flexRow">
-            <div class="flexRow">
-                <slot name="prev-month-btn"><button>&#11207;</button></slot>
-                <span id="month">Month</span>
-                <slot name="next-month-btn"><button>&#11208;</button></slot>
-            </div>
-            <div class="flexRow">
-                <slot name="prev-year-btn"><button>&#11207;</button></slot>
-                <span id="year">Year</span>
-                <slot name="next-year-btn"><button>&#11208;</button></slot>
+            <slot name="hours"><input id="hours" type="number" value="0"></slot>
+            <div class="flexCol">
+                <slot name="inc-hours"><button>&#129169;</button></slot>
+                <slot name="dec-hours"><button>&#129171;</button></slot>
             </div>
         </div>
-    </header>
-    <main>
-        <!-- filled by'createGridItems()' on initialization -->
-    </main>
-    <footer class="footer">
-        <slot name="cancel-btn"><button>Cancel</button></slot>
-        <slot name="confirm-btn"><button>OK</button></slot>
-    </footer>
-</div>
-`;
+    </div>
+    <div>
+        <div>Minutes:</div>
+        <div class="flexRow">
+            <slot name="minutes"><input id="minutes" type="number" value="0"></slot>
+            <div class="flexCol">
+                <slot name="inc-minutes"><button>&#129169;</button></slot>
+                <slot name="dec-minutes"><button>&#129171;</button></slot>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div>Seconds:</div>
+        <div class="flexRow">
+            <slot name="seconds"><input id="seconds" type="number" value="0"></slot>
+            <div class="flexCol">
+                <slot name="inc-seconds"><button>&#129169;</button></slot>
+                <slot name="dec-seconds"><button>&#129171;</button></slot>
+            </div>
+        </div>
+    </div>
+    <div style="width: 100%;">
+        <div>Milliseconds:</div>
+        <div class="flexRow">
+            <slot name="millis"><input id="millis" type="number" value="0"></slot>
+            <div class="flexCol">
+                <slot name="inc-millis"><button>&#129169;</button></slot>
+                <slot name="dec-millis"><button>&#129171;</button></slot>
+            </div>
+        </div>
+    </div>
+</main>
+<footer>
+    <slot name="cancel-btn"><button>Cancel</button></slot>
+    <slot name="confirm-btn"><button>OK</button></slot>
+</footer>
+`
 
-class DatePicker extends HTMLElement {
+class TimePicker extends HTMLElement {
     //////////////////////////////////////////////////////////////////////////////////////////
     // Web Component Lifecycle Hooks:
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -85,48 +233,72 @@ class DatePicker extends HTMLElement {
     constructor() {
         super()
         // Set Default Properties:
-        this.dayNames = ["M","T","W","T","F","S","S"];
-        this.monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-        this.confirmOnSelect = false;
         this.initDate = null;
 
         // Setup Shadow DOM:
-        if(!template) { throw new Error("No template found"); }
+        if(!timePickerTemplate) { throw new Error("No template found"); }
         this.shadow = this.attachShadow({ mode:"closed" });
-        this.shadow.append(template.content.cloneNode(true));
+        this.shadow.append(timePickerTemplate.content.cloneNode(true));
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
         if(name === "init-date") {
             this.initDate = newValue;
-        } else if(name === "confirm-on-select") {
-            this.confirmOnSelect = true;
         }
     }
 
     connectedCallback() {
-        // Build Template Structure:
-        this.#createGridItems();
-
         // Initialize Slotted Elements:
         const headlineSlot = this.shadow.querySelector("slot[name='headline']");
         this.headlineText = headlineSlot.assignedNodes({ flatten:true })[0];
 
-        const prevMonthSlot = this.shadow.querySelector("slot[name='prev-month-btn']");
-        const prevMonthButton = prevMonthSlot.assignedNodes({ flatten:true })[0];
-        prevMonthButton.onclick = () => { this.#showPrevMonth() };
+        const hoursSlot = this.shadow.querySelector("slot[name='hours']");
+        this.hoursInput = hoursSlot.assignedNodes({ flatten:true })[0];
+        this.hoursInput.oninput = () => { this.#parseHours() };
 
-        const nextMonthSlot = this.shadow.querySelector("slot[name='next-month-btn']");
-        const nextMonthButton = nextMonthSlot.assignedNodes({ flatten:true })[0];
-        nextMonthButton.onclick = () => { this.#showNextMonth() };
+        const incHoursSlot = this.shadow.querySelector("slot[name='inc-hours']");
+        const incHoursButton = incHoursSlot.assignedNodes({ flatten:true })[0];
+        incHoursButton.onclick = () => { this.#updateHours(+1) };
 
-        const prevYearSlot = this.shadow.querySelector("slot[name='prev-year-btn']");
-        const prevYearButton = prevYearSlot.assignedNodes({ flatten:true })[0];
-        prevYearButton.onclick = () => { this.#showPrevYear() };
+        const decHoursSlot = this.shadow.querySelector("slot[name='dec-hours']");
+        const decHoursButton = decHoursSlot.assignedNodes({ flatten:true })[0];
+        decHoursButton.onclick = () => { this.#updateHours(-1) };
 
-        const nextYearSlot = this.shadow.querySelector("slot[name='next-year-btn']");
-        const nextYearButton = nextYearSlot.assignedNodes({ flatten:true })[0];
-        nextYearButton.onclick = () => { this.#showNextYear() };
+        const minutesSlot = this.shadow.querySelector("slot[name='minutes']");
+        this.minutesInput = minutesSlot.assignedNodes({ flatten:true })[0];
+        this.minutesInput.oninput = () => { this.#parseMinutes() };
+
+        const incMinutesSlot = this.shadow.querySelector("slot[name='inc-minutes']");
+        const incMinutesButton = incMinutesSlot.assignedNodes({ flatten:true })[0];
+        incMinutesButton.onclick = () => { this.#updateMinutes(+1) };
+
+        const decMinutesSlot = this.shadow.querySelector("slot[name='dec-minutes']");
+        const decMinutesButton = decMinutesSlot.assignedNodes({ flatten:true })[0];
+        decMinutesButton.onclick = () => { this.#updateMinutes(-1) };
+
+        const secondsSlot = this.shadow.querySelector("slot[name='seconds']");
+        this.secondsInput = secondsSlot.assignedNodes({ flatten:true })[0];
+        this.secondsInput.oninput = () => { this.#parseSeconds() };
+
+        const incSecondsSlot = this.shadow.querySelector("slot[name='inc-seconds']");
+        const incSecondsButton = incSecondsSlot.assignedNodes({ flatten:true })[0];
+        incSecondsButton.onclick = () => { this.#updateSeconds(+1) };
+
+        const decSecondsSlot = this.shadow.querySelector("slot[name='dec-seconds']");
+        const decSecondsButton = decSecondsSlot.assignedNodes({ flatten:true })[0];
+        decSecondsButton.onclick = () => { this.#updateSeconds(-1) };
+
+        const millisSlot = this.shadow.querySelector("slot[name='millis']");
+        this.millisInput = millisSlot.assignedNodes({ flatten:true })[0];
+        this.millisInput.oninput = () => { this.#parseMillis() };
+
+        const incMillisSlot = this.shadow.querySelector("slot[name='inc-millis']");
+        const incMillisButton = incMillisSlot.assignedNodes({ flatten:true })[0];
+        incMillisButton.onclick = () => { this.#updateMillis(+1) };
+
+        const decMillisSlot = this.shadow.querySelector("slot[name='dec-millis']");
+        const decMillisButton = decMillisSlot.assignedNodes({ flatten:true })[0];
+        decMillisButton.onclick = () => { this.#updateMillis(-1) };
 
         const cancelSlot = this.shadow.querySelector("slot[name='cancel-btn']");
         const cancelButton = cancelSlot.assignedNodes({ flatten:true })[0];
@@ -146,9 +318,7 @@ class DatePicker extends HTMLElement {
         }
 
         // Initialize Internal State:
-        this.displayedMonth = this.selectedDate.getMonth();
-        this.displayedYear = this.selectedDate.getFullYear();
-        this.#renderCalendar();
+        this.selectedDate = this.confirmedDate;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -170,8 +340,7 @@ class DatePicker extends HTMLElement {
      */
     set selectedDateObj(date) {
         console.assert(date instanceof Date, "Given date has to be of type 'Date'");
-        this.selectedDate = new Date(date); // clone date object
-        this.#selectDateValue(this.selectedDate.getDate(), this.selectedDate.getMonth(), this.selectedDate.getFullYear());
+        this.#selectDateValue(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
     }
 
     /**
@@ -184,13 +353,13 @@ class DatePicker extends HTMLElement {
 
     /**
      * Updates the currenlty confirmed date. Updating the confirmed date automatically updates the
-     * selected date. The events 'select' and 'confirm' are emitted based on the given parameters.
+     * selected date. The events 'select' and 'confirm' are not emitted.
      * @param {Date} date confirmedDate date object
      */
     set confirmedDateObj(date) {
         console.assert(date instanceof Date, "Given date has to be of type 'Date'");
-        this.#selectDateValue(date.getDate(), date.getMonth(), date.getFullYear());
-        this.#confirmDateValue();
+        this.#selectDateValue(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds(), false); // dont emit 'select' event
+        this.#confirmDateValue(false); // dont emit 'confirm' event
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -199,23 +368,27 @@ class DatePicker extends HTMLElement {
 
     /**
      * Takes the given date parameters and sets the selected date object
-     * @param {Number} day date number
-     * @param {Number} month month index
-     * @param {Number} year full year number
+     * @param {Number} hours hours
+     * @param {Number} minutes minutes
+     * @param {Number} seconds seconds
+     * @param {Number} millis milliseconds
      * @param {Boolean} fireSelectEvent if true the 'select' event is emitted, otherwise not
      */
-    #selectDateValue(day, month, year, fireSelectEvent = true) {
+    #selectDateValue(hours, minutes, seconds, millis=0, fireSelectEvent=true) {
         if(this.selectedDate) {
-            this.selectedDate.setFullYear(year);
-            this.selectedDate.setMonth(month, day);
+            if(hours !== null) { this.selectedDate.setHours(hours); }
+            if(minutes !== null) { this.selectedDate.setMinutes(minutes); }
+            if(seconds !== null) { this.selectedDate.setSeconds(seconds); }
+            if(millis !== null) { this.selectedDate.setMilliseconds(millis); }
         } else {
-            this.selectedDate = new Date(year, month, day);
+            const defaultDate = new Date();
+            if(hours !== null) { defaultDate.setHours(hours); }
+            if(minutes !== null) { defaultDate.setMinutes(minutes); }
+            if(seconds !== null) { defaultDate.setSeconds(seconds); }
+            if(millis !== null) { defaultDate.setMilliseconds(millis); }
+            this.selectedDate = defaultDate;
         }
-        
-        // const headline = this.shadow.querySelector("#headline");
-        const headline = this.headlineText;
-        if(headline) { headline.textContent = this.#toDateString(this.selectedDate); }
-        this.#renderCalendar();
+        this.#renderDisplay();
         if(fireSelectEvent) {
             this.dispatchEvent(new CustomEvent("select"));
         }
@@ -244,234 +417,147 @@ class DatePicker extends HTMLElement {
      */
     #resetDateValue(fireResetEvent = true) {
         this.selectedDate = new Date(this.confirmedDate); // reset to prev confirmed date
-        this.#selectDateValue(this.confirmedDate.getDate(), this.confirmedDate.getMonth(), this.confirmedDate.getFullYear());
-        this.#renderCalendar();
+        this.#selectDateValue(this.confirmedDate.getHours(), this.confirmedDate.getMinutes(), this.confirmedDate.getSeconds(), this.confirmedDate.getMilliseconds());
+        this.#renderDisplay();
         if(fireResetEvent) {
             this.dispatchEvent(new CustomEvent("reset"));
         }
     }
 
-    /**
-     * This function is called when the user clicks on a day element. Updates the selected date
-     * object.
-     * @param {Object} event Event object passed by the 'click' event
-     */
-    #dayClickedEventHandler(event) {
-        const clickedDay = event.target.innerHTML;
-        this.#selectDateValue(clickedDay, this.displayedMonth, this.displayedYear);
-        if(this.confirmOnSelect) {
-            this.#confirmDateValue();
+    #updateHours(step) {
+        const newDate = new Date(this.selectedDate.getTime() + (step*60*60*1000));
+        this.#selectDateValue(newDate.getHours(), null, null, null);
+    }
+
+    #updateMinutes(step) {
+        const newDate = new Date(this.selectedDate.getTime() + (step*60*1000));
+        this.#selectDateValue(null, newDate.getMinutes(), null, null);
+    }
+
+    #updateSeconds(step) {
+        const newDate = new Date(this.selectedDate.getTime() + (step*1000));
+        this.#selectDateValue(null, null, newDate.getSeconds(), null);
+    }
+
+    #updateMillis(step) {
+        const newDate = new Date(this.selectedDate.getTime() + (step));
+        this.#selectDateValue(null, null, null, newDate.getMilliseconds());
+    }
+
+    #renderDisplay() {
+        if(this.headlineText) {
+            this.headlineText.textContent = this.#toTimeString(this.selectedDate);
+        }
+        if(this.hoursInput) {
+            this.hoursInput.value = this.selectedDate.getHours();
+        }
+        if(this.minutesInput) {
+            this.minutesInput.value = this.selectedDate.getMinutes();
+        }
+        if(this.secondsInput) {
+            this.secondsInput.value = this.selectedDate.getSeconds();
+        }
+        if(this.millisInput) {
+            this.millisInput.value = this.selectedDate.getMilliseconds();
         }
     }
 
-    /**
-     * This function increments the currently shown month
-     * @info Call this function if the 'nextMonth' button is clicked
-     */
-    #showNextMonth() {
-        if(this.displayedMonth === 11) {
-            this.displayedMonth = 0;
-            this.displayedYear++;
-        } else {
-            this.displayedMonth++;
-        }
-        this.#renderCalendar();
-    }
-
-    /**
-     * This function decrements the currently shown month
-     * @info Call this function if the 'prevMonth' button is clicked
-     */
-    #showPrevMonth() {
-        if(this.displayedMonth === 0) {
-            this.displayedMonth = 11;
-            this.displayedYear--;
-        } else {
-            this.displayedMonth--;
-        }
-        this.#renderCalendar();
-    }
-
-    /**
-     * This function increments the currently shown year
-     * @info Call this function if the 'nextYear' button is clicked
-     */
-    #showNextYear() {
-        this.displayedYear++;
-        this.#renderCalendar();
-    }
-
-    /**
-     * This function decrements the currently shown year
-     * @info Call this function if the 'prevYear' button is clicked
-     */
-    #showPrevYear() {
-        this.displayedYear--;
-        this.#renderCalendar();
-    }
-
-    /**
-     * Creates the elements of the calendar grid. Only called once during initialization.
-     */
-    #createGridItems() {
-        const main = this.shadow.querySelector("main");
-        if(!main) { throw new Error("Could not query grid element. Template needs an element 'main'."); }
-
-        // Create Weekday Labels:
-        const weekdays = this.dayNames;
-        for(const weekday of weekdays) {
-            const labelElement = document.createElement("div");
-            labelElement.className = "gridItem"; // class 'gridItem' used for grid styling
-            labelElement.setAttribute("part", "label");
-            labelElement.innerHTML = weekday;
-            main.appendChild(labelElement);
-        }
-
-        // Create Days:
-        for(let idx = 0; idx < 42; idx++) {
-            const dayElement = document.createElement("div");
-            dayElement.className = "gridItem"; // class 'gridItem' used for grid styling
-            dayElement.setAttribute("part", "day");
-            main.appendChild(dayElement);
+    #showErrorVisuals(elem) {
+        if(elem) {
+            elem.style.borderStyle = "solid";
+            elem.style.borderColor = "red";
         }
     }
 
-    /**
-     * Renders the calendar grid with the currently displayed month and year
-     */
-    #renderCalendar() {
-        // Generate Day Array:
-        let dayNumbers = []; // numbers of dates
-        let activeDays = []; // boolean values, if the daynumber with the same index is active or not
-        this.#generateDayArray(dayNumbers, activeDays);
-
-        const main = this.shadow.querySelector("main");
-        if(!main) { throw new Error("Could not query grid element. Template needs an element 'main'."); }
-
-        // Style Day Elements:
-        const gridElements = main.querySelectorAll("[part~='day']"); // the '~=' attribute selector matches the specified word delimited by spaces
-        for(const [idx,gridElement] of gridElements.entries()) {
-            gridElement.innerHTML = dayNumbers[idx];
-            gridElement.removeAttribute("part"); // clean any parts
-            gridElement.onclick = null; // remove any event listeners
-            let attributeString = "day";
-            if(activeDays[idx]) {
-                gridElement.onclick = (event) => { this.#dayClickedEventHandler(event) };
-                attributeString += " active";
-                if(this.displayedMonth === this.selectedDate.getMonth() && this.displayedYear === this.selectedDate.getFullYear() && dayNumbers[idx] === this.selectedDate.getDate()) {
-                    attributeString += " selected";
-                }
-            } else {
-                attributeString += " inactive";
-            }
-            gridElement.setAttribute("part", attributeString);
-        }
-
-        // Update Text:
-        const month = this.shadow.querySelector("#month");
-        if(month) { month.innerHTML = this.monthNames[this.displayedMonth]; }
-        const year = this.shadow.querySelector("#year");
-        if(year) { year.innerHTML = this.displayedYear; }
-    }
-
-    /**
-     * Generates the array of days for the currently displayed month and year. The day array is
-     * essentially a list (=Array) starting with the last monday of the previous month. Followed
-     * by the days of the current month. Ending with the first few days of the next month.
-     * @param {Array} dayArray Array of numbers that holds the date numbers of the days to render
-     * @param {Array} activeDays Array of booleans with same length as 'dayArray'. Active days with
-     * the same index are set 'true', inactive days are set 'false'.
-     */
-    #generateDayArray(dayArray, activeDays) {
-        // Date Obj For Rendering Calendar Grid:
-        const displayedDate = new Date(this.displayedYear, this.displayedMonth);
-        displayedDate.setDate(1);
-
-        // Current Date:
-        const weekday = displayedDate.getDay();
-        const month = displayedDate.getMonth() + 1;
-        const year = displayedDate.getFullYear();
-        let daysInMonth = this.#daysInMonth(month, year);
-
-        // Previous Date:
-        displayedDate.setDate(displayedDate.getDate() - 1); // decrement date to get yesterday
-        const prevMonth = displayedDate.getMonth() + 1;
-        const prevMonthYear = displayedDate.getFullYear();
-        const daysInPrevMonth = this.#daysInMonth(prevMonth, prevMonthYear);
-
-        // Build Day Array:
-        const offset = ((weekday == 0) ? 6 : (weekday-1)); // sunday: weekday=0, monday: weekday=1
-        const firstMonday = daysInPrevMonth - (offset - 1); // date of the first monday to generate (= last monday of prev month)
-        for(let day = firstMonday; day <= daysInPrevMonth; day++) { // append days of prev month (=non-active days)
-            dayArray.push(day);
-            activeDays.push(false);
-        }
-        for(let day = 1; day <= daysInMonth; day++) { // append days of this month (=active-days)
-            dayArray.push(day);
-            activeDays.push(true);
-        }
-        const numberOfNextMonthDays = 42 - dayArray.length;
-        for(let day = 1; day <= numberOfNextMonthDays; day++) { // append days of next month (=non-active days)
-            dayArray.push(day);
-            activeDays.push(false);
+    #hideErrorVisuals(elem) {
+        if(elem) {
+            elem.style.borderStyle = "";
+            elem.style.borderColor = "";
         }
     }
 
-    /**
-     * Tells if the given year is a leap year
-     * @param {Number} year 
-     * @returns 'true' if the year is a leap year, false otherwise
-     */
-    #isLeapYear(year) {
-        return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)
-    }
-
-    /**
-     * Tells how many days there are in the given month of the year
-     * @param {Number} month month to inspect
-     * @param {Number} year year of the month
-     * @returns Number of days of the given month
-     */
-    #daysInMonth(month, year) {
-        if(month === 1 || month === 3 || month === 5 || month === 7 || month === 8 || month === 10 || month === 12) {
-            return 31;
-        } else if(month === 4 || month === 6 || month === 9 || month === 11) {
-            return 30;
-        } else if(month === 2 && this.#isLeapYear(year)) {
-            return 29;
-        } else if(month === 2 && !(this.#isLeapYear(year))) {
-            return 28;
+    #parseHours() {
+        const value = this.hoursInput.value;
+        if(!this.#isNumber(value)) {
+            this.#showErrorVisuals(this.hoursInput);
+            return;
         }
+        if(!((0 <= value) && (value <= 23))) {
+            this.#showErrorVisuals(this.hoursInput);
+            return;
+        }
+        this.#hideErrorVisuals(this.hoursInput);
+        this.#selectDateValue(value, null, null, null);
+    }
+
+    #parseMinutes() {
+        const value = this.minutesInput.value;
+        if(!this.#isNumber(value)) {
+            return;
+        }
+        if(!((0 <= value) && (value <= 59))) {
+            return;
+        }
+        this.#selectDateValue(null, value, null, null);
+    }
+
+    #parseSeconds() {
+        const value = this.secondsInput.value;
+        if(!this.#isNumber(value)) {
+            return;
+        }
+        if(!((0 <= value) && (value <= 59))) {
+            return;
+        }
+        this.#selectDateValue(null, null, value, null);
+    }
+
+    #parseMillis() {
+        const value = this.millisInput.value;
+        if(!this.#isNumber(value)) {
+            return;
+        }
+        if(!((0 <= value) && (value <= 999))) {
+            return;
+        }
+        this.#selectDateValue(null, null, null, value);
     }
 
     /**
-     * Tells if the given string is a date or datetime in ISO format. Valid is either the short
-     * format (only date, YYYY-MM-DD), standard format (date and time, YYYY-MM-DDThh:mm:ss) or the
-     * long format (with milliseconds, YYYY-MM-DDThh:mm:ss.zzz).
+     * Tells if the given string is a time or datetime in ISO format. Valid is either the short
+     * format (only time, hh:mm:ss), long-format (with milliseconds hh:mm:ss.zzz) or standard
+     * format (date and time with or without milliseconds, YYYY-MM-DDThh:mm:ss).
      * @param {String} str String to check
      * @returns 'true' if the string is a valid format
      */
     #isValidDatetimeString(str) {
-        const ISO_FORMAT = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(?:\.\d{3})?)?$/;
+        const ISO_FORMAT = /^(\d{4}-\d{2}-\d{2}T)?\d{2}:\d{2}:\d{2}(?:\.\d+)?$/;
         return ISO_FORMAT.test(str);
+    }
+
+    /**
+     * Checks if the given string is an integer number
+     * @param {String} str string to check
+     * @returns true if the string represents an integer, false, otherwise
+     */
+    #isNumber(str) {
+        if(typeof str != "string") { return false; }
+        if(str === "") { return false; }
+        return !isNaN(str);
     }
 
     /**
      * Extracts a readble string from the the given date
      * @param {Date} date date object to stringify
-     * @returns string in format "18. Oct 2025"
+     * @returns string in format "hh:mm:ss.zzz"
      */
-    #toDateString(date) {
+    #toTimeString(date) {
         console.assert(date instanceof Date, "Given parameter has to be of Type 'Date'");
-        const day = date.getDate();
-        const month = this.monthNames[date.getMonth()];
-        const year = date.getFullYear();
-        const split = date.toISOString().split("T");
-        const dateString = split[0];
-        const timeString = split[1].slice(0, -1);
-        return day+". "+month+" "+year;
+        const split = date.toLocaleString("fr-CH").split(" ");
+        const millis = ("000" + date.getMilliseconds()).slice(-3);
+        return split[1]+"."+millis;
     }
 }
 
 // Define the new component
-customElements.define("date-picker", DatePicker);
+customElements.define("time-picker", TimePicker);
