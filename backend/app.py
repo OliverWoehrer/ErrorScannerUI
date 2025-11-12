@@ -2,7 +2,6 @@
 This module implements the functions to handle main routes of "/".
 """
 from flask import Flask, render_template
-import os
 from api import api
 
 

@@ -1,6 +1,7 @@
 """
 This module implements the functions to handle routes of /api
 """
+from api.form import form
 from datetime import datetime, timedelta
 from flask import Blueprint, Response, request
 import json
@@ -69,6 +70,7 @@ Blueprint Endpoints
 """
 # Register Blueprint Hierarchy:
 api = Blueprint("api", __name__, url_prefix="/api")
+api.register_blueprint(form, url_prefix="/form")
 
 @api.route("", methods=["GET"])
 def index():
