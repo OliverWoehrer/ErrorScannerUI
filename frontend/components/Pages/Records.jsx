@@ -19,14 +19,14 @@ import 'mdui/components/text-field.js';
 
 // Local Imports:
 import { openDialog, closeDialog } from '../../assets/scripts.js'
-import { useFetchData } from '../../hooks/useFetchData.js';
+import { useFetchDataStream as useFetchData } from '../../hooks/useFetchData.js';
 
 
 function Records() {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Global Properties
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    const {isLoading,items,reloadItems} = useFetchData("/api/records");
+    const { isLoading, data:items, reloadData } = useFetchData("/api/records");
     const [filteredItems, setFilteredItems] = useState(items);
     const snackBarRef = useRef(null);
     const [selectedItem, setSelectedItem] = useState(null);

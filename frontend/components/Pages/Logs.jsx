@@ -20,7 +20,7 @@ import 'mdui/components/tooltip.js';
 
 // Local Imports:
 import { openDialog, closeDialog } from '../../assets/scripts.js'
-import { useFetchData } from '../../hooks/useFetchData.js';
+import { useFetchDataStream as useFetchData } from '../../hooks/useFetchData.js';
 import ItemFilters from '../ItemFilters.jsx';
 
 
@@ -28,7 +28,7 @@ function Logs() {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Global Properties
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    const {isLoading,items,reloadItems} = useFetchData("/api/logs");
+    const { isLoading, data:items, reloadData } = useFetchData("/api/logs"); // rename generic 'data' to 'items' on import
     const [filteredItems, setFilteredItems] = useState(items);
     const snackBarRef = useRef(null);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -72,7 +72,7 @@ function Logs() {
             <mdui-collapse>
                 <mdui-collapse-item trigger="#showFilters">
                     <div slot="header" style={{alignContent:"flex-end", alignItems:"center", display:"flex", gap:"12px", justifyContent:"space-between", padding:"12px 0.5rem 0.5rem"}}>
-                        <mdui-fab extended ref={loadingAnimationRef} onClick={() => {reloadItems()}} icon="refresh">Refresh logs</mdui-fab>
+                        <mdui-fab extended ref={loadingAnimationRef} onClick={() => {reloadData()}} icon="refresh">Refresh logs</mdui-fab>
                         <mdui-button id="showFilters" variant="text" end-icon="keyboard_arrow_down">Use filters</mdui-button>
                     </div>
                     <div style={{padding:"0 0.5rem"}}>

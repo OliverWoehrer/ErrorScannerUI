@@ -5,31 +5,82 @@ import { LogRecordItem } from "../assets/LogRecordItem.js";
 // Material Components:
 import { snackbar } from 'mdui/functions/snackbar.js';
 
-/**
- * Custom Hook to handle data fetching.
- * @param {String} urlPath path to fetch from
- */
-export const useFetchData = (urlPath) => {
-    const [items, setItems] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [reloadTrigger, setReloadTrigger] = useState(0);
+function printMessage(msg, delay = 10000) {
+    snackbar({
+        message: msg,
+        autoCloseDelay: delay,
+        closeable: true
+    });
+}
 
-    async function fetchItems() {
+/**
+ * Custom hok to fetch data from the given endpoint. Returns the data and loading state.
+ * @param {string} endpoint The URL to fetch data from.
+ * @returns {{isLoading: boolean, fetchedData: Array | null, refetchData: function}}
+ */
+export function useFetchData(endpoint) {
+    const [fetchedData, setFetchedData] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    async function fetchData() {
+        try {
+            const response = await fetch(endpoint, { method: "GET" });
+            if(!response.ok) {
+                printMessage(`Failed to fetch items [${response.status} ${response.statusText}]`);
+                return;
+            }
+            const data = await response.json();
+            setFetchedData(data);
+        } catch(error) {
+            if(error instanceof SyntaxError) {
+                printMessage(`Failed to parse reponse from ${endpoint}: ${error}`);
+            } else {
+                printMessage(`Failed to fetch data from ${endpoint}: ${error}`);
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    /**
+     * Fetch new data if endpoint changes
+     */
+    useEffect(() => {
+        fetchData();
+    }, [endpoint]);
+
+    /**
+     * Callback function to fetch data manually
+     */
+    const reloadData = useCallback(() => {
+        fetchData();
+    }, []);
+
+    return { isLoading, fetchedData, reloadData };
+}
+
+/**
+ * Custom hook to fetch data from the given endpoint as a continously updating stream
+ * @param {String} endpoint path to fetch from
+ * @returns {{isLoading: boolean, data: Array | null, refetchData: function}}
+ */
+export function useFetchDataStream(endpoint) {
+    const [data, setData] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+
+    async function fetchData() {
         // Enable Loading Animation:
         setIsLoading(true);
 
         try {
-            // Fetch Items:
-            const response = await fetch(urlPath);
+            // Fetch Data:
+            const response = await fetch(endpoint);
             if(!response.ok) {
-                snackbar({
-                    message: `Failed to fetch items [${response.status} ${response.statusText}]`,
-                    closeable:true
-                });
+                printMessage(`Failed to fetch data [${response.status} ${response.statusText}]`);
                 return;
             }
             const reader = response.body.getReader()// decode bytes to text chungs
-            setItems([]); // clear current items after successful request
+            setData([]); // clear current data after successful request
 
             // Read Incoming Stream:
             let buffer = ''; // byte buffer to accumulate chunks
@@ -49,7 +100,7 @@ export const useFetchData = (urlPath) => {
                     try {
                         const jsonObject = JSON.parse(trimmed);
                         const item = new LogRecordItem(jsonObject);
-                        setItems(prevItems => [...prevItems, item]);
+                        setData(prevData => [...prevData, item]);
                     } catch(e) {
                         console.warn(`Error parsing JSON "${trimmed}": ${e}`);
                     }
@@ -57,10 +108,7 @@ export const useFetchData = (urlPath) => {
                 if(done) { break; }
             }
         } catch(error) {
-            snackbar({
-                message: `${error} Failed fetch items.`,
-                closeable:true
-            });
+            printMessage(`${error} Failed fetch data.`);
         } finally {
             // Disable Loading Animation:
             setIsLoading(false);
@@ -68,32 +116,18 @@ export const useFetchData = (urlPath) => {
     }
 
     /**
-     * Fetches items from the given path. The response has to be in JSON Lines format so they can
-     * be parsed dynamically
+     * Fetch new data if endpoint changes
      */
-    const fetchItemsWrapper = useCallback(() => {
-        fetchItems();
-    }, [urlPath]);
-
     useEffect(() => {
-        fetchItemsWrapper();
-    }, [fetchItemsWrapper, reloadTrigger]);
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Shared Callbacks:
-    ///////////////////////////////////////////////////////////////////////////////////////////////
+        fetchData();
+    }, [endpoint]);
 
     /**
-     * Updates the state variable which triggers a reload of items (new fetch)
+     * Callback function to fetch data manually
      */
-    const reloadItems = useCallback(() => {
-        setReloadTrigger(prev => prev + 1);
+    const reloadData = useCallback(() => {
+        fetchData();
     }, []);
 
-
-    return {
-        isLoading,
-        items,
-        reloadItems
-    };
+    return { isLoading, data, reloadData };
 };
