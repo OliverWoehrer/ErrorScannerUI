@@ -7,7 +7,7 @@ import 'mdui/components/dialog.js';
 import 'mdui/components/icon.js';
 
 // Local Imports:
-import useScreenSize from '../../assets/useScreenSize';
+import useScreenSize from '../../hooks/useScreenSize.js';
 import "./style.css"
 
 function ListDetailLayout({listHeader, listFooter, list, detail}) {

@@ -20,7 +20,7 @@ import 'mdui/components/tooltip.js';
 
 // Local Imports:
 import { openDialog, closeDialog } from '../../assets/scripts.js'
-import { useFetchData } from '../../assets/useFetchData.js';
+import { useFetchData } from '../../hooks/useFetchData.js';
 import ItemFilters from '../ItemFilters.jsx';
 
 

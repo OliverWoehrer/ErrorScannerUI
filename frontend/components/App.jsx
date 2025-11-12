@@ -12,8 +12,8 @@ import 'mdui/components/navigation-rail.js';
 import 'mdui/components/navigation-rail-item.js';
 
 // Assets and Styles:
-import { ROUTES } from "../assets/routes";
-import useScreenSize from '../assets/useScreenSize';
+import { ROUTES } from "../assets/routes.js";
+import useScreenSize from '../hooks/useScreenSize.js';
 
 const { home, logs, records, settings } = ROUTES;
 

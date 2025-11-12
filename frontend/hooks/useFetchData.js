@@ -1,6 +1,6 @@
 // React Imports:
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { LogRecordItem } from "./LogRecordItem.js";
+import { LogRecordItem } from "../assets/LogRecordItem.js";
 
 // Material Components:
 import { snackbar } from 'mdui/functions/snackbar.js';
