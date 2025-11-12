@@ -15,6 +15,8 @@ import 'mdui/components/tooltip.js';
 // Local Imports:
 import { toDateString, toTimeString } from '../assets/scripts.js'
 import { LogRecordItem } from "../assets/LogRecordItem.js";
+import "../assets/DatePicker.js"
+import "../assets/TimePicker.js"
 
 function ItemFilters({items, updateFilteredItems}) {
     const [filters, setFilters] = useState({
@@ -69,10 +71,6 @@ function ItemFilters({items, updateFilteredItems}) {
             return true;
         });
     }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Event Handler (triggered on user interactions):
-    ///////////////////////////////////////////////////////////////////////////////////////////////
     
     // Handler For Search Input:
     function updateSearchQuery() {
@@ -266,11 +264,12 @@ function ItemFilters({items, updateFilteredItems}) {
             </section>
             <section>
                 <HorizontalRow>
+                    {/* Input Start Date & Time */}
                     <mdui-card variant="filled" style={{ width: "100%" }}>
                         <mdui-text-field ref={startDateRef.input} label="Starting Date" readonly onClick={() => { openDialog(startDateRef.dialog); }}>
                             <mdui-icon slot="icon" name="calendar_month"></mdui-icon>
                         </mdui-text-field>
-                        <mdui-dialog ref={startDateRef.dialog} close-on-esc>
+                        <mdui-dialog ref={startDateRef.dialog} close-on-esc close-on-overlay-click>
                             <date-picker ref={startDateRef.picker}>
                                 <span slot="supporting-text">Select a date</span>
                                 <mdui-top-app-bar-title slot="headline"></mdui-top-app-bar-title>
@@ -285,7 +284,7 @@ function ItemFilters({items, updateFilteredItems}) {
                         <mdui-text-field ref={startTimeRef.input} label="Starting Time" helper-on-focus onClick={() => { openDialog(startTimeRef.dialog); }}>
                             <mdui-icon slot="icon" name="access_time"></mdui-icon>
                         </mdui-text-field>
-                        <mdui-dialog ref={startTimeRef.dialog} close-on-esc>
+                        <mdui-dialog ref={startTimeRef.dialog} close-on-esc close-on-overlay-click>
                             <time-picker ref={startTimeRef.picker}>
                                 <span slot="supporting-text">Select a time</span>
                                 <mdui-top-app-bar-title slot="headline"></mdui-top-app-bar-title>
@@ -306,11 +305,12 @@ function ItemFilters({items, updateFilteredItems}) {
                             </time-picker>
                         </mdui-dialog>
                     </mdui-card>
+                    {/* Input End Date & Time */}
                     <mdui-card variant="filled" style={{ width: "100%" }}>
                         <mdui-text-field ref={endDateRef.input} label="Ending Date" readonly onClick={() => { openDialog(endDateRef.dialog); }}>
                             <mdui-icon slot="icon" name="calendar_month"></mdui-icon>
                         </mdui-text-field>
-                        <mdui-dialog ref={endDateRef.dialog} close-on-esc>
+                        <mdui-dialog ref={endDateRef.dialog} close-on-esc close-on-overlay-click>
                             <date-picker ref={endDateRef.picker}>
                                 <span slot="supporting-text">Select a date</span>
                                 <mdui-top-app-bar-title slot="headline"></mdui-top-app-bar-title>
@@ -325,7 +325,7 @@ function ItemFilters({items, updateFilteredItems}) {
                         <mdui-text-field ref={endTimeRef.input} label="End Time" helper-on-focus onClick={() => { openDialog(endTimeRef.dialog); }}>
                             <mdui-icon slot="icon" name="access_time"></mdui-icon>
                         </mdui-text-field>
-                        <mdui-dialog ref={endTimeRef.dialog} close-on-esc>
+                        <mdui-dialog ref={endTimeRef.dialog} close-on-esc close-on-overlay-click>
                             <time-picker ref={endTimeRef.picker}>
                                 <span slot="supporting-text">Select a time</span>
                                 <mdui-top-app-bar-title slot="headline"></mdui-top-app-bar-title>
