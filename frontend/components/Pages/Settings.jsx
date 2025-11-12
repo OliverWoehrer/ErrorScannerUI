@@ -74,10 +74,14 @@ function Settings() {
                         <HorizontalRow>
                             <div style={{width:"100%"}}></div>
                             <mdui-tooltip content="Enable which message category should be logged">
-                                <div className="info-text">Logging</div>
+                                <div style={{display:"flex", alignItems: "center"}} className="info-text">
+                                    Logging <mdui-icon name="info--outlined" style={{fontSize:"1rem"}}></mdui-icon>
+                                </div>
                             </mdui-tooltip>
-                            <mdui-tooltip content="Enable which message category should be automatically added to records if unknown">
-                                <div className="info-text">Record</div>
+                            <mdui-tooltip content="Enable which message category should be automatically added to records if unknown" style={{display:"flex", alignItems: "center"}} className="info-text">
+                                <div style={{display:"flex", alignItems: "center"}} className="info-text">
+                                    Record <mdui-icon name="info--outlined" style={{fontSize:"1rem"}}></mdui-icon>
+                                </div>
                             </mdui-tooltip>
                         </HorizontalRow>
                     </section>
