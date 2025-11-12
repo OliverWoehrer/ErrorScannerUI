@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 
 const SCREEN_SIZES = {
-    "small": 0,     // 0 - 600px
-    "medium": 601,  // 601 - 992px
-    "large": 993    // 993px - max
+    small: { min:0, max:600 },
+    medium: { min:601, max:992 },
+    large: { min:993, max:Infinity}
 };
 
 /**
@@ -13,6 +13,7 @@ const SCREEN_SIZES = {
  * isLargerThan: (breakpoint: "small" | "medium" | "large") => boolean,
  * isSmallerThan: (breakpoint: "small" | "medium" | "large") => boolean,
  * isAtLeast: (breakpoint: "small" | "medium" | "large") => boolean,
+ * isAtMost: (breakpoint: "small" | "medium" | "large") => boolean
  * }}
  */
 const useScreenSize = () => {
@@ -21,9 +22,9 @@ const useScreenSize = () => {
     useEffect(() => {
         const handleResize = () => {
             const width = window.innerWidth;
-            if(width >= SCREEN_SIZES.large) {
+            if(width >= SCREEN_SIZES.large.min) {
                 setScreenSize('large');
-            } else if(width >= SCREEN_SIZES.medium) {
+            } else if(width >= SCREEN_SIZES.medium.min) {
                 setScreenSize('medium');
             } else {
                 setScreenSize('small');
@@ -37,25 +38,25 @@ const useScreenSize = () => {
     }, []);
 
     const isLargerThan = (breakpoint) => {
-        const breakpointSize = SCREEN_SIZES[breakpoint];
+        const breakpointSize = SCREEN_SIZES[breakpoint].max;
         if(!breakpointSize) return false;
         return window.innerWidth > breakpointSize;
     };
 
     const isSmallerThan = (breakpoint) => {
-        const breakpointSize = SCREEN_SIZES[breakpoint];
+        const breakpointSize = SCREEN_SIZES[breakpoint].min;
         if(!breakpointSize) return false;
         return window.innerWidth < breakpointSize;
     };
     
     const isAtLeast = (breakpoint) => {
-        const breakpointSize = SCREEN_SIZES[breakpoint];
+        const breakpointSize = SCREEN_SIZES[breakpoint].min;
         if(!breakpointSize) return false;
         return window.innerWidth >= breakpointSize;
     };
 
     const isAtMost = (breakpoint) => {
-        const breakpointSize = SCREEN_SIZES[breakpoint];
+        const breakpointSize = SCREEN_SIZES[breakpoint].max;
         if(!breakpointSize) return false;
         return window.innerWidth <= breakpointSize;
     };
