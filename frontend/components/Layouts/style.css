@@ -1,13 +1,8 @@
-mdui-top-app-bar {
-    padding: 0;
-}
-
 .list-detail-layout {
     align-items: stretch;
     display: flex;
     flex-direction: row;
     height: 100%;
-    /* padding: 12px; */
     box-sizing: border-box;
 }
 
@@ -38,6 +33,10 @@ mdui-top-app-bar {
     width: 100%;
 }
 
+.list-detail-layout > aside mdui-top-app-bar {
+    padding: 0;
+}
+
 .list-detail-layout .elastic {
     display: flex;
     flex-direction: column;
@@ -63,14 +62,6 @@ mdui-top-app-bar {
 
     min-height: 0;
     overflow-y: auto;
-}
-
-.list-detail-layout .log-content {
-    font-family: Monospace;
-}
-
-.list-detail-layout .log-content div {
-    padding: 12px 0;
 }
 
 

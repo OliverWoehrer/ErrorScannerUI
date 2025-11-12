@@ -6,12 +6,14 @@ import 'mdui/components/top-app-bar.js';
 import 'mdui/components/top-app-bar-title.js';
 
 // Local Import:
+import ZeroMd from 'zero-md';
+customElements.define('zero-md', ZeroMd);
 
 function DetailsView({ top, log }) {
     return (
         <>
             {top}
-            <div className="log-content" style={{fontFamily:"Monospace"}}>
+            <div>
                 <div>
                     <table>
                         <tbody>
@@ -27,18 +29,31 @@ function DetailsView({ top, log }) {
                                 <td>Source:</td>
                                 <td>{log.source}</td>
                             </tr>
+                            <tr>
+                                <td>Search Key:</td>
+                                <td>{log.searchkey}</td>
+                            </tr>
                         </tbody>
                     </table>
+                    {log.message && ( /* render paragraph if message available */
                     <p>
                         {log.message}
                     </p>
+                    )}
                 </div>
                 <div>
-                    {log.solution && (
-                    <p>
-                        Solution:<br/>
-                        {log.solution}
-                    </p>
+                    {log.solution && ( /* render paragraph if solution available */
+                    <>
+                    <mdui-divider></mdui-divider>
+                    <zero-md>
+                        <template>
+                            <link rel="stylesheet" href="/github-markdown.css" />
+                        </template>
+                        <script type="text/markdown">
+                            {log.solution}
+                        </script>
+                    </zero-md>
+                    </>
                     )}
                 </div>
             </div>
