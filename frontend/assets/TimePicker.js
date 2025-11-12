@@ -493,33 +493,42 @@ class TimePicker extends HTMLElement {
     #parseMinutes() {
         const value = this.minutesInput.value;
         if(!this.#isNumber(value)) {
+            this.#showErrorVisuals(this.minutesInput);
             return;
         }
         if(!((0 <= value) && (value <= 59))) {
+            this.#showErrorVisuals(this.minutesInput);
             return;
         }
+        this.#hideErrorVisuals(this.minutesInput);
         this.#selectDateValue(null, value, null, null);
     }
 
     #parseSeconds() {
         const value = this.secondsInput.value;
         if(!this.#isNumber(value)) {
+            this.#showErrorVisuals(this.secondsInput);
             return;
         }
         if(!((0 <= value) && (value <= 59))) {
+            this.#showErrorVisuals(this.secondsInput);
             return;
         }
+        this.#hideErrorVisuals(this.secondsInput);
         this.#selectDateValue(null, null, value, null);
     }
 
     #parseMillis() {
         const value = this.millisInput.value;
         if(!this.#isNumber(value)) {
+            this.#showErrorVisuals(this.millisInput);
             return;
         }
         if(!((0 <= value) && (value <= 999))) {
+            this.#showErrorVisuals(this.millisInput);
             return;
         }
+        this.#hideErrorVisuals(this.millisInput);
         this.#selectDateValue(null, null, null, value);
     }
 
