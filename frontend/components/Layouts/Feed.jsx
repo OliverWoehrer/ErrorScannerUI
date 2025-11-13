@@ -15,7 +15,6 @@ function Feed({ children }) {
     return (
         <div className="feed-layout">
             {children}
-            {isSmallScreen && (<div style={{height:"70px"}}></div>)}
         </div>
     );
 }
