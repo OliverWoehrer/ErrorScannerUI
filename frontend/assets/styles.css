@@ -79,6 +79,24 @@ mdui-dialog::part(panel) {
     width: 100%;
 }
 
+.fab {
+    border-radius: var(--mdui-shape-corner-large);
+    box-shadow: var(--mdui-elevation-level3);
+    height: 3.5rem;
+}
+
+.fab::part(button) {
+    background-color: rgb(var(--mdui-color-primary-container));
+    color: rgb(var(--mdui-color-on-primary-container));
+}
+
+.fab::part(icon) {
+    font-size: 24px;
+}
+.fab::part(loading) {
+    stroke: rgb(var(--mdui-color-on-primary-container));
+}
+
 .info-text {
     color: rgb(var(--mdui-color-outline-dark));
     font-size: 0.8rem;

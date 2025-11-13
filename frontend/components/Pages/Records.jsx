@@ -83,7 +83,7 @@ function Records() {
             <mdui-collapse>
                 <mdui-collapse-item trigger="#showFilters">
                     <div slot="header" style={{alignContent:"flex-end", alignItems:"center", display:"flex", gap:"12px", justifyContent:"space-between", padding:"12px 0.5rem 0.5rem"}}>
-                        <mdui-fab extended ref={loadingAnimationRef} onClick={() => {openDialog(newRecordDialogRef)}} icon="note_add">Add new record</mdui-fab>
+                        <mdui-button ref={loadingAnimationRef} onClick={() => {openDialog(newRecordDialogRef)}} className="fab" icon="note_add">Add new record</mdui-button>
                         <mdui-button id="showFilters" variant="text" end-icon="keyboard_arrow_down">Use filters</mdui-button>
                     </div>
                     <div style={{padding:"0 0.5rem"}}>
