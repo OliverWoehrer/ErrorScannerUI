@@ -18,7 +18,6 @@ import 'mdui/components/menu-item.js';
 import 'mdui/components/text-field.js';
 
 // Local Imports:
-import { openDialog, closeDialog } from '../../assets/scripts.js'
 import { useFetchDataStream as useFetchData } from '../../hooks/useFetchData.js';
 
 
@@ -28,12 +27,27 @@ function Records() {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     const { isLoading, data:items, reloadData } = useFetchData("/api/records");
     const [filteredItems, setFilteredItems] = useState(items);
-    const snackBarRef = useRef(null);
     const [selectedItem, setSelectedItem] = useState(null);
+    const newRecordDialogRef = useRef(null);
+    const editRecordDialogRef = useRef(null);
+    const deleteRecordDialogRef = useRef(null);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Event Handler (triggered on user interactions):
+    // Helper Functions:
     ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    function openDialog(reference) {
+        if(reference.current) {
+            reference.current.open = true;
+        }
+    }
+
+    function closeDialog(reference) {
+        if(reference.current) {
+            reference.current.open = false;
+        }
+    }
+
     function showDetails(id) {
         setSelectedItem(items.find(item => item.id === id));
     };
@@ -69,7 +83,7 @@ function Records() {
             <mdui-collapse>
                 <mdui-collapse-item trigger="#showFilters">
                     <div slot="header" style={{alignContent:"flex-end", alignItems:"center", display:"flex", gap:"12px", justifyContent:"space-between", padding:"12px 0.5rem 0.5rem"}}>
-                        <mdui-fab extended ref={loadingAnimationRef} onClick={() => {openDialog("add-record")}} icon="note_add">Add new record</mdui-fab>
+                        <mdui-fab extended ref={loadingAnimationRef} onClick={() => {openDialog(newRecordDialogRef)}} icon="note_add">Add new record</mdui-fab>
                         <mdui-button id="showFilters" variant="text" end-icon="keyboard_arrow_down">Use filters</mdui-button>
                     </div>
                     <div style={{padding:"0 0.5rem"}}>
@@ -77,11 +91,13 @@ function Records() {
                     </div>
                 </mdui-collapse-item>
             </mdui-collapse>
-            <mdui-dialog id="add-record" close-on-esc close-on-overlay-click>
-                <TopBar title="Add new record" closeFunction={() => (closeDialog("add-record"))}></TopBar>
-                <RecordForm action="#"></RecordForm>
+            <mdui-dialog ref={newRecordDialogRef} close-on-esc close-on-overlay-click>
+                <TopBar title="Add new record" closeFunction={() => (closeDialog(newRecordDialogRef))}></TopBar>
+                <RecordForm action="/api/form/new-record" onSuccess={() => (closeDialog(newRecordDialogRef))}></RecordForm>
             </mdui-dialog>
-            <span className="info-text">Showing {filteredItems.length} of {items.length}</span>
+            <div style={{paddingLeft:"16px"}}>
+                <span className="info-text">Showing {filteredItems.length} of {items.length}</span>
+            </div>
         </>
     );
 
@@ -99,20 +115,18 @@ function Records() {
     const DetailsTopBarElement = selectedItem && (
         <>
             <TopBar title={"#"+selectedItem.id} closeFunction={hideDetails}>
-                <mdui-button-icon icon="delete" onClick={() => (openDialog("delete-record"))}></mdui-button-icon>
-                <mdui-button-icon icon="edit" onClick={() => (openDialog("edit-record"))}></mdui-button-icon>
+                <mdui-button-icon icon="edit" onClick={() => (openDialog(editRecordDialogRef))}></mdui-button-icon>
+                <mdui-button-icon icon="delete" onClick={() => (openDialog(deleteRecordDialogRef))}></mdui-button-icon>
             </TopBar>
-            <mdui-dialog id="edit-record" close-on-esc close-on-overlay-click>
-                <TopBar title={"Edit Record #"+selectedItem.id} closeFunction={() => (closeDialog("edit-record"))}></TopBar>
-                <RecordForm action="#" record={selectedItem}></RecordForm>
+            <mdui-dialog ref={editRecordDialogRef} close-on-esc close-on-overlay-click>
+                <TopBar title={"Edit Record #"+selectedItem.id} closeFunction={() => (closeDialog(editRecordDialogRef))}></TopBar>
+                <RecordForm action="/api/form/edit-record" onSuccess={() => (closeDialog(editRecordDialogRef))} record={selectedItem}></RecordForm>
             </mdui-dialog>
-            <mdui-dialog id="delete-record" close-on-esc close-on-overlay-click>
-                <TopBar title={"Delete Record #"+selectedItem.id} closeFunction={() => (closeDialog("delete-record"))}></TopBar>
-                <Form action="#">
-                    <section>
-                        <input type="hidden" name="id" value={selectedItem.id}/>
-                        Do you want to delete this record?
-                    </section>
+            <mdui-dialog ref={deleteRecordDialogRef} close-on-esc close-on-overlay-click>
+                <TopBar title={"Delete Record #"+selectedItem.id} closeFunction={() => (closeDialog(deleteRecordDialogRef))}></TopBar>
+                <Form action="/api/form/delete-record" onSuccess={() => (closeDialog(deleteRecordDialogRef))}>
+                    <input type="hidden" name="id" value={selectedItem.id}/>
+                    Do you want to delete this record?
                 </Form>
             </mdui-dialog>
         </>
@@ -123,10 +137,7 @@ function Records() {
     );
 
     return(
-        <>
-            <mdui-snackbar ref={snackBarRef}></mdui-snackbar>
-            <ListDetailLayout listHeader={ListHeader} list={ListPane} detail={DetailPane} />
-        </>
+        <ListDetailLayout listHeader={ListHeader} list={ListPane} detail={DetailPane} />
     );
 }
 

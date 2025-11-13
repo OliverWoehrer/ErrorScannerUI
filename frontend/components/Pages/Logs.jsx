@@ -19,7 +19,6 @@ import 'mdui/components/text-field.js';
 import 'mdui/components/tooltip.js';
 
 // Local Imports:
-import { openDialog, closeDialog } from '../../assets/scripts.js'
 import { useFetchDataStream as useFetchData } from '../../hooks/useFetchData.js';
 import ItemFilters from '../ItemFilters.jsx';
 
@@ -30,12 +29,25 @@ function Logs() {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     const { isLoading, data:items, reloadData } = useFetchData("/api/logs"); // rename generic 'data' to 'items' on import
     const [filteredItems, setFilteredItems] = useState(items);
-    const snackBarRef = useRef(null);
     const [selectedItem, setSelectedItem] = useState(null);
+    const newRecordDialogRef = useRef(null);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Event Handler (triggered on user interactions):
+    // Helper Functions:
     ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    function openDialog(reference) {
+        if(reference.current) {
+            reference.current.open = true;
+        }
+    }
+
+    function closeDialog(reference) {
+        if(reference.current) {
+            reference.current.open = false;
+        }
+    }
+
     function showDetails(id) {
         setSelectedItem(items.find(item => item.id === id));
     };
@@ -80,16 +92,16 @@ function Logs() {
                     </div>
                 </mdui-collapse-item>
             </mdui-collapse>
-            <span className="info-text">Showing {filteredItems.length} of {items.length}</span>
+            <div style={{paddingLeft:"16px"}}>
+                <span className="info-text">Showing {filteredItems.length} of {items.length}</span>
+            </div>
         </>
     );
 
     const ListPane = filteredItems.length > 0 ? (
-        <>
-            <mdui-list>
-                {filteredItems.map(item => (<LogItemView key={item.id} log={item} onClick={showDetails} isSelected={item === selectedItem} />))}
-            </mdui-list>
-        </>
+        <mdui-list>
+            {filteredItems.map(item => (<LogItemView key={item.id} log={item} onClick={showDetails} isSelected={item === selectedItem} />))}
+        </mdui-list>
     ) : (
         <div style={{alignItems:'center', display:'flex', justifyContent:'center', margin:'auto'}}>
             <mdui-button-icon icon="search_off" variant="standard"></mdui-button-icon>
@@ -100,14 +112,14 @@ function Logs() {
     const DetailsTopBarElement = selectedItem && (
         <>
             <TopBar title={"#"+selectedItem.id} closeFunction={hideDetails}>
-                <mdui-button onclick={() => (openDialog("add-to-records"))}>
+                <mdui-button onclick={() => (openDialog(newRecordDialogRef))}>
                     <mdui-icon slot="icon" name="add"></mdui-icon>
                     Add to records
                 </mdui-button>
             </TopBar>
-            <mdui-dialog id="add-to-records" close-on-esc close-on-overlay-click>
-                <TopBar title="Add log to records" closeFunction={() => (closeDialog("add-to-records"))}></TopBar>
-                <RecordForm action="#" record={selectedItem}></RecordForm>
+            <mdui-dialog ref={newRecordDialogRef} close-on-esc close-on-overlay-click>
+                <TopBar title="Add log to records" closeFunction={() => (closeDialog(newRecordDialogRef))}></TopBar>
+                <RecordForm action="/api/form/new-record" onSuccess={() => (closeDialog(newRecordDialogRef))} record={selectedItem}></RecordForm>
             </mdui-dialog>
         </>
     );
@@ -117,10 +129,7 @@ function Logs() {
     );
 
     return(
-        <>
-            <mdui-snackbar ref={snackBarRef}></mdui-snackbar>
-            <ListDetailLayout listHeader={ListHeader} list={ListPane} detail={DetailPane} />
-        </>
+        <ListDetailLayout listHeader={ListHeader} list={ListPane} detail={DetailPane} />
     );
 }
 
