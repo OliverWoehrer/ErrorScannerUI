@@ -3,12 +3,14 @@ This module implements the functions to handle routes of /api
 """
 from api.form import form
 from datetime import datetime, timedelta
-from flask import Blueprint, Response, request
+from flask import Blueprint, Response, request, current_app
 import json
 import os
+from pathlib import Path
 import random
 import time
 import traceback
+from werkzeug.exceptions import HTTPException
 
 
 
@@ -19,7 +21,8 @@ def my_traceback(exception: Exception) -> str:
     """
     Formats a traceback to only include frames whose file paths are within the specified project root directory.
     """
-    PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+    PROJECT_ROOT = Path(__file__).parent.parent
+    IGNORE_DIRS = [".venv"]
 
     # Extract Frame List:
     exception_traceback = exception.__traceback__
@@ -28,8 +31,19 @@ def my_traceback(exception: Exception) -> str:
     # Iterate Through Each Frame:
     filtered_frames = []
     for frame in frame_list:
-        if frame.filename.startswith(PROJECT_ROOT):
-            filtered_frames.append(frame)
+        full_path = Path(frame.filename)
+        try:
+            relative_path = full_path.relative_to(PROJECT_ROOT)
+        except ValueError:
+            continue # skip if path is not under PROJECT_ROOT
+        relative_path_str = str(relative_path)
+        is_ignored = False
+        for ignored_dir in IGNORE_DIRS:
+            if relative_path_str.startswith(ignored_dir):
+                is_ignored = True
+                break
+        if not is_ignored:
+            filtered_frames.append(frame) # only append if under PROJECT_ROOT but not in IGNORE_DIRS
 
     # Return Formated Stracktrace:
     if filtered_frames:
@@ -48,10 +62,10 @@ def generate_logs(num_items=20, with_solution=False):
     TIME_RANGE_SECONDS = int((END_DATE - START_DATE).total_seconds())
 
     for idx in range(0, num_items):
-        random_offset = random.randint(0, TIME_RANGE_SECONDS)
+        random_offset = random.randint(0, TIME_RANGE_SECONDS*1000)
         log_item = {
             "id": str(idx),
-            "timestamp": (START_DATE + timedelta(seconds=random_offset)).isoformat(),
+            "timestamp": (START_DATE + timedelta(milliseconds=random_offset)).isoformat(),
             "category": random.choice(["Critical","Error","Warning","Info","Debug"]),
             "source": random.choice(["Thirsty-Wombat","Jumpy-Giraffe","Sleepy-Koala"]),
             "message": random.choice(["User 'alice' attempted to access restricted resource /admin/settings.", "Database connection pool initialized successfully with 10 connections.", "Failed to serialize response object for container 'zealous-pony': null value found in required field 'name'.", "Starting garbage collection cycle. Memory usage before: 128MB.", "System wide disk space usage exceeded 95%. Automated cleanup initiated.", "Mounted disk with 128MB."]),
@@ -59,7 +73,7 @@ def generate_logs(num_items=20, with_solution=False):
         }
         json_line = json.dumps(log_item) + "\r\n"        
         yield json_line.encode('utf-8') # yield the string (Flask sends this chunk immediately)
-        time.sleep(3/num_items)
+        time.sleep(1/num_items)
     
     yield '\n' # send final LF character
 
@@ -93,4 +107,11 @@ def records():
 
 @api.errorhandler(Exception)
 def error(e: Exception):
-    return f"{e}\r\n\r\n{my_traceback(e)}", 500
+    if isinstance(e, HTTPException): # display HTTP errors
+        msg = f"{e.code} {e.name}: {e.description}\r\n{my_traceback(e)}"
+        current_app.logger.error(msg)
+        return e.description, e.code
+    else: # do not return message about unknown errors
+        msg = f"{e}\r\n{my_traceback(e)}"
+        current_app.logger.error(msg)
+        return "Unhandled Error", 500
