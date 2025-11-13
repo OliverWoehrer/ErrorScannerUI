@@ -2,10 +2,20 @@ export class LogRecordItem {
     constructor(jsonObject = null) {
         const data = jsonObject || {};
 
+        if(data instanceof LogRecordItem) {
+            this.id = data.id;
+            this.date = new Date(data.date); 
+            this.category = data.category;
+            this.source = data.source;
+            this.message = data.message;
+            this.solution = data.solution;
+            this.searchkey = data.searchkey;
+            return;
+        }
+
         if(typeof data.id === "string") {
             this.id = data.id;
         } else {
-            console.warn("Property 'id' has to be of type 'string'");
             this.id = "";
         }
 
@@ -15,25 +25,21 @@ export class LogRecordItem {
             if(this.#isValidDatetimeString(data.timestamp)) {
                 this.date = new Date(data.timestamp);
             } else {
-                console.warn("Property 'timestamp' is not ISO format string");
                 this.date = new Date();
             }
         } else {
-            console.warn("Property 'timestamp' has to be of type 'Date' or 'string'");
             this.date = new Date();
         }
 
         if(typeof data.category === "string") {
             this.category = data.category;
         } else {
-            console.warn("Property 'category' has to be of type 'string'");
             this.category = "Info";
         }
 
         if(typeof data.source === "string") {
             this.source = data.source;
         } else {
-            console.warn("Property 'source' has to be of type 'string'");
             this.source = "";
         }
 
@@ -47,22 +53,31 @@ export class LogRecordItem {
             if(typeof data.solution === "string") {
                 this.solution = data.solution;
             } else {
-                console.warn("Property 'solution' has to be of type 'string'");
-                this.solution = null;
+                this.solution = "";
             }
         } else {
-            this.solution = null;
+            this.solution = "";
         }
 
         if(data.searchkey) {
             if(typeof data.searchkey === "string") {
                 this.searchkey = data.searchkey;
             } else {
-                console.warn("Property 'searchkey' has to be of type 'string'");
                 this.searchkey = null;
             }
         } else {
             this.searchkey = null;
+        }
+    }
+
+    get datetimeObj() {
+        return this.date;
+    }
+
+    set datetimeObj(datetime) {
+        console.assert(datetime instanceof Date, "Given 'datetime' has to be of type 'Date'");
+        if(datetime instanceof Date) {
+            this.date = new Date(datetime);
         }
     }
 
@@ -78,17 +93,21 @@ export class LogRecordItem {
     }
 
     /**
-     * Return time in format hh:mm:ss
+     * Return time in format hh:mm:ss.sss
      */
     get timeString() {
-        return this.date.toLocaleString("fr-CH").split(" ")[1];
+        const time = this.date.toLocaleString("fr-CH").split(" ")[1];
+        const millis = this.date.getMilliseconds();
+        return time+"."+("000"+millis).slice(-3);
     }
 
     /**
      * Return date and time in format DD.MM.YYYY hh:mm:ss.sss
      */
     get datetimeString() {
-        return this.date.toLocaleString("fr-CH");
+        const date = this.dateString;
+        const time = this.timeString;
+        return date+" "+time;
     }
 
     /**
@@ -102,16 +121,18 @@ export class LogRecordItem {
      * Return time in format hh:mm:ss.sss
      */
     get timeISOString() {
-        return this.date.toLocaleString("sv-SE").split(" ")[1];
+        const time = this.date.toLocaleString("sv-SE").split(" ")[1];
+        const millis = this.date.getMilliseconds();
+        return time+"."+("000"+millis).slice(-3);
     }
 
     /**
      * Return date and time in format YYYY-MM-DDThh:mm:ss.sss
      */
     get datetimeISOString() {
-        console.assert(date instanceof Date, "Given parameter has to be of Type 'Date'");
-        const split = date.toLocaleString("sv-SE").split(" ");
-        return split[0]+"T"+split[1];
+        const date = this.dateISOString;
+        const time = this.timeISOString;
+        return date+"T"+time;
     }
 
     /**
