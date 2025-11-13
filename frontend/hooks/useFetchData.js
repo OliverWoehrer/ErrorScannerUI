@@ -5,7 +5,7 @@ import { LogRecordItem } from "../assets/LogRecordItem.js";
 // Material Components:
 import { snackbar } from 'mdui/functions/snackbar.js';
 
-function printMessage(msg, delay = 10000) {
+function printMessage(msg, delay = 0) {
     snackbar({
         message: msg,
         autoCloseDelay: delay,
@@ -16,24 +16,26 @@ function printMessage(msg, delay = 10000) {
 /**
  * Custom hok to fetch data from the given endpoint. Returns the data and loading state.
  * @param {string} endpoint The URL to fetch data from.
- * @returns {{isLoading: boolean, fetchedData: Array | null, refetchData: function}}
+ * @returns {{isLoading: boolean, data: Array | null, refetchData: function}}
  */
 export function useFetchData(endpoint) {
-    const [fetchedData, setFetchedData] = useState(null);
+    const [data, setData] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
     async function fetchData() {
         try {
+            setIsLoading(true); // enable loading animation
             const response = await fetch(endpoint, { method: "GET" });
             if(!response.ok) {
-                printMessage(`Failed to fetch items [${response.status} ${response.statusText}]`);
+                const text = await response.text();
+                printMessage(`Failed to fetch data: [${response.status} ${response.statusText}] ${text}`);
                 return;
             }
-            const data = await response.json();
-            setFetchedData(data);
+            const parsed = await response.json();
+            setData(parsed);
         } catch(error) {
             if(error instanceof SyntaxError) {
-                printMessage(`Failed to parse reponse from ${endpoint}: ${error}`);
+                printMessage(`Failed to parse response from ${endpoint}: ${error}`);
             } else {
                 printMessage(`Failed to fetch data from ${endpoint}: ${error}`);
             }
@@ -56,7 +58,7 @@ export function useFetchData(endpoint) {
         fetchData();
     }, []);
 
-    return { isLoading, fetchedData, reloadData };
+    return { isLoading, data, reloadData };
 }
 
 /**
@@ -69,14 +71,14 @@ export function useFetchDataStream(endpoint) {
     const [isLoading, setIsLoading] = useState(false);
 
     async function fetchData() {
-        // Enable Loading Animation:
-        setIsLoading(true);
-
         try {
+            setIsLoading(true); // enable loading animation
+            
             // Fetch Data:
             const response = await fetch(endpoint);
             if(!response.ok) {
-                printMessage(`Failed to fetch data [${response.status} ${response.statusText}]`);
+                const text = await response.text();
+                printMessage(`Failed to fetch data [${response.status} ${response.statusText}] ${text}`);
                 return;
             }
             const reader = response.body.getReader()// decode bytes to text chungs
