@@ -2,15 +2,23 @@
 import 'mdui/components/button.js';
 import { snackbar } from 'mdui/functions/snackbar.js';
 
+function printMessage(msg, delay = 0) {
+    snackbar({
+        message: msg,
+        autoCloseDelay: delay,
+        closeable: true
+    });
+}
+
 function defaultSubmit(event) {
     event.preventDefault(); // prevent automatic form submisson
 };
 
-async function sendData(event) {
+async function sendData(event, onSuccess) {
     // Build JSON Form Data:
     const form = event.target.closest("form");
     if(!form) {
-        snackbar({ message:`Could not find parent <form> element`, closeable:true });
+        printMessage(`Could not find parent <form> element`);
         return;
     }
     const formData = new FormData(form);
@@ -25,27 +33,34 @@ async function sendData(event) {
             headers: { "Content-Type":"application/json" },
             body: formDataJsonString,
         });
-        if(response.ok) {
-            snackbar({ message:`Submitted data successfully`, closeable:true });
-        } else {
-            snackbar({ message:`Failed to submit data to '${endpoint}' [${response.status} ${response.statusText}]`, closeable:true });
+        if(!response.ok) {
+            const text = await response.text();
+            printMessage(`Failed to submit data to '${endpoint}': [${response.status} ${response.statusText}] ${text}`);
             return;
         }
+        if(onSuccess) {
+            onSuccess(); // callback function on success
+        }
+        printMessage(`Submitted data successfully`, 3000);
+        // TODO: update form with received response
     } catch(error) {
-        snackbar({ message:`Failed to submit data to '${endpoint}' [${error}]`, closeable:true });
+        printMessage(`Failed to submit data to '${endpoint}' [${error}]`);
     }
 }
 
-function Form({ action, children }) {
+function Form({ action, onSuccess, children }) {
+    function handleSubmit(event) {
+        sendData(event, onSuccess);
+    }
+
     return(
-        <form name="my-form" action={action} method="GET" onSubmit={defaultSubmit} style={{alignItems:"stretch", display:"flex", flexDirection:"column", height:"100%", justifyContent:"space-between"}}>
-            {/* TODO: change method to POST */}
+        <form name="my-form" action={action} onSubmit={defaultSubmit} style={{alignItems:"stretch", display:"flex", flexDirection:"column", height:"100%", justifyContent:"space-between"}}>
             <div>
                 {children}
             </div>
             <div style={{alignSelf:"flex-end", float:"right", marginTop:"12px"}}>
                 <mdui-button type="reset" variant="text">Discard changes</mdui-button>
-                <mdui-button type="submit" onClick={sendData}>Confirm</mdui-button>
+                <mdui-button type="submit" onClick={handleSubmit}>Confirm</mdui-button>
             </div>
         </form>
     );
