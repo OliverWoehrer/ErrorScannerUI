@@ -1,0 +1,33 @@
+{
+    "docker_interface": {
+        "network": "lognet"
+    },
+    "scanner": {
+        "interval": 15000,
+        "tags": {
+            "critical": "**CRITICAL**",
+            "error": "**ERROR**",
+            "warning": "**WARNING**",
+            "info": "**INFO**",
+            "debug": "**DEBUG**"
+        },
+        "logging": [
+            "critical",
+            "error",
+            "warning"
+        ],
+        "recording": [
+            "critical",
+            "error"
+        ]
+    },
+    "disk_usage": {
+        "max_logs": 60000
+    },
+    "database": {
+        "host": "localhost",
+        "port": "5000",
+        "path": "/api/data",
+        "key": "123ABC"
+    }
+}
