@@ -64,7 +64,7 @@ function ItemFilters({items, updateFilteredItems}) {
             const start = filters.startDatetime.getTime();
             const end = filters.endDatetime.getTime();
             const current = item.timestamp;
-            if (!((start <= current) && (current <= end))) {
+            if(!((start <= current) && (current <= end))) {
                 return false;
             }
 
