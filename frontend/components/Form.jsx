@@ -42,7 +42,6 @@ async function sendData(event, onSuccess) {
             onSuccess(); // callback function on success
         }
         printMessage(`Submitted data successfully`, 3000);
-        // TODO: update form with received response
     } catch(error) {
         printMessage(`Failed to submit data to '${endpoint}' [${error}]`);
     }
