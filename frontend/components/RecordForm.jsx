@@ -129,7 +129,9 @@ function RecordForm({ action, onSuccess, record }) {
                 <mdui-text-field label="Name of Docker Container" value={item.source} defaultValue={item.source} name="source"></mdui-text-field>
             </HorizontalRow>
             <HorizontalRow>
-                <mdui-text-field label="Search Key" value={item.searchkey} defaultValue={item.searchkey} name="searchkey"></mdui-text-field>
+                <mdui-text-field label="Search Key" value={item.searchkey} defaultValue={item.searchkey} name="searchkey" helper-on-focus>
+                    <span slot="helper">String to identify this record. Is used to search and compare with incoming log messages and check if the log message is a known record. Should be a sub-string of the original log message.</span>
+                </mdui-text-field>
             </HorizontalRow>
             <HorizontalRow>
                 <mdui-text-field label="Log Message" value={item.message} defaultValue={item.message} name="message" autosize min-rows="2" max-rows="7" enterkeyhint="enter"></mdui-text-field>
