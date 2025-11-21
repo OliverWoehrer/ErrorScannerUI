@@ -3,18 +3,19 @@
         "network": "lognet"
     },
     "scanner": {
-        "interval": 15000,
+        "interval": 5,
         "tags": {
-            "critical": "**CRITICAL**",
-            "error": "**ERROR**",
-            "warning": "**WARNING**",
-            "info": "**INFO**",
-            "debug": "**DEBUG**"
+            "critical": "[CRITICAL]",
+            "error": "[ERROR]",
+            "warning": "[WARNING]",
+            "info": "[INFO]",
+            "debug": "[DEBUG]"
         },
         "logging": [
             "critical",
             "error",
-            "warning"
+            "warning",
+            "info"
         ],
         "recording": [
             "critical",
