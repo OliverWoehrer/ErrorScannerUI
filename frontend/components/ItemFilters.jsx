@@ -63,7 +63,7 @@ function ItemFilters({items, updateFilteredItems}) {
             // Check Datetime Range:
             const start = filters.startDatetime.getTime();
             const end = filters.endDatetime.getTime();
-            const current = item.timestamp;
+            const current = item.unixtime;
             if(!((start <= current) && (current <= end))) {
                 return false;
             }
@@ -97,6 +97,7 @@ function ItemFilters({items, updateFilteredItems}) {
     const startTimeRef = { input:useRef(null), dialog:useRef(null), picker:useRef(null) };
     const endDateRef = { input:useRef(null), dialog:useRef(null), picker:useRef(null) };
     const endTimeRef = { input:useRef(null), dialog:useRef(null), picker:useRef(null) };
+    const categoriesRef = useRef(null);
 
     // Initialization:
     useEffect(() => {
@@ -114,11 +115,13 @@ function ItemFilters({items, updateFilteredItems}) {
         }
         
         // Initialze Category Filter:
-        const chips = Array.from(document.querySelectorAll("mdui-chip[variant='filter']"));
-        const selectedChips = chips.filter(chip => chip.hasAttribute('selected'));
-        const categories = chips.map(chip => chip.textContent.trim());
-        const selectedCategories = selectedChips.map(chip => chip.textContent.trim());
-        updateFilter("categories", selectedCategories);
+        if(categoriesRef.current) {
+            // const chips = Array.from(document.querySelectorAll("mdui-chip[variant='filter']"));
+            const chips = Array.from(categoriesRef.current.querySelectorAll("mdui-chip"));
+            const selectedChips = chips.filter(chip => chip.hasAttribute('selected'));
+            const selectedCategories = selectedChips.map(chip => chip.textContent.trim().toLowerCase());
+            updateFilter("categories", selectedCategories);
+        }
 
         // Implement Event Handlers:
         function confirmStartDate() {
@@ -206,9 +209,9 @@ function ItemFilters({items, updateFilteredItems}) {
     // Update Datetime Filter on New Items:
     useEffect(() => {
         if(items.length > 0) {
-            const timestamps = items.map(item => item.timestamp);
-            const initStartDate = new Date(Math.min(...timestamps));
-            const initEndDate = new Date(Math.max(...timestamps));
+            const unixtimes = items.map(item => item.unixtime);
+            const initStartDate = new Date(Math.min(...unixtimes));
+            const initEndDate = new Date(Math.max(...unixtimes));
             updateFilter("startDatetime", new Date(initStartDate));
             updateFilter("endDatetime", new Date(initEndDate));
         }
@@ -348,13 +351,13 @@ function ItemFilters({items, updateFilteredItems}) {
                     </mdui-card>
                 </HorizontalRow>
             </section>
-            <section>
+            <section ref={categoriesRef}>
                 <HorizontalRow overflow>
-                    <mdui-chip variant="filter" onClick={() => updateCategory("Critical")} selectable selected>Critical</mdui-chip>
-                    <mdui-chip variant="filter" onClick={() => updateCategory("Error")} selectable selected>Error</mdui-chip>
-                    <mdui-chip variant="filter" onClick={() => updateCategory("Warning")} selectable selected>Warning</mdui-chip>
-                    <mdui-chip variant="filter" onClick={() => updateCategory("Info")} selectable>Info</mdui-chip>
-                    <mdui-chip variant="filter" onClick={() => updateCategory("Debug")} selectable>Debug</mdui-chip>
+                    <mdui-chip variant="filter" onClick={() => updateCategory("critical")} selectable selected>Critical</mdui-chip>
+                    <mdui-chip variant="filter" onClick={() => updateCategory("error")} selectable selected>Error</mdui-chip>
+                    <mdui-chip variant="filter" onClick={() => updateCategory("warning")} selectable selected>Warning</mdui-chip>
+                    <mdui-chip variant="filter" onClick={() => updateCategory("info")} selectable>Info</mdui-chip>
+                    <mdui-chip variant="filter" onClick={() => updateCategory("debug")} selectable>Debug</mdui-chip>
                 </HorizontalRow>
             </section>
         </>
