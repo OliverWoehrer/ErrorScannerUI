@@ -3,3 +3,8 @@
 
 # Cache and Build Files:
 __pycache__
+
+# Ignore Data Files:
+data/*json
+data/*jsonl
+data/*txt
