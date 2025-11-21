@@ -2,24 +2,11 @@
 This module implements the functions to handle routes of /form
 """
 # System Imports:
-from datetime import datetime, timedelta
+from data import config_data
 from flask import Blueprint, Response, request
 import json
-import time
 from werkzeug.exceptions import NotImplemented
 
-# Local Imports:
-from data import SettingsHandler
-
-"""
-Setup File Handlers
-"""
-settings = SettingsHandler("settings.json")
-
-
-"""
-Blueprint Endpoints
-"""
 # Register Blueprint Hierarchy:
 form = Blueprint("form", __name__, url_prefix="/form")
 
@@ -55,9 +42,9 @@ def delete_record():
 def docker_interface():
     if request.method == "GET":
         data = {
-            "network": settings.docker_interface_network(),
-            "whitelist": settings.docker_interface_whitelist(),
-            "blacklist": settings.docker_interface_blacklist(),
+            "network": config_data.docker_interface_network(),
+            "whitelist": config_data.docker_interface_whitelist(),
+            "blacklist": config_data.docker_interface_blacklist(),
         }
         response = json.dumps(data)
         return response
@@ -67,26 +54,26 @@ def docker_interface():
         payload = json.loads(body)
 
         if "network" in payload:
-            settings.docker_interface_network(payload["network"])
+            config_data.docker_interface_network(payload["network"])
         if "whitelist" in payload:
-            settings.docker_interface_whitelist(payload["whitelist"])
+            config_data.docker_interface_whitelist(payload["whitelist"])
         if "blacklist" in payload:
-            settings.docker_interface_blacklist(payload["blacklist"])
+            config_data.docker_interface_blacklist(payload["blacklist"])
 
         return "OK", 200
 
 @form.route("/scanner", methods=["GET","POST"])
 def scanner():
     if request.method == "GET":
-        logging_list = settings.scanner_logging()
-        recording_list = settings.scanner_recording()
+        logging_list = config_data.scanner_logging()
+        recording_list = config_data.scanner_recording()
         data = {
-            "interval": settings.scanner_interval(),
-            "tags_critical": settings.scanner_tags_critical(),
-            "tags_error": settings.scanner_tags_error(),
-            "tags_warning": settings.scanner_tags_warning(),
-            "tags_info": settings.scanner_tags_info(),
-            "tags_debug": settings.scanner_tags_debug(),
+            "interval": config_data.scanner_interval(),
+            "tags_critical": config_data.scanner_tags_critical(),
+            "tags_error": config_data.scanner_tags_error(),
+            "tags_warning": config_data.scanner_tags_warning(),
+            "tags_info": config_data.scanner_tags_info(),
+            "tags_debug": config_data.scanner_tags_debug(),
             "logging_critical": "critical" in logging_list,
             "logging_error": "error" in logging_list,
             "logging_warning": "warning" in logging_list,
@@ -106,19 +93,19 @@ def scanner():
         payload = json.loads(body)
 
         if "interval" in payload:
-            settings.scanner_interval(payload["interval"])
+            config_data.scanner_interval(payload["interval"])
         if "tags" in payload and isinstance(payload["tags"], dict):
             tags = payload["tags"]
             if "critical" in tags:
-                settings.scanner_tags_critical(tags["critical"])
+                config_data.scanner_tags_critical(tags["critical"])
             if "error" in tags:
-                settings.scanner_tags_error(tags["error"])
+                config_data.scanner_tags_error(tags["error"])
             if "warning" in tags:
-                settings.scanner_tags_warning(tags["warning"])
+                config_data.scanner_tags_warning(tags["warning"])
             if "info" in tags:
-                settings.scanner_tags_info(tags["info"])
+                config_data.scanner_tags_info(tags["info"])
             if "debug" in tags:
-                settings.scanner_tags_debug(tags["debug"])
+                config_data.scanner_tags_debug(tags["debug"])
         logging_list = []
         recording_list = []
         for key in payload.keys():
@@ -128,15 +115,15 @@ def scanner():
             if key.startswith("recording_"):
                 category = key.replace("recording_", "")
                 recording_list.append(category) # add string to recording list
-        settings.scanner_logging(logging_list)
-        settings.scanner_recording(recording_list)
+        config_data.scanner_logging(logging_list)
+        config_data.scanner_recording(recording_list)
 
         return "OK", 200
 
 @form.route("/disk-usage", methods=["GET","POST"])
 def disk_usage():
     if request.method == "GET":
-        disk_usage = settings.disk_usage()
+        disk_usage = config_data.disk_usage()
         response = json.dumps(disk_usage) # convert to valid json string
         return response
 
@@ -148,14 +135,14 @@ def disk_usage():
         # Check JSON Fields:
         if "max_logs" in payload:
             value = payload["max_logs"]
-            settings.disk_usage_max_logs(int(value))
+            config_data.disk_usage_max_logs(int(value))
         
         return "OK", 200
 
 @form.route("/database", methods=["GET","POST"])
 def database():
     if request.method == "GET":
-        database_settings = settings.database()
+        database_settings = config_data.database()
         response = json.dumps(database_settings)
         return response
 
@@ -164,12 +151,12 @@ def database():
         payload = json.loads(body)
 
         if "host" in payload:
-            settings.database_host(payload["host"])
+            config_data.database_host(payload["host"])
         if "port" in payload:
-            settings.database_port(payload["port"])
+            config_data.database_port(payload["port"])
         if "path" in payload:
-            settings.database_path(payload["path"])
+            config_data.database_path(payload["path"])
         if "key" in payload:
-            settings.database_key(payload["key"])
+            config_data.database_key(payload["key"])
 
         return "OK", 200

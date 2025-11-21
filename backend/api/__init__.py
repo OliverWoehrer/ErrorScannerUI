@@ -2,15 +2,15 @@
 This module implements the functions to handle routes of /api
 """
 from api.form import form
+from data import logs_data, records_data
 from datetime import datetime, timedelta
 from flask import Blueprint, Response, request, current_app
 import json
-import os
 from pathlib import Path
 import random
 import time
 import traceback
-from werkzeug.exceptions import HTTPException
+from werkzeug.exceptions import HTTPException, NotImplemented
 
 
 
@@ -93,17 +93,11 @@ def index():
 
 @api.route("/logs", methods=["GET"])
 def logs():
-    num_param = request.args.get("num")
-    if num_param is None:
-        num_param = 40
-    return Response(generate_logs(num_items=num_param), mimetype="application/json-lines")
+    return Response(logs_data.stream_lines(), mimetype="application/json-lines")
 
 @api.route("/records", methods=["GET"])
 def records():
-    num_param = request.args.get("num")
-    if num_param is None:
-        num_param = 40
-    return Response(generate_logs(num_items=num_param, with_solution=True), mimetype="application/json-lines")
+    return Response(records_data.stream_lines(), mimetype="application/json-lines")
 
 @api.errorhandler(Exception)
 def error(e: Exception):
