@@ -72,7 +72,10 @@ function Records() {
     // Update Loading Animation:
     const loadingAnimationRef = useRef(null);
     useEffect(() => {
-        loadingAnimationRef.current.loading = isLoading;
+        if(loadingAnimationRef.current) {
+            loadingAnimationRef.current.loading = isLoading;
+            loadingAnimationRef.current.disabled = isLoading;
+        }
     }, [isLoading]);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +86,7 @@ function Records() {
             <mdui-collapse>
                 <mdui-collapse-item trigger="#showFilters">
                     <div slot="header" style={{alignContent:"flex-end", alignItems:"center", display:"flex", gap:"12px", justifyContent:"space-between", padding:"12px 0.5rem 0.5rem"}}>
-                        <mdui-button ref={loadingAnimationRef} onClick={() => {openDialog(newRecordDialogRef)}} className="fab" icon="note_add">Add new record</mdui-button>
+                        <mdui-button onClick={() => {openDialog(newRecordDialogRef)}} className="fab" icon="note_add">Add new record</mdui-button>
                         <mdui-button id="showFilters" variant="text" end-icon="keyboard_arrow_down">Use filters</mdui-button>
                     </div>
                     <div style={{padding:"0 0.5rem"}}>
@@ -95,8 +98,8 @@ function Records() {
                 <TopBar title="Add new record" closeFunction={() => (closeDialog(newRecordDialogRef))}></TopBar>
                 <RecordForm action="/api/form/new-record" onSuccess={() => (closeDialog(newRecordDialogRef))}></RecordForm>
             </mdui-dialog>
-            <div style={{paddingLeft:"16px"}}>
-                <span className="info-text">Showing {filteredItems.length} of {items.length}</span>
+            <div>
+                <mdui-button ref={loadingAnimationRef} onClick={() => {reloadData()}} icon="refresh" variant="text" loading>Showing {filteredItems.length} of {items.length}</mdui-button>
             </div>
         </>
     );
