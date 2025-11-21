@@ -8,7 +8,7 @@ function LogView({ log, onClick, isSelected }) {
         <>
             <mdui-divider middle></mdui-divider>
             <mdui-list-item headline-line={1} description-line={1} onClick={() => onClick(log.id)} active={isSelected} rounded>
-                <div >
+                <div>
                     {log.message}
                 </div>
                 <div slot='description'>
