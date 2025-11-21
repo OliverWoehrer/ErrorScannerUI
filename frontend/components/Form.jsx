@@ -15,12 +15,17 @@ function defaultSubmit(event) {
 };
 
 async function sendData(event, onSuccess) {
-    // Build JSON Form Data:
+    // Validate Form:
     const form = event.target.closest("form");
     if(!form) {
         printMessage(`Could not find parent <form> element`);
         return;
     }
+    if(!form.reportValidity()) {
+        return; // dont send invalid data
+    }
+
+    // Build JSON Form Data:
     const formData = new FormData(form);
     const formDataObject = Object.fromEntries(formData.entries());
     const formDataJsonString = JSON.stringify(formDataObject); // convert to serialized JSON string
