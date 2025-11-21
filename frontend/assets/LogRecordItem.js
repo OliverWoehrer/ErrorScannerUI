@@ -4,7 +4,7 @@ export class LogRecordItem {
 
         if(data instanceof LogRecordItem) {
             this.id = data.id;
-            this.date = new Date(data.date); 
+            this.timestamp = new Date(data.timestamp); 
             this.category = data.category;
             this.source = data.source;
             this.message = data.message;
@@ -15,20 +15,22 @@ export class LogRecordItem {
 
         if(typeof data.id === "string") {
             this.id = data.id;
+        } else if(typeof data.id === "number") {
+            this.id = data.id;
         } else {
             this.id = "";
         }
 
         if(data.timestamp instanceof Date) {
-            this.date = new Date(data.timestamp);
+            this.timestamp = new Date(data.timestamp);
         } else if(typeof data.timestamp === "string") {
             if(this.#isValidDatetimeString(data.timestamp)) {
-                this.date = new Date(data.timestamp);
+                this.timestamp = new Date(data.timestamp);
             } else {
-                this.date = new Date();
+                this.timestamp = new Date();
             }
         } else {
-            this.date = new Date();
+            this.timestamp = new Date();
         }
 
         if(typeof data.category === "string") {
@@ -71,33 +73,33 @@ export class LogRecordItem {
     }
 
     get datetimeObj() {
-        return this.date;
+        return this.timestamp;
     }
 
     set datetimeObj(datetime) {
         console.assert(datetime instanceof Date, "Given 'datetime' has to be of type 'Date'");
         if(datetime instanceof Date) {
-            this.date = new Date(datetime);
+            this.timestamp = new Date(datetime);
         }
     }
 
-    get timestamp() {
-        return this.date.getTime();
+    get unixtime() {
+        return this.timestamp.getTime();
     }
 
     /**
      * Return date in format DD.MM.YYYY
      */
     get dateString() {
-        return this.date.toLocaleString("fr-CH").split(" ")[0];
+        return this.timestamp.toLocaleString("fr-CH").split(" ")[0];
     }
 
     /**
      * Return time in format hh:mm:ss.sss
      */
     get timeString() {
-        const time = this.date.toLocaleString("fr-CH").split(" ")[1];
-        const millis = this.date.getMilliseconds();
+        const time = this.timestamp.toLocaleString("fr-CH").split(" ")[1];
+        const millis = this.timestamp.getMilliseconds();
         return time+"."+("000"+millis).slice(-3);
     }
 
@@ -114,15 +116,15 @@ export class LogRecordItem {
      * Return date in format YYYY-MM-DD
      */
     get dateISOString() {
-        return this.date.toLocaleString("sv-SE").split(" ")[0];
+        return this.timestamp.toLocaleString("sv-SE").split(" ")[0];
     }
 
     /**
      * Return time in format hh:mm:ss.sss
      */
     get timeISOString() {
-        const time = this.date.toLocaleString("sv-SE").split(" ")[1];
-        const millis = this.date.getMilliseconds();
+        const time = this.timestamp.toLocaleString("sv-SE").split(" ")[1];
+        const millis = this.timestamp.getMilliseconds();
         return time+"."+("000"+millis).slice(-3);
     }
 
@@ -161,12 +163,14 @@ export class LogRecordItem {
     /**
      * Tells if the given string is a date or datetime in ISO format. Valid is either the short
      * format (only date, YYYY-MM-DD), standard format (date and time, YYYY-MM-DDThh:mm:ss) or the
-     * long format (with milliseconds, YYYY-MM-DDThh:mm:ss.zzz).
+     * long format (with milliseconds, YYYY-MM-DDThh:mm:ss.ssssssZhh:mm).
+     * @info More details on supported formats: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#date_time_string_format
      * @param {String} str String to check
      * @returns 'true' if the string is a valid format
      */
     #isValidDatetimeString(str) {
-        const ISO_FORMAT = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(?:\.\d+)?)?$/;
+        // const ISO_FORMAT = /^\d{4}  (-\d{2}(-\d{2})?)?  (T\d{2}:\d{2}(:\d{2}(\.\d{1,6})?)?)?  ([Z+-]\d{2}:\d{2})?$/;
+        const ISO_FORMAT = /^\d{4}(-\d{2}(-\d{2})?)?(T\d{2}:\d{2}(:\d{2}(\.\d{1,6})?)?)?([Z+-]\d{2}:\d{2})?$/;
         return ISO_FORMAT.test(str);
     }
 }
