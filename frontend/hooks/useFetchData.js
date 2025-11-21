@@ -19,7 +19,7 @@ function printMessage(msg, delay = 0) {
  * @returns {{isLoading: boolean, data: Array | null, refetchData: function}}
  */
 export function useFetchData(endpoint) {
-    const [data, setData] = useState(null);
+    const [data, setData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
     async function fetchData() {
