@@ -120,11 +120,11 @@ function RecordForm({ action, onSuccess, record }) {
             </HorizontalRow>
             <HorizontalRow>
                 <mdui-select label="Select Category" value={item.category} defaultValue={item.category} name="category" style={{width:"auto"}} >
-                    <mdui-menu-item value="Critical">Critical</mdui-menu-item>
-                    <mdui-menu-item value="Error">Error</mdui-menu-item>
-                    <mdui-menu-item value="Warning">Warning</mdui-menu-item>
-                    <mdui-menu-item value="Info">Info</mdui-menu-item>
-                    <mdui-menu-item value="Debug">Debug</mdui-menu-item>
+                    <mdui-menu-item value="critical">Critical</mdui-menu-item>
+                    <mdui-menu-item value="error">Error</mdui-menu-item>
+                    <mdui-menu-item value="warning">Warning</mdui-menu-item>
+                    <mdui-menu-item value="info">Info</mdui-menu-item>
+                    <mdui-menu-item value="debug">Debug</mdui-menu-item>
                 </mdui-select>
                 <mdui-text-field label="Name of Docker Container" value={item.source} defaultValue={item.source} name="source"></mdui-text-field>
             </HorizontalRow>
