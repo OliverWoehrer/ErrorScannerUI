@@ -101,13 +101,6 @@ function ItemFilters({items, updateFilteredItems}) {
 
     // Initialization:
     useEffect(() => {
-        // Initialze ESC Key:
-        document.body.addEventListener("keydown", function(event) {
-            if (event.key === "Escape") {
-                hideDetails();
-            }
-        });
-
         // Initialize Search Function:
         if(textSearchRef.current) {
             textSearchRef.current.addEventListener("input", updateSearchQuery);
