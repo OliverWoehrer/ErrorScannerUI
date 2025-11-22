@@ -12,35 +12,33 @@ import "./style.css"
 
 function ListDetailLayout({listHeader, listFooter, list, detail}) {
     // Layout Conditionals
-    const { isAtLeast } = useScreenSize();
-    const isBiggerScreen = isAtLeast('large'); // Split view for medium (601-992px) and large (993px+)
+    const { isAtMost } = useScreenSize();
+    const isSmallerScreen = isAtMost('small'); // split view for medium (601-992px) and large (993px+)
 
     function DetailPane() {
-        if(isBiggerScreen) {
-            if(detail) { // if details displayed, wrap the details within a card element
-                detail = (
+        if(isSmallerScreen) { // make details fullscreen overlay on smaller screens
+            return(
+                <mdui-dialog fullscreen open={detail}>
+                    {detail}
+                </mdui-dialog>
+            );
+        } else if(detail) { // details on bigger screen, wrap the details within a card element
+            return(
+                <aside>
                     <mdui-card variant="elevated">
                         {detail}
                     </mdui-card>
-                );
-            } else {
-                detail = (
+                </aside>
+            );
+        } else { // no details to show on bigger screen, display placeholder instead
+            return(
+                <aside>
                     <div>
                         Select a log to see more details
                     </div>
-                );
-            }
-            return(
-                <aside>
-                    {detail}
                 </aside>
             );
         }
-        return(
-            <mdui-dialog fullscreen open={detail}>
-                {detail}
-            </mdui-dialog>
-        );
     }
 
     return(
