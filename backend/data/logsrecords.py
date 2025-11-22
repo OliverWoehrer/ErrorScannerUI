@@ -10,7 +10,7 @@ class LogsRecordsItem:
     def __init__(self, timestamp: datetime = None, category: str = None, source : str = None, message: str = None, solution: str = None, searchkey: str = None):
         assert (not timestamp) or isinstance(timestamp, datetime), "'timestamp' has to by of time 'datetime'"
         self.timestamp = timestamp or datetime.now() # use current date as fallback
-        self.category = category or "info"
+        self.category = category or "debug"
         self.source = source or ""
         self.message = message or ""
         self.solution = solution

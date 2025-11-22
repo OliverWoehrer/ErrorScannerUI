@@ -78,7 +78,7 @@ class ConfigHandler:
             scanner["interval"] = interval
             self.scanner(scanner)
             return None
-        return scanner.get("interval", 15000)
+        return scanner.get("interval", 5)
     def scanner_tags(self, tags: dict | None = None) -> dict | None:
         scanner = self.scanner()
         if tags is not None:
@@ -127,7 +127,7 @@ class ConfigHandler:
             scanner["logging"] = logging_list
             self.scanner(scanner)
             return None
-        return scanner.get("logging", [])
+        return scanner.get("logging", ["debug"])
     def scanner_recording(self, recording_list: list | None = None) -> list | None:
         scanner = self.scanner()
         if recording_list is not None:
@@ -208,7 +208,8 @@ class ConfigHandler:
             return {} # return empty json
         except json.decoder.JSONDecodeError as e:
             text = file.read()
-            print(f"Could not parse JSON {text}: {e}")
+            if text: # check file content
+                print(f"Could not parse JSON ({text}): {e}")
             return {} # return empty json
         finally:
             file.close()
