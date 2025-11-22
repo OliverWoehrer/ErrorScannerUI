@@ -62,11 +62,13 @@ function RecordForm({ action, onSuccess, record }) {
         // Initialize Datetime Pickers:
         if(dateRef.picker.current) {
             const picker = dateRef.picker.current;
+            picker.selectedDateObj = item.datetimeObj;
             picker.addEventListener("confirm", confirmDate);
             picker.addEventListener("reset", () => { closeDialog(dateRef.dialog); });
         }
         if(timeRef.picker.current) {
             const picker = timeRef.picker.current;
+            picker.selectedDateObj = item.datetimeObj;
             picker.addEventListener("confirm", confirmTime);
             picker.addEventListener("reset", () => { closeDialog(timeRef.dialog); });
         }
