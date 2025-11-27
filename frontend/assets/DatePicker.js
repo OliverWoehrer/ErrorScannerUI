@@ -67,29 +67,29 @@
  * 
  *                      ╔═══════════════════════════════════════════════╗
  *                      ║                                               ║
- *                      ║  Select a date ◀──slot=supporting-text        ║
- *                      ║  18. Oct 2025 ◀───slot=headline               ║
+ *                      ║  Select a date <──slot=supporting-text        ║
+ *                      ║  18. Oct 2025 <───slot=headline               ║
  *                      ║                                               ║
  *                      ║  ┌─┐     ┌─┐                    ┌─┐      ┌─┐  ║
- * slot=next-month-btn──║─▶│<│ Oct │>│                    │<│ 2025 │>│◀─║──slot=next-year-btn
+ * slot=next-month-btn──║─>│<│ Oct │>│                    │<│ 2025 │>│<─║──slot=next-year-btn
  *                      ║  └─┘     └─┘                    └─┘      └─┘  ║
  *                      ║  ┌─────────────────────────────────────────┐  ║
- *                      ║  │ Mon   Tue   Wed   Thu   Fri   Sat   Sun │◀─║──part:label
+ *                      ║  │ Mon   Tue   Wed   Thu   Fri   Sat   Sun │<─║──part:label
  *                      ║  ├────────────┬────────────────────────────┤  ║
- *       part:inactive──║─▶│  29    30  │  1     2     3     4     5 │◀─║──part:day
+ *       part:inactive──║─>│  29    30  │  1     2     3     4     5 │<─║──part:day
  *                      ║  ├────────────┘                            │  ║
- *         part:active──║─▶│   6     7     8     9    10    11    12 │  ║
- *                      ║  │                              ┌────┐◀────│──║──part:selected
+ *         part:active──║─>│   6     7     8     9    10    11    12 │  ║
+ *                      ║  │                              ┌────┐<────│──║──part:selected
  *                      ║  │  13    14    15    16    17  │ 18 │  19 │  ║
  *                      ║  │                              └────┘     │  ║
  *                      ║  │  20    21    21    23    24    25    26 │  ║
  *                      ║  │                             ┌───────────┤  ║
  *                      ║  |  27    28    29    30    31 │   1     2 │  ║
  *                      ║  ├─────────────────────────────┘           │  ║
- *       part:inactive──║─▶|   3     4     5     6     7     8     9 │  ║
+ *       part:inactive──║─>|   3     4     5     6     7     8     9 │  ║
  *                      ║  └─────────────────────────────────────────┘  ║
  *                      ║                       ┌────────┐ ┌─────────┐  ║
- * slot=cancel-btn──────║──────────────────────▶│ Cancel │ │ Confirm │◀─║──slot=confirm-button
+ * slot=cancel-btn──────║──────────────────────>│ Cancel │ │ Confirm │<─║──slot=confirm-button
  *                      ║                       └────────┘ └─────────┘  ║
  *                      ╚═══════════════════════════════════════════════╝
  * 
@@ -409,11 +409,10 @@ class DatePicker extends HTMLElement {
     /**
      * This function is called when the user clicks on a day element. Updates the selected date
      * object.
-     * @param {Object} event Event object passed by the 'click' event
+     * @param {JSON} date JSON object with {"day":day,"month":month,"year":year}
      */
-    #dayClickedEventHandler(event) {
-        const clickedDay = event.target.innerHTML;
-        this.#selectDateValue(clickedDay, this.displayedMonth, this.displayedYear);
+    #dayClickedEventHandler(date) {
+        this.#selectDateValue(date.day, date.month, date.year);
         if(this.confirmOnSelect) {
             this.#confirmDateValue();
         }
@@ -496,9 +495,9 @@ class DatePicker extends HTMLElement {
      */
     #renderCalendar() {
         // Generate Day Array:
-        let dayNumbers = []; // numbers of dates
+        let dates = []; // numbers of dates
         let activeDays = []; // boolean values, if the daynumber with the same index is active or not
-        this.#generateDayArray(dayNumbers, activeDays);
+        this.#generateDayArray(dates, activeDays);
 
         const main = this.shadow.querySelector("main");
         if(!main) { throw new Error("Could not query grid element. Template needs an element 'main'."); }
@@ -506,16 +505,16 @@ class DatePicker extends HTMLElement {
         // Style Day Elements:
         const gridElements = main.querySelectorAll("[part~='day']"); // the '~=' attribute selector matches the specified word delimited by spaces
         for(const [idx,gridElement] of gridElements.entries()) {
-            gridElement.innerHTML = dayNumbers[idx];
+            gridElement.innerHTML = dates[idx].day;
             gridElement.removeAttribute("part"); // clean any parts
             gridElement.onclick = null; // remove any event listeners
+            gridElement.onclick = () => { this.#dayClickedEventHandler(dates[idx]) };
             let attributeString = "day";
+            if(dates[idx].day === this.selectedDate.getDate() && dates[idx].month === this.selectedDate.getMonth() && dates[idx].year === this.selectedDate.getFullYear()) {
+                attributeString += " selected";
+            }
             if(activeDays[idx]) {
-                gridElement.onclick = (event) => { this.#dayClickedEventHandler(event) };
                 attributeString += " active";
-                if(this.displayedMonth === this.selectedDate.getMonth() && this.displayedYear === this.selectedDate.getFullYear() && dayNumbers[idx] === this.selectedDate.getDate()) {
-                    attributeString += " selected";
-                }
             } else {
                 attributeString += " inactive";
             }
@@ -533,41 +532,51 @@ class DatePicker extends HTMLElement {
      * Generates the array of days for the currently displayed month and year. The day array is
      * essentially a list (=Array) starting with the last monday of the previous month. Followed
      * by the days of the current month. Ending with the first few days of the next month.
-     * @param {Array} dayArray Array of numbers that holds the date numbers of the days to render
+     * @param {Array} dateArray Array of numbers that holds the date numbers of the days to render
      * @param {Array} activeDays Array of booleans with same length as 'dayArray'. Active days with
      * the same index are set 'true', inactive days are set 'false'.
      */
-    #generateDayArray(dayArray, activeDays) {
+    #generateDayArray(dateArray, activeDays) {
         // Date Obj For Rendering Calendar Grid:
         const displayedDate = new Date(this.displayedYear, this.displayedMonth);
-        displayedDate.setDate(1);
+        displayedDate.setDate(1); // use first day of displayed month
 
         // Current Date:
         const weekday = displayedDate.getDay();
-        const month = displayedDate.getMonth() + 1;
+        const month = displayedDate.getMonth();
         const year = displayedDate.getFullYear();
         let daysInMonth = this.#daysInMonth(month, year);
 
-        // Previous Date:
-        displayedDate.setDate(displayedDate.getDate() - 1); // decrement date to get yesterday
-        const prevMonth = displayedDate.getMonth() + 1;
-        const prevMonthYear = displayedDate.getFullYear();
-        const daysInPrevMonth = this.#daysInMonth(prevMonth, prevMonthYear);
+        // Previous Month:
+        const startOfPrevMonth = new Date(displayedDate);
+        startOfPrevMonth.setMonth(displayedDate.getMonth() - 1); // decrement date by one month
+        const prevMonth = startOfPrevMonth.getMonth();
+        const prevYear = startOfPrevMonth.getFullYear();
+        const daysInPrevMonth = this.#daysInMonth(prevMonth, prevYear);
+
+        // Next Month:
+        const startOfNextMonth = new Date(displayedDate);
+        startOfNextMonth.setMonth(displayedDate.getMonth() + 1); // increment date by one month
+        const nextMonth = startOfNextMonth.getMonth();
+        const nextYear = startOfNextMonth.getFullYear();
 
         // Build Day Array:
         const offset = ((weekday == 0) ? 6 : (weekday-1)); // sunday: weekday=0, monday: weekday=1
         const firstMonday = daysInPrevMonth - (offset - 1); // date of the first monday to generate (= last monday of prev month)
         for(let day = firstMonday; day <= daysInPrevMonth; day++) { // append days of prev month (=non-active days)
-            dayArray.push(day);
+            const date = { "day":day, "month":prevMonth, "year":prevYear }
+            dateArray.push(date);
             activeDays.push(false);
         }
         for(let day = 1; day <= daysInMonth; day++) { // append days of this month (=active-days)
-            dayArray.push(day);
+            const date = { "day":day, "month":month, "year":year }
+            dateArray.push(date);
             activeDays.push(true);
         }
-        const numberOfNextMonthDays = 42 - dayArray.length;
+        const numberOfNextMonthDays = 42 - dateArray.length;
         for(let day = 1; day <= numberOfNextMonthDays; day++) { // append days of next month (=non-active days)
-            dayArray.push(day);
+            const date = { "day":day, "month":nextMonth, "year":nextYear }
+            dateArray.push(date);
             activeDays.push(false);
         }
     }
@@ -583,11 +592,12 @@ class DatePicker extends HTMLElement {
 
     /**
      * Tells how many days there are in the given month of the year
-     * @param {Number} month month to inspect
+     * @param {Number} month month to inspect (jan=0,...,dec=11)
      * @param {Number} year year of the month
      * @returns Number of days of the given month
      */
     #daysInMonth(month, year) {
+        month++;
         if(month === 1 || month === 3 || month === 5 || month === 7 || month === 8 || month === 10 || month === 12) {
             return 31;
         } else if(month === 4 || month === 6 || month === 9 || month === 11) {
