@@ -53,7 +53,7 @@ def my_traceback(exception: Exception) -> str:
     else:
         return "No application-specific traceback frames found"
 
-def generate_logs(num_items=20, with_solution=False):
+def generate_logs(num_items: int = 20, with_solution: bool = False):
     """
     A generator that yields JSON Line strings with a delay.
     """
@@ -66,7 +66,7 @@ def generate_logs(num_items=20, with_solution=False):
         log_item = {
             "id": str(idx),
             "timestamp": (START_DATE + timedelta(milliseconds=random_offset)).isoformat(),
-            "category": random.choice(["Critical","Error","Warning","Info","Debug"]),
+            "category": random.choice(["critical","error","warning","info","debug"]),
             "source": random.choice(["Thirsty-Wombat","Jumpy-Giraffe","Sleepy-Koala"]),
             "message": random.choice(["User 'alice' attempted to access restricted resource /admin/settings.", "Database connection pool initialized successfully with 10 connections.", "Failed to serialize response object for container 'zealous-pony': null value found in required field 'name'.", "Starting garbage collection cycle. Memory usage before: 128MB.", "System wide disk space usage exceeded 95%. Automated cleanup initiated.", "Mounted disk with 128MB."]),
             "solution": random.choice(["Just pray at this point", "Try to restart the container", None]) if with_solution else None
@@ -74,8 +74,6 @@ def generate_logs(num_items=20, with_solution=False):
         json_line = json.dumps(log_item) + "\r\n"        
         yield json_line.encode('utf-8') # yield the string (Flask sends this chunk immediately)
         time.sleep(1/num_items)
-    
-    yield '\n' # send final LF character
 
 
 
@@ -93,6 +91,7 @@ def index():
 
 @api.route("/logs", methods=["GET"])
 def logs():
+    # return Response(generate_logs(), mimetype="application/json-lines")
     return Response(logs_data.stream_lines(), mimetype="application/json-lines")
 
 @api.route("/records", methods=["GET"])
