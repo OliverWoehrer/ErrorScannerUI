@@ -4,14 +4,11 @@ from datetime import datetime, timedelta, timezone
 import docker
 import docker.models
 import docker.models.containers
-from itertools import product
-from multiprocessing import Process
 import os
 import re
 import signal
 from threading import Event
 import warnings
-from zoneinfo import ZoneInfo
 
 warnings.filterwarnings("error") # handle warning from libraries as exceptions
 
@@ -58,60 +55,43 @@ class Scanner():
         network_name = self.config.docker_interface_network()
         watchlist = self._build_watchlist(network_name, whitelist, blacklist)
 
+        # Infinite Loop:
         last_scanned = {} # store timestamp when each container was last scanned
-        prev_logged_items = []
         while not self.stop_event.is_set():
             # Initialize Iteration:
             new_logged_items = []  # list of new log items from all containers in the watchlist
-            all_recorded_items = self.records.load_items() # list of all previously recorded log items
-            categories_to_log = self.config.scanner_logging() # list of categories to store to the log file
-            categories_to_record = self.config.scanner_recording() # list of categories to auto-record if the log message was not already recorded
-            
+            all_recorded_items = self.records.load_items()
+            self.categories_to_log = self.config.scanner_logging() # list of categories to store to the log file
+            self.categories_to_record = self.config.scanner_recording() # list of categories to auto-record if the log message was not already recorded
+            self.similarity_threshold = self.config.scanner_threshold() # similarity threshold if no searchkey is available
+
             #TODO: remove after debug
-            current_recorded_items_count = len(all_recorded_items)
             updated_records_count = 0
+            new_records_count = 0
             
             for container in watchlist:
                 # Read New Logs:
-                since_time = last_scanned.get(container.name, None) # use posix timestamp 0 as fallback
+                since_time = last_scanned.get(container.name, datetime.fromtimestamp(0, tz=timezone.utc)) # use posix timestamp 0 as fallback
                 log_items = self._get_log_items(container, since=since_time)
                 if not log_items:
                     continue # no logs, skip to the next container
-                
-                # Check Which Log to Store and Record:
-                lastest_timestamp = datetime.fromtimestamp(0, tz=timezone.utc) # will hold the timestamp of the latest log item
-                for log_item in log_items:
-                    lastest_timestamp = max(log_item.timestamp, lastest_timestamp)
 
-                    # check if its category should be logged
-                    if log_item.category in categories_to_log:
-                        new_logged_items.append(log_item) # store this item to logs file
-                    elif log_item.category not in categories_to_record:
-                        continue # skip, do not further process this item
-                    
-                    # check if log message was already recorded previously
-                    previously_recorded = False # tells if the log message is already known and was recorded
-                    for record_item in all_recorded_items:
-                        if log_item == record_item: # check if the log message was already recorded
-                            record_item.timestamp = log_item.timestamp # update timestamp (last seen datetime)
-                            previously_recorded = True
-                            updated_records_count += 1
-                            break # skip rest of loop, matching record already found
-                        
-                    # if not already recorded, check if the category should be auto-recorded
-                    if not previously_recorded:
-                        if log_item.category in categories_to_record:
-                            all_recorded_items.append(log_item)
+                print(f"Processing {len(log_items)} logs from {container.name}")
                 
+                # Check Which Item to Log and Record:
+                lastest_timestamp, new_rec_cnt, upd_rec_cnt = self._process_log_items(items=log_items, logged_items=new_logged_items, recorded_items=all_recorded_items)
+                new_records_count += new_rec_cnt
+                updated_records_count += upd_rec_cnt
+
                 # Update Last Scanned Timestamp (use timestamp of the *last* log entry)
                 last_scanned[container.name] = lastest_timestamp
-                
-            for prev_log,new_log in product(prev_logged_items, new_logged_items):
-                assert prev_log.id != new_log.id, "No duplicates expected: {new_log.id}"
-            print(f"New Logs: {len(new_logged_items):>5} | Updated Records: {updated_records_count:>5} | New Records: {(len(all_recorded_items)-current_recorded_items_count):>5}\r\n")
-            prev_logged_items = new_logged_items # TODO: remove after debug
+
+            if new_records_count or updated_records_count:
+                print(f"New Records: {new_records_count:>5} | Updated Records: {updated_records_count:>5}")
 
             # Write String of Items to File:
+            max_log_count = self.config.disk_usage_max_logs()
+            self.logs.set_max_linecount(max_log_count)
             self.logs.store_items(new_logged_items, append=True)
             self.records.store_items(all_recorded_items, append=False)
 
@@ -162,6 +142,8 @@ class Scanner():
                     for network_name in network_settings.keys():
                         print(f"- {network_name}")
                         network_names.add(network_name)
+            finally: # cleanup host file
+                file.close()
         
         # [INFO]
         # Each network has multiple containers connected to it. We call this the 'galaxy' of
@@ -202,7 +184,7 @@ class Scanner():
 
         return watchlist
 
-    def _get_log_items(self, container: docker.models.containers.Container, since: datetime = None) -> list[LogsRecordsItem]:
+    def _get_log_items(self, container: docker.models.containers.Container, since: datetime) -> list[LogsRecordsItem]:
         """
         Get logs from a container since the given timestamp. If no timestamp is given, all logs
         are returned.
@@ -214,26 +196,24 @@ class Scanner():
         Returns:
             A list of log lines (strings). Returns an empty list on error.
         """
-        # Increment Starting Timestamp:
         # [INFO]
         # Log with timestamp 'since' was already fetched in previous iteration. So we increment
-        # timestamp 'since' by one nanosecond to not fetch it again. The method logs() only seems
-        # to consider nanaosecond resolution if the 'since' parameter is passed as float in
-        # nanoseconds
-        print(f"╔{container.name:═^45}╗")
-        print(f"║ Scanning since {since}")
-        
+        # timestamp 'since' by one microsecond to not fetch it again. The method logs() only seems
+        # to consider nanaosecond resolution if the 'since' parameter is passed as float in seconds
+
         # Fetch Logs as String:
         try:
-            logs_text = container.logs(stream=False, timestamps=True, since=since).decode("utf-8")
+            start = since.timestamp() if since.timestamp() else 0.0001 # smallest possible timestamp
+            logs_text = container.logs(stream=False, timestamps=True, since=start).decode("utf-8")
             lines = logs_text.splitlines()
         except Exception as e:
             print(f"Error retrieving logs for {container.name}: {e}")
             return []
+        
+        min_ts = datetime.now(timezone.utc) # TODO: remove after debug
+        max_ts = datetime.fromtimestamp(0, tz=timezone.utc)
 
         # Parse Text to Logs:
-        min_ts = datetime.now(timezone.utc)
-        max_ts = datetime.fromtimestamp(0, tz=timezone.utc) # TODO: removve after debug
         logs = []
         for line in lines:
             # [INFO]
@@ -245,6 +225,7 @@ class Scanner():
             
             # Look For RFC3339 Nano Timestamp (generated by Docker):
             timestamp = None
+            original_line = line
             match = re.search(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+Z(\d{2}:\d{2})?\s?", line)
             if match: # found Nano timestamp: nanosecond part needs to be cleaned to microseconds
                 dirty_string = match.group(0)
@@ -252,38 +233,41 @@ class Scanner():
                 microsecond_part = parts[1][:6] # trim nanaseconds to 6 digits
                 cleaned_string = f"{parts[0]}.{microsecond_part}Z"
                 timestamp = parser.isoparse(cleaned_string)#.astimezone(ZoneInfo("Europe/Vienna"))
-                # timestamp = aware_timestamp.replace(tzinfo=None)
-                original_line = line
                 line = line.replace(dirty_string, "") # remove timestamp generated by Docker
-            if since and timestamp and timestamp <= since:
-                continue # skip items before 'since', this happens for single logs when they appear a few microseconds before 'since'
-
-            # Clean Remaining Message:
+            assert timestamp, "Expected parsable timestamp from Docker log: {original_line}."
+            min_ts = min(timestamp, min_ts) #TODO: remove after debug
+            max_ts = max(timestamp, max_ts)
+            if timestamp == since:
+                continue # skip this log, it was previously parsed
+            assert timestamp > since, f"Expected timestamp bigger then {since}: {original_line}"
+            
+            # Clean Remaining Line:
             try: # remove remaining timestamps with dateutil parser
-                # fuzzy tokens return format = (datetime_obj, unused_tokens)
-                # datetime_obj: datetime object parsed
-                # unused_tokens: tokens not used for parsing 
-                datetime_obj, unused_tokens = parser.parse(line, fuzzy_with_tokens=True) # try to extract date
-                line = "".join(unused_tokens).strip() # only use tokens without datetime
+                if True: # set to False to stop auto-parsing timestamps
+                    # parse with fuzzy tokens return format = (datetime_obj, unused_tokens)
+                    # datetime_obj: datetime object parsed
+                    # unused_tokens: tokens not used for parsing
+                    datetime_obj, unused_tokens = parser.parse(line, fuzzy_with_tokens=True) # try to extract date
+                    line = "".join(unused_tokens).strip() # only use tokens without datetime
             except parser.ParserError as e:
-                continue # skip, unable to parse
+                pass # ignore, unable to parse
             except RuntimeWarning as e:
                 pass # continue without removing datetime string
             except Exception as e:
                 print(f"Failed to automatically remove datetime string from '{line}'")
-            
+
             # [INFO]
             # Some log messages spread over multiple line (e.g. stack traces). They originally get
             # extracted as separate logs. We now merge them under the assumption their timestamps are
             # within the threshold.
 
             # Merge Multiline Log Messages:
-            TIME_THRESHOLD = timedelta(microseconds=80)
+            TIME_THRESHOLD = timedelta(microseconds=200)
             if logs and (timestamp - logs[-1].timestamp) < TIME_THRESHOLD:
-                last_log = logs[-1]
-                last_log.message += "\n" + line # append to existing log message
+                logs[-1].message += "\n" + line # append to existing log message
+                logs[-1].timestamp = timestamp # use timestamp of new line
                 continue # skip the rest, no parsing needed
-            
+
             # Parse Log:
             parsed_category = None
             tags = self.config.scanner_tags()
@@ -294,18 +278,55 @@ class Scanner():
                    break # stop looking for other category tags
             item = LogsRecordsItem(timestamp=timestamp, category=parsed_category, source=container.name, message=line)
             logs.append(item)
-            min_ts = min(timestamp, min_ts)
-            max_ts = max(timestamp, max_ts) #TODO: remove after debug
-            if since and timestamp and timestamp <= since:
-                print("Expected earliest timestamp {timestamp} to be bigger then {since}")
-                # raise RuntimeError("Expected earliest timestamp {timestamp} to be bigger then {since}")
-
-        print(f"║ {len(logs)} new items")
-        if logs:
-            print(f"║ min = {min_ts}") # TODO: remove after debug
+            
+        if False: # TODO: remove after debug
+            print(f"╔{container.name:═^50}╗")
+            print(f"║ since {since}")
+            print(f"║ parsed {len(logs)} logs from {len(lines)} lines")
+            print(f"║ min = {min_ts}")
             print(f"║ max = {max_ts}")
-        print(f"╚{"":═^45}╝")
+            print(f"╚{"":═^50}╝")
         return logs
+
+    def _process_log_items(self, items: list[LogsRecordsItem], logged_items: list[LogsRecordsItem], recorded_items: list[LogsRecordsItem]) -> tuple[list[LogsRecordsItem],datetime]:
+        new_records_count = 0
+        updated_records_count = 0
+        lastest_timestamp = datetime.fromtimestamp(0, tz=timezone.utc) # will hold the timestamp of the latest log item
+        for item in items:
+            lastest_timestamp = max(item.timestamp, lastest_timestamp)
+
+            # 1. check if its category should be logged
+            if item.category in self.categories_to_log:
+                logged_items.append(item) # store this item to logs file
+            elif item.category not in self.categories_to_record:
+                continue # skip, do not further process this item
+            
+            # [INFO]
+            # At this point we need to record log_item. Check if the same log was already
+            # recorded. If it was recorded previously, update its timestamp. If it was not
+            # recorded previously, we automatically add it to the records.
+
+            # 2 check if log message was already recorded previously
+            best_score = self.similarity_threshold
+            best_match = None
+            for recorded_item in recorded_items:
+                score = item.similarity_score(recorded_item)
+                if score > best_score:
+                    best_score = score
+                    best_match = recorded_item
+                if best_score == 1.0:
+                    break # found perfect match, skip rest of loop
+
+            # 3. update records
+            if best_score > self.similarity_threshold:
+                best_match.timestamp = item.timestamp
+                updated_records_count += 1
+            else:
+                recorded_items.append(item)
+                new_records_count += 1                
+
+        return lastest_timestamp, new_records_count, updated_records_count
+        
 
 scanner = Scanner()
 

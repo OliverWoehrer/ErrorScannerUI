@@ -79,6 +79,13 @@ class ConfigHandler:
             self.scanner(scanner)
             return None
         return scanner.get("interval", 5)
+    def scanner_threshold(self, threshold: float | None = None) -> float | None:
+        scanner = self.scanner()
+        if threshold is not None:
+            scanner["threshold"] = threshold
+            self.scanner(scanner)
+            return None
+        return scanner.get("threshold", 0.85)
     def scanner_tags(self, tags: dict | None = None) -> dict | None:
         scanner = self.scanner()
         if tags is not None:
@@ -121,14 +128,14 @@ class ConfigHandler:
             self.scanner_tags(tags)
             return None
         return tags.get("debug", "")
-    def scanner_logging(self, logging_list: list | None = None) -> list | None:
+    def scanner_logging(self, logging_list: list[str] | None = None) -> list[str] | None:
         scanner = self.scanner()
         if logging_list is not None:
             scanner["logging"] = logging_list
             self.scanner(scanner)
             return None
         return scanner.get("logging", ["debug"])
-    def scanner_recording(self, recording_list: list | None = None) -> list | None:
+    def scanner_recording(self, recording_list: list[str] | None = None) -> list[str] | None:
         scanner = self.scanner()
         if recording_list is not None:
             scanner["recording"] = recording_list
@@ -152,7 +159,7 @@ class ConfigHandler:
             disk_usage["max_logs"] = num
             self.disk_usage(disk_usage)
             return None
-        return disk_usage.get("max_logs", 1000) 
+        return disk_usage.get("max_logs", 0) 
 
     
     # --- Database ---
