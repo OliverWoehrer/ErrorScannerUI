@@ -1,7 +1,7 @@
 // React Components:
 import { useEffect } from "react";
-import { BrowserRouter, Navigate, Routes, Route, useLocation, useNavigate } from "react-router"
-import { LogsPage, RecordsPage, SettingsPage } from "./Pages";
+import { useLocation, useNavigate } from "react-router"
+import { LogsPage, RecordsPage, SettingsPage } from "./Pages.jsx";
 
 // Material Components:
 import 'mdui/components/icon.js';
@@ -104,8 +104,6 @@ function PageWrapper({ path, children }) {
  * @returns React JSX element
  */
 function App() {
-    
-
     return(
         <>
             <nav>
