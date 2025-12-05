@@ -2,6 +2,8 @@
     --mdui-color-shadow-dark: 255, 255, 255!important;
 }
 
+
+
 /***************************************/
 /* Overwrite Default Styles: */
 /***************************************/
@@ -29,6 +31,11 @@ section {
     margin: 0.5rem 0;
 }
 
+
+
+/***************************************/
+/* Custom Web Components: */
+/***************************************/
 date-picker {
     --color-selected: var(--mdui-color-primary);
     --color-on-selected: var(--mdui-color-on-primary);
@@ -47,11 +54,29 @@ date-picker::part(active):hover {
     border-style: solid;
     border-width: 1px;
 }
+date-picker::part(inactive):hover {
+    border-color: rgb(var(--color-selected));
+    border-style: solid;
+    border-width: 1px;
+}
 date-picker::part(selected):hover {
     background-color: inherit;
     color: inherit;
 }
 
+file-input::part(file-picker) {
+    background-color: rgb(var(--mdui-color-surface-container-highest));
+    border: none;
+    border-radius: var(--mdui-shape-corner-large);
+    height: 100%;
+    padding: 6px;
+}
+
+
+
+/***************************************/
+/* MDUI Library Styles: */
+/***************************************/
 mdui-card {
     padding: 12px;
 }
@@ -73,9 +98,12 @@ mdui-top-app-bar {
 mdui-text-field[variant="filled"]::part(container) {
     box-shadow: 0px 0px;
     border-radius: var(--mdui-shape-corner-large);
-    margin: 0.5rem 0;
 }
 
+mdui-dialog::part(body) {
+    height: 100%;
+    width: 100%;
+}
 mdui-dialog::part(overlay) {
     background-color: rgba(0,0,0,0.4);
 }
@@ -83,26 +111,46 @@ mdui-dialog::part(panel) {
     width: 100%;
 }
 
-.fab {
-    border-radius: var(--mdui-shape-corner-large);
-    box-shadow: var(--mdui-elevation-level3);
-    height: 3.5rem;
-}
 
-.fab::part(button) {
-    background-color: rgb(var(--mdui-color-primary-container));
-    color: rgb(var(--mdui-color-on-primary-container));
-}
 
-.fab::part(icon) {
-    font-size: 24px;
-}
-.fab::part(loading) {
-    stroke: rgb(var(--mdui-color-on-primary-container));
-}
-
+/***************************************/
+/* General CSS Classes: */
+/***************************************/
 .info-text {
     color: rgb(var(--mdui-color-outline-dark));
     font-size: 0.8rem;
     /* margin-left: 15px; */
+}
+
+.flex-row {
+    display: flex;
+    align-content: flex-start;
+    align-items: center;
+    gap: 12px;
+    justify-content: space-between;
+    overflow-x: hidden;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.flex-column > header {
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+}
+.flex-column > footer {
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+}
+.flex-column > main {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+
+    min-height: 0;
+    overflow-y: auto;
 }
