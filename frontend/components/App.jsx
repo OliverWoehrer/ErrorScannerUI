@@ -12,10 +12,14 @@ import 'mdui/components/navigation-rail.js';
 import 'mdui/components/navigation-rail-item.js';
 
 // Assets and Styles:
-import { ROUTES } from "../assets/routes.js";
 import useScreenSize from '../hooks/useScreenSize.js';
 
-const { home, logs, records, settings } = ROUTES;
+const ROUTES = {
+    home: "/",
+    logs: "/logs",
+    records: "/records",
+    settings: "/settings",
+};
 
 /**
  * Navigation component handles navigation between pages
@@ -24,8 +28,8 @@ const { home, logs, records, settings } = ROUTES;
 function Navigation() {
     // Redirect Pages:
     useEffect(() => {
-        if(currentRoute === home) { // redirect home path "/" to "/logs"
-            navigate(logs, { replace:true })
+        if(currentRoute === ROUTES.home) { // redirect home path "/" to "/logs"
+            navigate(ROUTES.logs, { replace:true })
         }
     }, []);
 
@@ -109,13 +113,13 @@ function App() {
             <nav>
                 <Navigation />
             </nav>
-            <PageWrapper path={logs}>
+            <PageWrapper path={ROUTES.logs}>
                 <LogsPage />
             </PageWrapper>
-            <PageWrapper path={records}>
+            <PageWrapper path={ROUTES.records}>
                 <RecordsPage />
             </PageWrapper>
-            <PageWrapper path={settings}>
+            <PageWrapper path={ROUTES.settings}>
                 <SettingsPage />
             </PageWrapper>
         </>
