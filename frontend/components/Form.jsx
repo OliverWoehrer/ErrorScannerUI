@@ -52,20 +52,23 @@ async function sendData(event, onSuccess) {
     }
 }
 
-function Form({ action, onSuccess, children }) {
+function Form({ action, submitButtonText, resetButtonText, onSuccess, onReset, children }) {
+    const submitText = submitButtonText || "Confirm changes";
+    const resetText = resetButtonText || "Discard changes";
+
     function handleSubmit(event) {
         sendData(event, onSuccess);
     }
 
     return(
-        <form name="my-form" action={action} onSubmit={defaultSubmit} style={{alignItems:"stretch", display:"flex", flexDirection:"column", height:"100%", justifyContent:"space-between"}}>
-            <div>
+        <form name="my-form" action={action} onSubmit={defaultSubmit} className="flex-column">
+            <main>
                 {children}
-            </div>
-            <div style={{alignSelf:"flex-end", float:"right", marginTop:"12px"}}>
-                <mdui-button type="reset" variant="text">Discard changes</mdui-button>
-                <mdui-button type="submit" onClick={handleSubmit}>Confirm</mdui-button>
-            </div>
+            </main>
+            <footer>
+                <mdui-button type="submit" onClick={handleSubmit}>{submitText}</mdui-button>
+                <mdui-button type="reset" onClick={onReset} variant="text">{resetText}</mdui-button>
+            </footer>
         </form>
     );
 }

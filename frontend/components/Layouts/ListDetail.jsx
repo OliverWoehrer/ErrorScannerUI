@@ -13,7 +13,7 @@ import "./style.css"
 function ListDetailLayout({listHeader, listFooter, list, detail}) {
     // Layout Conditionals
     const { isAtMost } = useScreenSize();
-    const isSmallerScreen = isAtMost('small'); // split view for medium (601-992px) and large (993px+)
+    const isSmallerScreen = isAtMost('medium'); // split view for medium (601-992px) and large (993px+)
 
     function DetailPane() {
         if(isSmallerScreen) { // make details fullscreen overlay on smaller screens
@@ -44,7 +44,7 @@ function ListDetailLayout({listHeader, listFooter, list, detail}) {
     return(
         <div className="list-detail-layout">
             <main>
-                <div className='elastic'>
+                <div className='flex-column'>
                     <header>
                         {listHeader}
                     </header>

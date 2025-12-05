@@ -33,33 +33,6 @@
     width: 100%;
 }
 
-.list-detail-layout .elastic {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-.list-detail-layout .elastic > header {
-    flex-grow: 0;
-    flex-shrink: 1;
-    flex-basis: auto;
-}
-
-.list-detail-layout .elastic > footer {
-    flex-grow: 0;
-    flex-shrink: 1;
-    flex-basis: auto;
-}
-
-.list-detail-layout .elastic > main {
-    flex-grow: 1;
-    flex-shrink: 1;
-    flex-basis: auto;
-
-    min-height: 0;
-    overflow-y: auto;
-}
-
 
 
 .supporting-pane-layout {
@@ -120,5 +93,4 @@
         width: 99%;
     }
 }
-
 

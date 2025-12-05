@@ -1,17 +1,11 @@
 // React Components:
 import { useEffect, useState, useRef } from 'react';
 import { ListDetailLayout } from '../Layouts';
-import DetailsView from '../DetailsView';
-import Form from '../Form.jsx';
-import ItemFilters from '../ItemFilters.jsx';
-import RecordItemView from '../RecordItemView';
-import RecordForm from '../RecordForm.jsx';
-import TopBar from '../TopBar';
-import HorizontalRow from '../HorizontalRow.jsx';
+import ItemFilters from '../Filters.jsx';
+import { RecordItemView, ItemFormView, RecordItemListView } from '../ItemViews.jsx';
 
 // Material Components:
 import 'mdui/components/button-icon.js';
-import 'mdui/components/fab.js';
 import 'mdui/components/list.js';
 import 'mdui/components/select.js';
 import 'mdui/components/menu-item.js';
@@ -19,18 +13,20 @@ import 'mdui/components/text-field.js';
 
 // Local Imports:
 import { useFetchDataStream as useFetchData } from '../../hooks/useFetchData.js';
+import useScreenSize from '../../hooks/useScreenSize.js';
+import { LogRecordItem } from '../../assets/LogRecordItem.js';
 
 
 function Records() {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Global Properties
     ///////////////////////////////////////////////////////////////////////////////////////////////
+    const { isAtMost } = useScreenSize();
+    const isSmallerScreen = isAtMost('medium'); // split view for medium (601-992px) and large (993px+)
     const { isLoading, data:items, reloadData } = useFetchData("/api/records");
     const [filteredItems, setFilteredItems] = useState(items);
     const [selectedItem, setSelectedItem] = useState(null);
     const newRecordDialogRef = useRef(null);
-    const editRecordDialogRef = useRef(null);
-    const deleteRecordDialogRef = useRef(null);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Helper Functions:
@@ -85,8 +81,11 @@ function Records() {
         <>
             <mdui-collapse>
                 <mdui-collapse-item trigger="#showFilters">
-                    <div slot="header" style={{alignContent:"flex-end", alignItems:"center", display:"flex", gap:"12px", justifyContent:"space-between", padding:"12px 0.5rem 0.5rem"}}>
-                        <mdui-button onClick={() => {openDialog(newRecordDialogRef)}} className="fab" icon="note_add">Add new record</mdui-button>
+                    <div slot="header" className="flex-row" style={{padding:"12px 0.5rem 0.5rem"}}>
+                        <div>
+                            <mdui-button ref={loadingAnimationRef} onClick={reloadData} variant="filled" icon="refresh">Refresh records</mdui-button>
+                            <mdui-button onClick={() => {openDialog(newRecordDialogRef)}} variant="text" icon="note_add">Add new record</mdui-button>
+                        </div>
                         <mdui-button id="showFilters" variant="text" end-icon="keyboard_arrow_down">Use filters</mdui-button>
                     </div>
                     <div style={{padding:"0 0.5rem"}}>
@@ -94,19 +93,22 @@ function Records() {
                     </div>
                 </mdui-collapse-item>
             </mdui-collapse>
-            <mdui-dialog ref={newRecordDialogRef} close-on-esc close-on-overlay-click>
-                <TopBar title="Add new record" closeFunction={() => (closeDialog(newRecordDialogRef))}></TopBar>
-                <RecordForm action="/api/form/new-record" onSuccess={() => (closeDialog(newRecordDialogRef))}></RecordForm>
+            <mdui-dialog ref={newRecordDialogRef} close-on-esc close-on-overlay-click fullscreen={isSmallerScreen} style={{width:"100%"}}>
+                <mdui-top-app-bar>
+                    <mdui-button-icon icon="clear" onClick={() => closeDialog(newRecordDialogRef)} />
+                    <mdui-top-app-bar-title>Add new record</mdui-top-app-bar-title>
+                </mdui-top-app-bar>
+                <ItemFormView item={new LogRecordItem()} onSuccess={() => (closeDialog(newRecordDialogRef))} onReset={() => (closeDialog(newRecordDialogRef))} />
             </mdui-dialog>
-            <div>
-                <mdui-button ref={loadingAnimationRef} onClick={() => {reloadData()}} icon="refresh" variant="text" loading>Showing {filteredItems.length} of {items.length}</mdui-button>
+            <div className="info-text" style={{paddingLeft:"16px"}}>
+                Showing {filteredItems.length} of {items.length}
             </div>
         </>
     );
 
     const ListPane = filteredItems.length > 0 ? (
         <mdui-list>
-            {filteredItems.map(item => (<RecordItemView key={item.id} log={item} onClick={showDetails} isSelected={item === selectedItem} />))}
+            {filteredItems.map(item => (<RecordItemListView key={item.id} item={item} onClick={showDetails} isSelected={item === selectedItem} />))}
         </mdui-list>
     ) : (
         <div style={{alignItems:'center', display:'flex', justifyContent:'center', margin:'auto'}}>
@@ -115,28 +117,18 @@ function Records() {
         </div>
     );
 
-    const DetailsTopBarElement = selectedItem && (
-        <>
-            <TopBar title={"#"+selectedItem.id} closeFunction={hideDetails}>
-                <mdui-button-icon icon="edit" onClick={() => (openDialog(editRecordDialogRef))}></mdui-button-icon>
-                <mdui-button-icon icon="delete" onClick={() => (openDialog(deleteRecordDialogRef))}></mdui-button-icon>
-            </TopBar>
-            <mdui-dialog ref={editRecordDialogRef} close-on-esc close-on-overlay-click>
-                <TopBar title={"Edit Record #"+selectedItem.id} closeFunction={() => (closeDialog(editRecordDialogRef))}></TopBar>
-                <RecordForm action="/api/form/edit-record" onSuccess={() => (closeDialog(editRecordDialogRef))} record={selectedItem}></RecordForm>
-            </mdui-dialog>
-            <mdui-dialog ref={deleteRecordDialogRef} close-on-esc close-on-overlay-click>
-                <TopBar title={"Delete Record #"+selectedItem.id} closeFunction={() => (closeDialog(deleteRecordDialogRef))}></TopBar>
-                <Form action="/api/form/delete-record" onSuccess={() => (closeDialog(deleteRecordDialogRef))}>
-                    <input type="hidden" name="id" value={selectedItem.id}/>
-                    Do you want to delete this record?
-                </Form>
-            </mdui-dialog>
-        </>
-    );
-
     const DetailPane = selectedItem && (
-        <DetailsView top={DetailsTopBarElement} log={selectedItem} />
+        <div className='flex-column'>
+            <header>
+                <mdui-top-app-bar>
+                    <mdui-button-icon icon="clear" onClick={hideDetails} />
+                    <mdui-top-app-bar-title>{"#"+selectedItem.id}</mdui-top-app-bar-title>
+                </mdui-top-app-bar>
+            </header>
+            <main>
+                <RecordItemView item={selectedItem} />
+            </main>
+        </div>
     );
 
     return(

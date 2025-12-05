@@ -1,10 +1,7 @@
 // React Components:
 import { useEffect, useState, useRef } from 'react';
 import { ListDetailLayout } from '../Layouts';
-import RecordForm from '../RecordForm';
-import LogItemView from '../LogItemView.jsx';
-import DetailsView from '../DetailsView';
-import TopBar from '../TopBar';
+import { LogItemView, LogItemListView } from '../ItemViews.jsx';
 
 // Material Components:
 import 'mdui/components/button.js';
@@ -17,10 +14,12 @@ import 'mdui/components/list.js';
 import 'mdui/components/range-slider.js';
 import 'mdui/components/text-field.js';
 import 'mdui/components/tooltip.js';
+import 'mdui/components/top-app-bar.js';
+import 'mdui/components/top-app-bar-title.js';
 
 // Local Imports:
 import { useFetchDataStream as useFetchData } from '../../hooks/useFetchData.js';
-import ItemFilters from '../ItemFilters.jsx';
+import ItemFilters from '../Filters.jsx';
 
 
 function Logs() {
@@ -30,23 +29,13 @@ function Logs() {
     const { isLoading, data:items, reloadData } = useFetchData("/api/logs"); // rename generic 'data' to 'items' on import
     const [filteredItems, setFilteredItems] = useState(items);
     const [selectedItem, setSelectedItem] = useState(null);
-    const newRecordDialogRef = useRef(null);
+    const collapseRef = useRef(null);
+    const triggerRef = useRef(null);
+
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Helper Functions:
     ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    function openDialog(reference) {
-        if(reference.current) {
-            reference.current.open = true;
-        }
-    }
-
-    function closeDialog(reference) {
-        if(reference.current) {
-            reference.current.open = false;
-        }
-    }
 
     function showDetails(id) {
         setSelectedItem(items.find(item => item.id === id));
@@ -56,9 +45,11 @@ function Logs() {
         setSelectedItem(null);
     };
 
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Hooks:
     ///////////////////////////////////////////////////////////////////////////////////////////////
+
     // Initialize:
     useEffect(() => {
         // Initialze ESC Key:
@@ -67,6 +58,20 @@ function Logs() {
                 hideDetails();
             }
         });
+
+        // Listen On Collapse Open:
+        if(collapseRef.current) {
+            collapseRef.current.addEventListener("open", () => {
+                triggerRef.current.setAttribute("end-icon", "keyboard_arrow_up");
+            });
+        }
+
+        // Listen On Collapse Close:
+        if(collapseRef.current) {
+            collapseRef.current.addEventListener("close", () => {
+                triggerRef.current.setAttribute("end-icon", "keyboard_arrow_down");
+            });
+        }
     }, []);
 
     // Update Loading Animation:
@@ -81,26 +86,26 @@ function Logs() {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     const ListHeader = (
         <>
-            <mdui-collapse>
+            <mdui-collapse ref={collapseRef}>
                 <mdui-collapse-item trigger="#showFilters">
-                    <div slot="header" style={{alignContent:"flex-end", alignItems:"center", display:"flex", gap:"12px", justifyContent:"space-between", padding:"12px 0.5rem 0.5rem"}}>
-                        <mdui-button ref={loadingAnimationRef} onClick={() => {reloadData()}} className="fab" icon="refresh">Refresh logs</mdui-button>
-                        <mdui-button id="showFilters" variant="text" end-icon="keyboard_arrow_down">Use filters</mdui-button>
+                    <div slot="header" className="flex-row" style={{padding:"12px 0.5rem 0.5rem"}}>
+                        <mdui-button ref={loadingAnimationRef} onClick={() => {reloadData()}} variant="filled" icon="refresh">Refresh logs</mdui-button>
+                        <mdui-button ref={triggerRef} id="showFilters" variant="text" end-icon="keyboard_arrow_down">Use filters</mdui-button>
                     </div>
                     <div style={{padding:"0 0.5rem"}}>
                         <ItemFilters items={items} updateFilteredItems={setFilteredItems} />
                     </div>
                 </mdui-collapse-item>
             </mdui-collapse>
-            <div style={{paddingLeft:"16px"}}>
-                <span className="info-text">Showing {filteredItems.length} of {items.length}</span>
+            <div className="info-text" style={{paddingLeft:"16px"}}>
+                Showing {filteredItems.length} of {items.length}
             </div>
         </>
     );
 
     const ListPane = filteredItems.length > 0 ? (
         <mdui-list>
-            {filteredItems.map(item => (<LogItemView key={item.id} log={item} onClick={showDetails} isSelected={item === selectedItem} />))}
+            {filteredItems.map(item => (<LogItemListView key={item.id} item={item} onClick={showDetails} isSelected={item === selectedItem} />))}
         </mdui-list>
     ) : (
         <div style={{alignItems:'center', display:'flex', justifyContent:'center', margin:'auto'}}>
@@ -109,23 +114,18 @@ function Logs() {
         </div>
     );
 
-    const DetailsTopBarElement = selectedItem && (
-        <>
-            <TopBar title={"#"+selectedItem.id} closeFunction={hideDetails}>
-                <mdui-button onclick={() => (openDialog(newRecordDialogRef))}>
-                    <mdui-icon slot="icon" name="add"></mdui-icon>
-                    Add to records
-                </mdui-button>
-            </TopBar>
-            <mdui-dialog ref={newRecordDialogRef} close-on-esc close-on-overlay-click>
-                <TopBar title="Add log to records" closeFunction={() => (closeDialog(newRecordDialogRef))}></TopBar>
-                <RecordForm action="/api/form/new-record" onSuccess={() => (closeDialog(newRecordDialogRef))} record={selectedItem}></RecordForm>
-            </mdui-dialog>
-        </>
-    );
-
     const DetailPane = selectedItem && (
-        <DetailsView top={DetailsTopBarElement} log={selectedItem} />
+        <div className='flex-column'>
+            <header>
+                <mdui-top-app-bar>
+                    <mdui-button-icon icon="clear" onClick={hideDetails}></mdui-button-icon>
+                    <mdui-top-app-bar-title>{"#"+selectedItem.id}</mdui-top-app-bar-title>
+                </mdui-top-app-bar>
+            </header>
+            <main>
+                <LogItemView item={selectedItem} />
+            </main>
+        </div>
     );
 
     return(
