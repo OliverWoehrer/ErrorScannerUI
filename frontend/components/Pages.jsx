@@ -19,6 +19,8 @@ import 'mdui/components/tab-panel.js';
 import { useFetchDataStream as useFetchData } from '../hooks/useFetchData.js';
 import useScreenSize from '../hooks/useScreenSize.js';
 import { LogRecordItem } from '../assets/LogRecordItem.js';
+import "./../assets/styles.css"
+import "./../assets/FileInput.js"
 
 function ListDetailsPage({ items, Header, ListView, DetailsView }) {
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -608,14 +610,17 @@ export function SettingsPage() {
                     <div>Download or upload records file. The file has to be in JSONLines format (.jsonl)</div>
                 </section>
                 <section>
-                    <mdui-button variant="tonal" full-width>Download File</mdui-button>
+                        <mdui-button variant="tonal" full-width href={endpoint} >Download File</mdui-button>
                 </section>
                 <section>
-                    <form action={endpoint} method="POST" encType="multipart/form-data" className="flex-row">
-                            <file-input></file-input>
-                            {/* TODO: make file-input fulll height */}
-                            <mdui-button type="submit">Overwrite File</mdui-button>
-                    </form>
+                    <mdui-card variant="filled" style={{width:"100%"}} >
+                        <form action={endpoint} method="POST" encType="multipart/form-data" className="flex-row" style={{alignItems:"stretch"}}>
+                            <div style={{flexGrow:"1"}}>
+                                <file-input helper-text="Select a file"></file-input>
+                            </div>
+                            <mdui-button variant="outlined" type="submit">Upload File</mdui-button>
+                        </form>
+                    </mdui-card>
                 </section>
             </mdui-card>
         );

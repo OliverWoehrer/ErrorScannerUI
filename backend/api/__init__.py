@@ -1,7 +1,8 @@
 """
 This module implements the functions to handle routes of /api
 """
-from api.form import form
+from .form import form
+from .file import file
 from data import logs_data, records_data
 from datetime import datetime, timedelta
 from flask import Blueprint, Response, request, current_app
@@ -82,6 +83,7 @@ Blueprint Endpoints
 """
 # Register Blueprint Hierarchy:
 api = Blueprint("api", __name__, url_prefix="/api")
+api.register_blueprint(file, url_prefix="/file")
 api.register_blueprint(form, url_prefix="/form")
 
 @api.route("", methods=["GET"])
@@ -91,11 +93,12 @@ def index():
 
 @api.route("/logs", methods=["GET"])
 def logs():
-    # return Response(generate_logs(), mimetype="application/json-lines")
+    return Response(generate_logs(), mimetype="application/json-lines")
     return Response(logs_data.stream_lines(), mimetype="application/json-lines")
 
 @api.route("/records", methods=["GET"])
 def records():
+    return Response(generate_logs(), mimetype="application/json-lines")
     return Response(records_data.stream_lines(), mimetype="application/json-lines")
 
 @api.errorhandler(Exception)

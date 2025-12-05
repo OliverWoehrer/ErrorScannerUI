@@ -200,6 +200,18 @@ class LogsRecordsHandler:
     def stream_lines(self) -> Generator[str,None,None]:
         yield from self._yield_lines()
 
+    def stream_bytes(self) -> Generator[bytes,None,None]:
+        yield from self._yield_bytes()
+
+    def overwrite(self, file_storage):
+        try:
+            self._lock.acquire()
+            file_storage.save(self._filename)
+        except Exception as e:
+            raise RuntimeError(f"Failed to overwrite {self._filename}.")
+        finally:
+            self._lock.release()
+
     """
     Private Methods
     """
@@ -230,6 +242,18 @@ class LogsRecordsHandler:
                     continue # skip this line
         except Exception as e:
             raise RuntimeError(f"Failed to yield lines: {e}")
+        finally:
+            file.close()
+            self._lock.release()
+
+    def _yield_bytes(self):
+        try:
+            self._lock.acquire()
+            file = open(self._filename, mode="rb")
+            for line in file:
+                yield line
+        except Exception as e:
+            raise RuntimeError(f"Failed to yield bytes: {e}")
         finally:
             file.close()
             self._lock.release()
@@ -332,6 +356,7 @@ class LogsRecordsHandler:
             file = open(self._filename, mode="r")
             return sum(1 for _ in file)
         except FileNotFoundError as e:
+            file = open(self._filename, mode="w") # create new file
             return 0
         finally:
             file.close()
