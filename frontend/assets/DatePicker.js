@@ -44,8 +44,6 @@
  * "headline":          Element to display the currently selected date
  * "prev-month-btn":    The previous month is displayed when this element is clicked
  * "next-month-btn":    The next month is displayed when this element is clicked
- * "prev-year-btn":     The previous year is displayed when this element is clicked
- * "next-year-btn":     The next year is displayed when this element is clicked
  * "cancel-btn":        The selected date is reset to the last confirmed date, when this element is
  *                      clicked. The 'reset' event is emitted.
  * "confirm-btn"        The selected date is confirmed when this element is clicked. The 'confirm'
@@ -70,9 +68,9 @@
  *                      ║  Select a date <──slot=supporting-text        ║
  *                      ║  18. Oct 2025 <───slot=headline               ║
  *                      ║                                               ║
- *                      ║  ┌─┐     ┌─┐                    ┌─┐      ┌─┐  ║
- * slot=next-month-btn──║─>│<│ Oct │>│                    │<│ 2025 │>│<─║──slot=next-year-btn
- *                      ║  └─┘     └─┘                    └─┘      └─┘  ║
+ *                      ║                                     ┌─┐  ┌─┐  ║
+ *                      ║  Oct 2025    slot=prev-month-btn───>│<│  │>│<─║──slot=next-month-btn
+ *                      ║                                     └─┘  └─┘  ║
  *                      ║  ┌─────────────────────────────────────────┐  ║
  *                      ║  │ Mon   Tue   Wed   Thu   Fri   Sat   Sun │<─║──part:label
  *                      ║  ├────────────┬────────────────────────────┤  ║
@@ -130,8 +128,6 @@
  *      <date-picker init-date="2025-10-18" confirm-on-select>
  *          <my-button slot="prev-month-btn">Prev Month</my-button>
  *          <my-button slot="next-month-btn">Next Month</my-button>
- *          <my-button slot="prev-year-btn">Prev Year</my-button>
- *          <my-button slot="next-year-btn">Next Year</my-button>
  *          <my-button slot="cancel-btn">Cancel</my-button>
  *          <my-button slot="confirm-btn">OK</my-button>
  *      </date-picker>
@@ -152,89 +148,112 @@
  * 
  * This implementation is based on <wc-datepicker> from https://github.com/vanillawc/wc-datepicker
  */
-const datePickerTemplate = document.createElement("template");
-datePickerTemplate.innerHTML = `
-<style>
-    :host {
-        --grid-margin: 10px;
-        display: block;
-        width: 100vw;
-        max-width: 100%;
-    }
-    header {
-        margin-bottom: 12px;
-    }
-    main {
-        display: grid;
-        grid-gap: var(--grid-margin);
-        grid-template-columns: repeat(7, 1fr);
-        margin-bottom: var(--grid-margin);
-    }
-    footer {
-        display: flex;
-        gap: var(--grid-margin);
-        justify-content: flex-end;
-    }
-    .flexRow {
-        align-items: center;
-        display: flex;
-        gap: var(--grid-margin);
-        justify-content: space-between;
-    }
-    .gridItem {
-        aspect-ratio: 1 / 1;
-        box-sizing: border-box;
-        cursor: default;
-        display: grid;
-        height: auto;
-        place-items: center;
-    }
-    [part~="selected"] {
-        border-style: solid;
-        border-width: 1px;   
-    }
-    [part~="inactive"] {
-        opacity: 0.4;
-    }
-</style>
-<div>
+class DatePicker extends HTMLElement {
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // Static Template:
+    //////////////////////////////////////////////////////////////////////////////////////////
+    static observedAttributes = ["init-date", "confirm-on-select"];
+    static templateString = `
+    <style>
+        :host {
+            --grid-margin: 10px;
+            height: 100%;
+            width: 100%;
+
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+        }
+        header {
+            flex-shrink: 0;
+            margin-bottom: var(--grid-margin);
+            width: 100%;
+        }
+        footer {
+            flex-shrink: 0;
+            margin-top: var(--grid-margin);
+            width: 100%;
+
+            display: flex;
+            gap: var(--grid-margin);
+            justify-content: flex-end;
+        }
+        main {
+            // flex-grow: 1;
+            width: 100%;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .flex-row {
+            align-items: center;
+            display: flex;
+            gap: var(--grid-margin);
+            justify-content: space-between;
+        }
+        .grid {
+            height: 100%;
+            max-height: 100%;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+
+            display: grid;
+            grid-gap: var(--grid-margin);
+            grid-template-columns: repeat(7, 1fr);
+        }
+        .grid-item {
+            aspect-ratio: 1 / 1;
+            box-sizing: border-box;
+            cursor: default;
+            display: grid;
+            height: auto;
+            place-items: center;
+        }
+        [part~="selected"] {
+            border-style: solid;
+            border-width: 1px;   
+        }
+        [part~="inactive"] {
+            opacity: 0.4;
+        }
+    </style>
     <header>
-        <div style="opacity: 0.4">
-            <slot name="supporting-text"></slot>
-        </div>
         <div>
-            <slot name=headline><span></span></slot>
-        </div>
-        <div class="flexRow">
-            <div class="flexRow">
-                <slot name="prev-month-btn"><button>&#11207;</button></slot>
-                <span id="month">Month</span>
-                <slot name="next-month-btn"><button>&#11208;</button></slot>
+            <div style="opacity: 0.4">
+                <slot name="supporting-text"></slot>
             </div>
-            <div class="flexRow">
-                <slot name="prev-year-btn"><button>&#11207;</button></slot>
-                <span id="year">Year</span>
-                <slot name="next-year-btn"><button>&#11208;</button></slot>
+            <div>
+                <slot name=headline><span></span></slot>
+            </div>
+        </div>
+        <div class="flex-row">
+            <div>
+                <span id="month">Month</span> <span id="year">Year</span>
+            </div>
+            <div>
+                <slot name="prev-month-btn"><button>&#11207;</button></slot>
+                <slot name="next-month-btn"><button>&#11208;</button></slot>
             </div>
         </div>
     </header>
     <main>
-        <!-- filled by'createGridItems()' on initialization -->
+        <div class="grid">
+            <!-- filled by'createGridItems()' on initialization -->
+        </div>
     </main>
     <footer>
         <slot name="cancel-btn"><button>Cancel</button></slot>
         <slot name="confirm-btn"><button>OK</button></slot>
     </footer>
-</div>
-`;
+    `;
 
-class DatePicker extends HTMLElement {
     //////////////////////////////////////////////////////////////////////////////////////////
     // Web Component Lifecycle Hooks:
     //////////////////////////////////////////////////////////////////////////////////////////
-
-    static observedAttributes = ["init-date", "confirm-on-select"];
-
     constructor() {
         super()
         // Set Default Properties:
@@ -244,9 +263,11 @@ class DatePicker extends HTMLElement {
         this.initDate = null;
 
         // Setup Shadow DOM:
-        if(!datePickerTemplate) { throw new Error("No template found"); }
+        const template = document.createElement("template");
+        if(!DatePicker.templateString) { throw new Error("No template found"); }
+        template.innerHTML = DatePicker.templateString;
         this.shadow = this.attachShadow({ mode:"closed" });
-        this.shadow.append(datePickerTemplate.content.cloneNode(true));
+        this.shadow.append(template.content.cloneNode(true));
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -273,14 +294,6 @@ class DatePicker extends HTMLElement {
         const nextMonthButton = nextMonthSlot.assignedNodes({ flatten:true })[0];
         nextMonthButton.onclick = () => { this.#showNextMonth() };
 
-        const prevYearSlot = this.shadow.querySelector("slot[name='prev-year-btn']");
-        const prevYearButton = prevYearSlot.assignedNodes({ flatten:true })[0];
-        prevYearButton.onclick = () => { this.#showPrevYear() };
-
-        const nextYearSlot = this.shadow.querySelector("slot[name='next-year-btn']");
-        const nextYearButton = nextYearSlot.assignedNodes({ flatten:true })[0];
-        nextYearButton.onclick = () => { this.#showNextYear() };
-
         const cancelSlot = this.shadow.querySelector("slot[name='cancel-btn']");
         const cancelButton = cancelSlot.assignedNodes({ flatten:true })[0];
         cancelButton.onclick = () => { this.#resetDateValue() };
@@ -297,6 +310,10 @@ class DatePicker extends HTMLElement {
         } else { // invalid datetime string
             throw new Error(`Attribute 'init-date' has an invalid string format: "${this.initDate}". Use ISO format YYYY-MM-DDThh:mm:ss.zzz`);
         }
+
+        // Initialize Resize Observer:
+        const resizeObserver = new ResizeObserver(() => { this.#resize() });
+        resizeObserver.observe(this);
 
         // Initialize Internal State:
         this.displayedMonth = this.selectedDate.getMonth();
@@ -400,7 +417,6 @@ class DatePicker extends HTMLElement {
     #resetDateValue(fireResetEvent = true) {
         this.selectedDate = new Date(this.confirmedDate); // reset to prev confirmed date
         this.#selectDateValue(this.confirmedDate.getDate(), this.confirmedDate.getMonth(), this.confirmedDate.getFullYear());
-        this.#renderCalendar();
         if(fireResetEvent) {
             this.dispatchEvent(new CustomEvent("reset"));
         }
@@ -468,26 +484,60 @@ class DatePicker extends HTMLElement {
      * Creates the elements of the calendar grid. Only called once during initialization.
      */
     #createGridItems() {
-        const main = this.shadow.querySelector("main");
-        if(!main) { throw new Error("Could not query grid element. Template needs an element 'main'."); }
+        const grid = this.shadow.querySelector(".grid");
+        if(!grid) { throw new Error("Could not query grid element. Template needs an element <div class='grid'>."); }
 
         // Create Weekday Labels:
         const weekdays = this.dayNames;
         for(const weekday of weekdays) {
             const labelElement = document.createElement("div");
-            labelElement.className = "gridItem"; // class 'gridItem' used for grid styling
+            labelElement.className = "grid-item"; // class 'grid-item' used for grid styling
             labelElement.setAttribute("part", "label");
             labelElement.innerHTML = weekday;
-            main.appendChild(labelElement);
+            grid.appendChild(labelElement);
         }
 
         // Create Days:
         for(let idx = 0; idx < 42; idx++) {
             const dayElement = document.createElement("div");
-            dayElement.className = "gridItem"; // class 'gridItem' used for grid styling
+            dayElement.className = "grid-item"; // class 'grid-item' used for grid styling
             dayElement.setAttribute("part", "day");
-            main.appendChild(dayElement);
+            grid.appendChild(dayElement);
         }
+    }
+
+    /**
+     * Called when the component is resized. Sets the width of the elements dynamically so it
+     * always uses maximum width and height, which ever is smaller. Sets the width of header,
+     * grid and footer element.
+     */
+    #resize() {
+        // Calculate Unused Height:
+        let usedHeight = 0;
+        for(const child of this.shadow.children) {
+            const computedStyle = window.getComputedStyle(child);
+            usedHeight += child.offsetHeight;
+            usedHeight += parseFloat(computedStyle.marginTop);
+            usedHeight += parseFloat(computedStyle.marginBottom);
+        }
+        const unusedHeight = this.offsetHeight - usedHeight;
+
+        // Calculate Unused Width:
+        const main = this.shadow.querySelector("main");
+        const grid = this.shadow.querySelector(".grid");
+        const unusedWidth = main.offsetWidth - grid.offsetWidth;
+
+        // Calculate Limit with Unused Pixels:
+        const unusedPixels = Math.min(unusedHeight,unusedWidth);
+        const limit = grid.offsetHeight + unusedPixels;
+
+        // Set New Limit:
+        const header = this.shadow.querySelector("header");
+        const footer = this.shadow.querySelector("footer");
+        grid.style.width = limit+"px";
+        grid.style.height = limit+"px";
+        header.style.width = limit+"px";
+        footer.style.width = limit+"px";
     }
 
     /**
@@ -499,11 +549,11 @@ class DatePicker extends HTMLElement {
         let activeDays = []; // boolean values, if the daynumber with the same index is active or not
         this.#generateDayArray(dates, activeDays);
 
-        const main = this.shadow.querySelector("main");
-        if(!main) { throw new Error("Could not query grid element. Template needs an element 'main'."); }
+        const grid = this.shadow.querySelector(".grid");
+        if(!grid) { throw new Error("Could not query grid element. Template needs an element <div class='grid'>."); }
 
         // Style Day Elements:
-        const gridElements = main.querySelectorAll("[part~='day']"); // the '~=' attribute selector matches the specified word delimited by spaces
+        const gridElements = grid.querySelectorAll("[part~='day']"); // the '~=' attribute selector matches the specified word delimited by spaces
         for(const [idx,gridElement] of gridElements.entries()) {
             gridElement.innerHTML = dates[idx].day;
             gridElement.removeAttribute("part"); // clean any parts
