@@ -107,128 +107,130 @@
  * 
  * 
  */
-const timePickerTemplate = document.createElement("template");
-timePickerTemplate.innerHTML = `
-<style>
-    :host {
-        --grid-margin: 10px;
-        display: block;
-        width: 100%;
-        max-width: 100%;
-    }
-    header {
-        margin-bottom: 12px;
-    }
-    main {
-        align-items: center;
-        box-sizing: border-box;
-        display: flex;
-        flex-flow: row wrap;
-        gap: var(--grid-margin);
-        justify-content: space-between;
-        width: 100%;
-    }
-    main > div {
-        width: 31%;
-    }
-    input {
-        box-sizing: border-box;
-        max-width: vw;
-        padding: 0;
-        width: 100%;
-    }
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button { /* hide default buttons of number input */
-        -webkit-appearance: none;
-        margin: 0;
-    }
-    input[type=number] { /* hide default buttons of number input */
-        -moz-appearance: textfield;
-    }
-    footer {
-        display: flex;
-        gap: var(--grid-margin);
-        margin: var(--grid-margin) 0;
-        justify-content: flex-end;
-    }
-    .flexRow {
-        align-items: stretch;
-        display: flex;
-        flex-flow: row nowrap;
-        gap: var(--grid-margin);
-        height: 100%;
-        justify-content: space-between;
-    }
-    .flexCol {
-        align-items: center;
-        flex-flow: column nowrap;
-        display: flex;
-        gap: var(--grid-margin);
-        justify-content: space-between;
-    }
-</style>
-<header>
-    <div style="opacity: 0.4">
-        <slot name="supporting-text">Select Time</slot>
-    </div>
-    <div>
-        <slot name=headline><span></span></slot>
-    </div>
-</header>
-<main>
-    <div>
-        <div>Hours:</div>
-        <div class="flexRow">
-            <slot name="hours"><input id="hours" type="number" value="0"></slot>
-            <div class="flexCol">
-                <slot name="inc-hours"><button>&#129169;</button></slot>
-                <slot name="dec-hours"><button>&#129171;</button></slot>
-            </div>
-        </div>
-    </div>
-    <div>
-        <div>Minutes:</div>
-        <div class="flexRow">
-            <slot name="minutes"><input id="minutes" type="number" value="0"></slot>
-            <div class="flexCol">
-                <slot name="inc-minutes"><button>&#129169;</button></slot>
-                <slot name="dec-minutes"><button>&#129171;</button></slot>
-            </div>
-        </div>
-    </div>
-    <div>
-        <div>Seconds:</div>
-        <div class="flexRow">
-            <slot name="seconds"><input id="seconds" type="number" value="0"></slot>
-            <div class="flexCol">
-                <slot name="inc-seconds"><button>&#129169;</button></slot>
-                <slot name="dec-seconds"><button>&#129171;</button></slot>
-            </div>
-        </div>
-    </div>
-    <div style="width: 100%;">
-        <div>Milliseconds:</div>
-        <div class="flexRow">
-            <slot name="millis"><input id="millis" type="number" value="0"></slot>
-            <div class="flexCol">
-                <slot name="inc-millis"><button>&#129169;</button></slot>
-                <slot name="dec-millis"><button>&#129171;</button></slot>
-            </div>
-        </div>
-    </div>
-</main>
-<footer>
-    <slot name="cancel-btn"><button>Cancel</button></slot>
-    <slot name="confirm-btn"><button>OK</button></slot>
-</footer>
-`
-
 class TimePicker extends HTMLElement {
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // Static Template:
+    //////////////////////////////////////////////////////////////////////////////////////////
+    static observedAttributes = ["init-date", "confirm-on-select"];
+    static templateString = `
+    <style>
+        :host {
+            --grid-margin: 10px;
+            display: block;
+            width: 100%;
+            max-width: 100%;
+        }
+        header {
+            margin-bottom: 12px;
+        }
+        main {
+            align-items: center;
+            box-sizing: border-box;
+            display: flex;
+            flex-flow: row wrap;
+            gap: var(--grid-margin);
+            justify-content: space-between;
+            width: 100%;
+        }
+        main > div {
+            width: 31%;
+        }
+        input {
+            box-sizing: border-box;
+            max-width: vw;
+            padding: 0;
+            width: 100%;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button { /* hide default buttons of number input */
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] { /* hide default buttons of number input */
+            -moz-appearance: textfield;
+        }
+        footer {
+            display: flex;
+            gap: var(--grid-margin);
+            margin: var(--grid-margin) 0;
+            justify-content: flex-end;
+        }
+        .flex-row {
+            align-items: stretch;
+            display: flex;
+            flex-flow: row nowrap;
+            gap: var(--grid-margin);
+            height: 100%;
+            justify-content: space-between;
+        }
+        .flex-column {
+            align-items: center;
+            flex-flow: column nowrap;
+            display: flex;
+            gap: var(--grid-margin);
+            justify-content: space-between;
+        }
+    </style>
+    <header>
+        <div style="opacity: 0.4">
+            <slot name="supporting-text">Select Time</slot>
+        </div>
+        <div>
+            <slot name=headline><span></span></slot>
+        </div>
+    </header>
+    <main>
+        <div>
+            <div>Hours:</div>
+            <div class="flex-row">
+                <slot name="hours"><input id="hours" type="number" value="0"></slot>
+                <div class="flex-column">
+                    <slot name="inc-hours"><button>&#129169;</button></slot>
+                    <slot name="dec-hours"><button>&#129171;</button></slot>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div>Minutes:</div>
+            <div class="flex-row">
+                <slot name="minutes"><input id="minutes" type="number" value="0"></slot>
+                <div class="flex-column">
+                    <slot name="inc-minutes"><button>&#129169;</button></slot>
+                    <slot name="dec-minutes"><button>&#129171;</button></slot>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div>Seconds:</div>
+            <div class="flex-row">
+                <slot name="seconds"><input id="seconds" type="number" value="0"></slot>
+                <div class="flex-column">
+                    <slot name="inc-seconds"><button>&#129169;</button></slot>
+                    <slot name="dec-seconds"><button>&#129171;</button></slot>
+                </div>
+            </div>
+        </div>
+        <div style="width: 100%;">
+            <div>Milliseconds:</div>
+            <div class="flex-row">
+                <slot name="millis"><input id="millis" type="number" value="0"></slot>
+                <div class="flex-column">
+                    <slot name="inc-millis"><button>&#129169;</button></slot>
+                    <slot name="dec-millis"><button>&#129171;</button></slot>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <slot name="cancel-btn"><button>Cancel</button></slot>
+        <slot name="confirm-btn"><button>OK</button></slot>
+    </footer>
+    `
+
     //////////////////////////////////////////////////////////////////////////////////////////
     // Web Component Lifecycle Hooks:
     //////////////////////////////////////////////////////////////////////////////////////////
 
-    static observedAttributes = ["init-date", "confirm-on-select"];
 
     constructor() {
         super()
@@ -236,9 +238,11 @@ class TimePicker extends HTMLElement {
         this.initDate = null;
 
         // Setup Shadow DOM:
-        if(!timePickerTemplate) { throw new Error("No template found"); }
+        const template = document.createElement("template");
+        if(!TimePicker.templateString) { throw new Error("No template found"); }
+        template.innerHTML = TimePicker.templateString;
         this.shadow = this.attachShadow({ mode:"closed" });
-        this.shadow.append(timePickerTemplate.content.cloneNode(true));
+        this.shadow.append(template.content.cloneNode(true));
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -418,7 +422,6 @@ class TimePicker extends HTMLElement {
     #resetDateValue(fireResetEvent = true) {
         this.selectedDate = new Date(this.confirmedDate); // reset to prev confirmed date
         this.#selectDateValue(this.confirmedDate.getHours(), this.confirmedDate.getMinutes(), this.confirmedDate.getSeconds(), this.confirmedDate.getMilliseconds());
-        this.#renderDisplay();
         if(fireResetEvent) {
             this.dispatchEvent(new CustomEvent("reset"));
         }
