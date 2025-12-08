@@ -22,7 +22,9 @@ function toDateString(date) {
 
 function toTimeString(date) {
     console.assert(date instanceof Date, "Given parameter has to be of Type 'Date'");
-    return date.toLocaleString("fr-SH").split(" ")[1];
+    const millis = ("000"+date.getMilliseconds()).slice(-3);
+    const split = date.toLocaleString("fr-SH").split(" ");
+    return split[1]+"."+millis;
 }
 
 
