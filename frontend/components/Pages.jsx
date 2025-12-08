@@ -17,7 +17,7 @@ import 'mdui/components/tab-panel.js';
 import 'mdui/components/tooltip.js';
 
 // Local Imports:
-import { useFetchDataStream as useFetchData } from '../hooks/useFetchData.js';
+import { useFetchData, useFetchDataStream } from '../hooks/useFetchData.js';
 import useScreenSize from '../hooks/useScreenSize.js';
 import { LogRecordItem } from '../assets/LogRecordItem.js';
 import "./../assets/styles.css"
@@ -209,7 +209,7 @@ export function LogsPage() {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Global Properties
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    const { isLoading, data:items, reloadData } = useFetchData("/api/logs"); // rename generic 'data' to 'items' on import
+    const { isLoading, data:items, reloadData } = useFetchDataStream("/api/logs"); // rename generic 'data' to 'items' on import
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -242,7 +242,7 @@ export function RecordsPage() {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Global Properties
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    const { isLoading, data:items, reloadData } = useFetchData("/api/records");
+    const { isLoading, data:items, reloadData } = useFetchDataStream("/api/records");
     const { isAtMost } = useScreenSize();
     const isSmallerScreen = isAtMost('medium'); // split view for medium (601-992px) and large (993px+)
 
