@@ -1,14 +1,17 @@
 // React Components:
 import { useEffect, useState, useRef } from 'react';
-import Form from './Form.jsx';
+import { TextForm } from './Forms.jsx';
 
 // Material Components:
 import 'mdui/components/button.js';
 import 'mdui/components/button-icon.js';
 import 'mdui/components/divider.js';
 import 'mdui/components/list-item.js';
+import 'mdui/components/menu-item.js';
+import 'mdui/components/select.js';
 import 'mdui/components/top-app-bar.js';
 import 'mdui/components/top-app-bar-title.js';
+import 'mdui/components/tooltip.js';
 
 // Local Import:
 import { DatePicker, TimePicker } from './Pickers.jsx';
@@ -18,63 +21,46 @@ import "../assets/TimePicker.js"
 
 function TemplateView({ initItem, readonly }) {
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Helper Functions:
+    // Confirm Picker Handler Functions:
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    function openDialog(reference) {
-        if(reference.current) { reference.current.open = true; }
+    function confirmDate(confirmedDateObj) {
+        item.datetimeObj.setFullYear(confirmedDateObj.getFullYear());
+        item.datetimeObj.setMonth(confirmedDateObj.getMonth());
+        item.datetimeObj.setDate(confirmedDateObj.getDate());
+        setItem(new LogRecordItem(item)); // create new item (deep copy) to trigger reload
+    }
+    function confirmTime(confirmedDateObj) {
+        item.datetimeObj.setHours(confirmedDateObj.getHours());
+        item.datetimeObj.setMinutes(confirmedDateObj.getMinutes());
+        item.datetimeObj.setSeconds(confirmedDateObj.getSeconds());
+        item.datetimeObj.setMilliseconds(confirmedDateObj.getMilliseconds());
+        setItem(new LogRecordItem(item)); // create new item (deep copy) to trigger reload
     }
 
-    function closeDialog(reference) {
-        if(reference.current) { reference.current.open = false; }
-    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Hooks:
     ///////////////////////////////////////////////////////////////////////////////////////////////
     const [item, setItem] = useState(initItem ?? new LogRecordItem()); // if no record is given, use default as fallback
-    const dateRef = { input:useRef(null), dialog:useRef(null), picker:useRef(null) };
-    const timeRef = { input:useRef(null), dialog:useRef(null), picker:useRef(null) };
 
-    useEffect(() => {
-        // Implement Event Handlers:
-        function confirmDate() {
-            const confirmedDateObj = dateRef.picker.current.confirmedDateObj;
-            item.datetimeObj.setFullYear(confirmedDateObj.getFullYear());
-            item.datetimeObj.setMonth(confirmedDateObj.getMonth());
-            item.datetimeObj.setDate(confirmedDateObj.getDate());
-            setItem(new LogRecordItem(item)); // create new item (deep copy) to trigger reload
-            closeDialog(dateRef.dialog);
-        }
-        function confirmTime() {
-            const confirmedDateObj = timeRef.picker.current.confirmedDateObj;
-            item.datetimeObj.setHours(confirmedDateObj.getHours());
-            item.datetimeObj.setMinutes(confirmedDateObj.getMinutes());
-            item.datetimeObj.setSeconds(confirmedDateObj.getSeconds());
-            item.datetimeObj.setMilliseconds(confirmedDateObj.getMilliseconds());
-            setItem(new LogRecordItem(item)); // create new item (deep copy) to trigger reload
-            closeDialog(timeRef.dialog);
-        }
-
-        // Initialize Datetime Pickers:
-        if(dateRef.picker.current) {
-            const picker = dateRef.picker.current;
-            picker.selectedDateObj = item.datetimeObj;
-            picker.addEventListener("confirm", confirmDate);
-            picker.addEventListener("reset", () => { closeDialog(dateRef.dialog); });
-        }
-        if(timeRef.picker.current) {
-            const picker = timeRef.picker.current;
-            picker.selectedDateObj = item.datetimeObj;
-            picker.addEventListener("confirm", confirmTime);
-            picker.addEventListener("reset", () => { closeDialog(timeRef.dialog); });
-        }
-    }, []);
+    useEffect(() => {}, []);
 
     return(
         <>
+            <div className="flex-row">
+                <div></div>
+                <div className="flex-row info-text">
+                    {readonly ? (
+                        <span><mdui-icon name='lock' style={{fontSize:"1.0rem"}} ></mdui-icon> Read Only Mode</span>
+                    ) : (
+                        <span><mdui-icon name='edit' style={{fontSize:"1.0rem"}} ></mdui-icon> Edit Mode</span>
+                    )}
+                </div>
+                <div></div>
+            </div>
             <section className="flex-row">
-                <DatePicker initItem={item} />
-                <TimePicker initItem={item} />
+                <DatePicker name="date" readonly={readonly} datetimeObj={item.datetimeObj} onConfirm={confirmDate} />
+                <TimePicker name="time" readonly={readonly} datetimeObj={item.datetimeObj} onConfirm={confirmTime} />
             </section>
             <section className="flex-row">
                 <mdui-select label="Category" value={item.category} defaultValue={item.category} name="category" readonly={readonly} style={{width:"auto"}} >
@@ -113,6 +99,7 @@ function TemplateView({ initItem, readonly }) {
                     <mdui-text-field label="Edit Solution" value={item.solution} defaultValue={item.solution} name="message" readonly={readonly} autosize enterkeyhint="enter"></mdui-text-field>
                 </section>
             )}
+            <input type="hidden" name="id" value={item.id}/>
         </>
     );
 }
@@ -130,53 +117,65 @@ export function LogItemView({ item }) {
                 <main>
                     <TemplateView initItem={item} readonly={true} />
                 </main>
-                <footer>
+                <footer className="flex-row">
                     <mdui-button onclick={toggleMode} variant="outlined" icon="add">Add to records</mdui-button>
                 </footer>
             </div>
         );
     } else {
         return(
-            <Form action="/api/form/new-record" submitButtonText="Save new record" resetButtonText="Do not save" onSuccess={toggleMode} onReset={toggleMode}>
+            <TextForm action="/api/form/new-record" submitButtonText="Save new record" resetButtonText="Cancel" onSuccess={toggleMode} onReset={toggleMode}>
                 <TemplateView initItem={item} readonly={false} />
-            </Form>
+            </TextForm>
         );
     }
 }
 
 export function RecordItemView({ item }) {
-    const [isReadonly, setIsReadonly] = useState(true);
+    const [mode, setMode] = useState(0);
 
-    function toggleMode() {
-        setIsReadonly((prev) => !prev);
+    function updateMode(mode) {
+        if(mode) {
+            setMode(mode);
+        } else {
+            setMode(0);
+        }
     }
 
-    if(isReadonly) {
+    if(mode == 2) { // delete mode: confirm delete operation
+        return(
+            <TextForm action="/api/form/delete-record" submitButtonText="Delete record" resetButtonText="Cancel" onSuccess={updateMode} onReset={updateMode}>
+                <div>Are you sure you want to delete this record?</div>
+            </TextForm>
+        );
+    } else if(mode == 1) { // edit mode: confirm updated changes
+        return(
+            <TextForm action="/api/form/edit-record" submitButtonText="Update record" resetButtonText="Cancel" onSuccess={updateMode} onReset={updateMode}>
+                <TemplateView initItem={item} readonly={false} />
+            </TextForm>
+        );
+    } else { // default mode: view details
         return(
             <div className="flex-column">
                 <main>
                     <TemplateView initItem={item} readonly={true} />
                 </main>
-                <footer>
-                    <mdui-button onclick={toggleMode} variant="outlined" icon="edit">Edit Record</mdui-button>
-                    <mdui-button onclick={toggleMode} variant="text" icon="delete">Delete Record</mdui-button>
+                <footer className="flex-row">
+                    <div>
+                        <mdui-button onclick={() => {updateMode(1)}} variant="outlined" icon="edit">Edit Record</mdui-button>
+                        <mdui-button onclick={() => {updateMode(2)}} variant="text" icon="delete">Delete Record</mdui-button>
+                    </div>
                 </footer>
             </div>
-        );
-    } else {
-        return(
-            <Form action="/api/form/edit-record" submitButtonText="Update record" resetButtonText="Discard changes" onSuccess={toggleMode} onReset={toggleMode}>
-                <TemplateView initItem={item} readonly={false} />
-            </Form>
         );
     }
 }
 
 export function ItemFormView({ item, onSuccess, onReset }) {
     return(
-        <Form action="/api/form/new-record" submitButtonText="Add new record" resetButtonText="Discard changes" onSuccess={onSuccess} onReset={onReset}>
+        <TextForm action="/api/form/new-record" submitButtonText="Add new record" resetButtonText="Discard changes" onSuccess={onSuccess} onReset={onReset}>
             <TemplateView initItem={item} readonly={false} />
-        </Form>
+        </TextForm>
     );
 }
 

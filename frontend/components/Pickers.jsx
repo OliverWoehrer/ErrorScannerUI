@@ -15,14 +15,6 @@ import "../assets/TimePicker.js"
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // Helper Functions:
 ///////////////////////////////////////////////////////////////////////////////////////////////
-function openDialog(reference) {
-    if(reference.current) { reference.current.open = true; }
-}
-
-function closeDialog(reference) {
-    if(reference.current) { reference.current.open = false; }
-}
-
 function toDateString(date) {
     console.assert(date instanceof Date, "Given parameter has to be of Type 'Date'");
     return date.toLocaleString("fr-CH").split(" ")[0];
@@ -37,7 +29,7 @@ function toTimeString(date) {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // Exported Components:
 ///////////////////////////////////////////////////////////////////////////////////////////////
-export function DatePicker({ name, datetimeObj, onConfirm }) {
+export function DatePicker({ name, readonly, datetimeObj, onConfirm }) {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Global Properties
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,6 +37,22 @@ export function DatePicker({ name, datetimeObj, onConfirm }) {
     const [dateObj, setDateObj] = useState(init); // if no date is given, use current date as fallback
     const dialogRef = useRef(null);
     const pickerRef = useRef(null);
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Event Handler:
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    function openDialog() {
+        if(!readonly) { // only open if writeable
+            const dialog = dialogRef.current;
+            if(dialog) { dialog.open = true; }
+        }
+    }
+
+    function closeDialog() {
+        const dialog = dialogRef.current;
+        if(dialog) { dialog.open = false; }
+    }
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,13 +69,13 @@ export function DatePicker({ name, datetimeObj, onConfirm }) {
             dateObj.setMonth(confirmedDateObj.getMonth());
             dateObj.setDate(confirmedDateObj.getDate());
             setDateObj(new Date(dateObj)); // create new date (deep copy) to trigger reload
-            closeDialog(dialogRef);
+            closeDialog();
         }
         const picker = pickerRef.current;
         if(picker) {
             picker.selectedDateObj = dateObj;
             picker.addEventListener("confirm", confirmHandler);
-            picker.addEventListener("reset", () => { closeDialog(dialogRef); });
+            picker.addEventListener("reset", closeDialog);
         }
 
         // Initialize Dialog:
@@ -93,7 +101,7 @@ export function DatePicker({ name, datetimeObj, onConfirm }) {
     return(
         <>
             {/* Input Field */}
-            <mdui-text-field label="Last Seen (Date)" value={toDateString(dateObj)} defaultValue={toDateString(dateObj)} name={name?(name+"-date"):"date"} readonly onClick={() => { openDialog(dialogRef); }}>
+            <mdui-text-field label="Last Seen (Date)" value={toDateString(dateObj)} defaultValue={toDateString(dateObj)} name={name?(name+"-date"):"date"} readonly onClick={openDialog}>
                 <mdui-icon slot="icon" name="calendar_month"></mdui-icon>
             </mdui-text-field>
             {/* Dialog with Picker */}
@@ -111,7 +119,7 @@ export function DatePicker({ name, datetimeObj, onConfirm }) {
     );
 }
 
-export function TimePicker({ name, datetimeObj, onConfirm }) {
+export function TimePicker({ name, readonly, datetimeObj, onConfirm }) {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Global Properties
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,6 +127,22 @@ export function TimePicker({ name, datetimeObj, onConfirm }) {
     const [dateObj, setDateObj] = useState(init); // if no date is given, use current date as fallback
     const dialogRef = useRef(null);
     const pickerRef = useRef(null);
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Event Handler:
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    function openDialog() {
+        if(!readonly) { // only open if writeable
+            const dialog = dialogRef.current;
+            if(dialog) { dialog.open = true; }
+        }
+    }
+
+    function closeDialog() {
+        const dialog = dialogRef.current;
+        if(dialog) { dialog.open = false; }
+    }
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,12 +160,12 @@ export function TimePicker({ name, datetimeObj, onConfirm }) {
             dateObj.setSeconds(confirmedDateObj.getSeconds());
             dateObj.setMilliseconds(confirmedDateObj.getMilliseconds());
             setDateObj(new Date(dateObj)); // create new date (deep copy) to trigger reload
-            closeDialog(dialogRef);
+            closeDialog();
         }
         const picker = pickerRef.current;
         if(picker) {
             picker.addEventListener("confirm", confirmHandler);
-            picker.addEventListener("reset", () => { closeDialog(dialogRef); });
+            picker.addEventListener("reset", closeDialog);
         }
 
         // Initialize Dialog:
@@ -165,7 +189,7 @@ export function TimePicker({ name, datetimeObj, onConfirm }) {
     return(
         <>
             {/* Input Field */}
-            <mdui-text-field label="Last Seen (Time)" value={toTimeString(dateObj)} defaultValue={toTimeString(dateObj)} name={name?(name+"-time"):"time"} readonly onClick={() => { openDialog(dialogRef); }}>
+            <mdui-text-field label="Last Seen (Time)" value={toTimeString(dateObj)} defaultValue={toTimeString(dateObj)} name={name?(name+"-time"):"time"} readonly onClick={openDialog}>
                 <mdui-icon slot="icon" name="access_time"></mdui-icon>
             </mdui-text-field>
             {/* Dialog with Picker */}
