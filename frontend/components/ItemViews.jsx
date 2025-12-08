@@ -173,7 +173,7 @@ export function RecordItemView({ item }) {
 
 export function ItemFormView({ item, onSuccess, onReset }) {
     return(
-        <TextForm action="/api/form/new-record" submitButtonText="Add new record" resetButtonText="Discard changes" onSuccess={onSuccess} onReset={onReset}>
+        <TextForm action="/api/form/new-record" submitButtonText="Add new record" resetButtonText="Cancel" onSuccess={onSuccess} onReset={onReset}>
             <TemplateView initItem={item} readonly={false} />
         </TextForm>
     );
