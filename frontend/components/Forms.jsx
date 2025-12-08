@@ -14,29 +14,42 @@ function defaultSubmit(event) {
     event.preventDefault(); // prevent automatic form submisson
 };
 
-async function sendData(event, onSuccess) {
+async function sendData(event, isFileUpload, onSuccess) {
     // Validate Form:
     const form = event.target.closest("form");
     if(!form) {
-        printMessage(`Could not find parent <form> element`);
+        printMessage("Could not find parent <form> element, don't know what data to send.");
         return;
     }
     if(!form.reportValidity()) {
         return; // dont send invalid data
     }
 
-    // Build JSON Form Data:
-    const formData = new FormData(form);
-    const formDataObject = Object.fromEntries(formData.entries());
-    const formDataJsonString = JSON.stringify(formDataObject); // convert to serialized JSON string
+    // Parse Form Data:
     const endpoint = form.getAttribute('action');
+    const formData = new FormData(form);
+    if(Array.from(formData.keys()).length === 0) {
+        printMessage("No data submitted, please select something.");
+        return;
+    }
+
+    // Set Request Properties:
+    let requestBody;
+    const requestHeaders = {};
+    if(isFileUpload) {
+        requestBody = formData;
+    } else {
+        const formDataObject = Object.fromEntries(formData.entries());
+        requestBody = JSON.stringify(formDataObject); // convert to serialized JSON string
+        requestHeaders["Content-Type"] = "application/json";
+    }
 
     // Send JSON Data:
     try {
         const response = await fetch(endpoint, {
             method: "POST",
-            headers: { "Content-Type":"application/json" },
-            body: formDataJsonString,
+            headers: requestHeaders,
+            body: requestBody,
         });
         if(!response.ok) {
             const text = await response.text();
@@ -52,12 +65,12 @@ async function sendData(event, onSuccess) {
     }
 }
 
-function Form({ action, submitButtonText, resetButtonText, onSuccess, onReset, children }) {
+export function TextForm({ action, submitButtonText, resetButtonText, onSuccess, onReset, children }) {
     const submitText = submitButtonText || "Confirm changes";
     const resetText = resetButtonText || "Discard changes";
 
     function handleSubmit(event) {
-        sendData(event, onSuccess);
+        sendData(event, false, onSuccess);
     }
 
     return(
@@ -73,4 +86,15 @@ function Form({ action, submitButtonText, resetButtonText, onSuccess, onReset, c
     );
 }
 
-export default Form;
+export function FileForm({ action, onSuccess, children }) {
+    function handleSubmit(event) {
+        event.preventDefault(); // prevent automatic form submisson
+        sendData(event, true, onSuccess);
+    }
+
+    return(
+        <form name="my-form" action={action} onSubmit={handleSubmit}>
+            {children}
+        </form>
+    );
+}

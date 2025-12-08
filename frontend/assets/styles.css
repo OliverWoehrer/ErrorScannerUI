@@ -65,12 +65,8 @@ date-picker::part(selected):hover {
 }
 
 file-input::part(file-picker) {
-    background-color: rgb(var(--mdui-color-surface-container-highest));
     border: none;
-    border-radius: var(--mdui-shape-corner-full);
-    box-sizing: border-box;
-    height: 100%;
-    padding: 6px;
+    padding: 6px 12px;
 }
 
 
@@ -117,10 +113,11 @@ mdui-dialog::part(panel) {
 /***************************************/
 /* General CSS Classes: */
 /***************************************/
-.info-text {
-    color: rgb(var(--mdui-color-outline-dark));
-    font-size: 0.8rem;
-    /* margin-left: 15px; */
+.outlined {
+    border-color: rgb(var(--mdui-color-outline));
+    border-style: solid;
+    border-radius: var(--mdui-shape-corner-full);
+    border-width: 1px;
 }
 
 .flex-row {
@@ -154,4 +151,9 @@ mdui-dialog::part(panel) {
 
     min-height: 0;
     overflow-y: auto;
+}
+
+.info-text {
+    color: rgb(var(--mdui-color-outline-dark));
+    font-size: 0.8rem;
 }

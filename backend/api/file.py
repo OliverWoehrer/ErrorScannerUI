@@ -18,12 +18,15 @@ def index():
 
 @file.route("/records", methods=["GET","POST"])
 def records():
+    FILENAME = "records.jsonl"
     if request.method == "GET":
-        filepath = Path(__file__).parent.parent / "data" / "records.jsonl"
+        filepath = Path(__file__).parent.parent / "data" / FILENAME
         file = open(filepath, mode="rb")
         if file is None:
             raise InternalServerError("Failed to open file")
-        return Response(records_data.stream_bytes(), mimetype="application/jsonl") #mimetype=application/octet-stream, as_attachment=True, download_name="records.jsonl",
+        response = Response(records_data.stream_bytes(), mimetype="application/jsonl") #mimetype=application/octet-stream, as_attachment=True, download_name="records.jsonl",
+        response.headers["Content-Disposition"] = f"attachment; filename={FILENAME}"
+        return response
 
     if request.method == "POST":
         # Parse File Upload:

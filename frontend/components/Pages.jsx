@@ -1,7 +1,7 @@
 // React Components:
 import { useEffect, useState, useRef } from 'react';
 import ItemFilters from './Filters.jsx';
-import Form from './Form.jsx';
+import { TextForm, FileForm } from './Forms.jsx';
 import { LogItemView, RecordItemView, ItemFormView, LogItemListView, RecordItemListView } from "./ItemViews.jsx";
 
 // Material Components:
@@ -14,6 +14,7 @@ import 'mdui/components/switch.js';
 import 'mdui/components/tabs.js';
 import 'mdui/components/tab.js';
 import 'mdui/components/tab-panel.js';
+import 'mdui/components/tooltip.js';
 
 // Local Imports:
 import { useFetchDataStream as useFetchData } from '../hooks/useFetchData.js';
@@ -22,7 +23,7 @@ import { LogRecordItem } from '../assets/LogRecordItem.js';
 import "./../assets/styles.css"
 import "./../assets/FileInput.js"
 
-function ListDetailsPage({ items, Header, ListView, DetailsView }) {
+function ListDetailsLayout({ items, Header, ListView, DetailsView }) {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Global Properties
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,7 +128,9 @@ function ListDetailsPage({ items, Header, ListView, DetailsView }) {
         <div className='flex-column'>
             <header>
                 <mdui-top-app-bar>
-                    <mdui-button-icon icon="clear" onClick={hideDetails} />
+                    <mdui-tooltip content="Close">
+                        <mdui-button-icon icon="clear" onClick={hideDetails} />
+                    </mdui-tooltip>
                     <mdui-top-app-bar-title>{"#"+selectedItem.id}</mdui-top-app-bar-title>
                 </mdui-top-app-bar>
             </header>
@@ -231,7 +234,7 @@ export function LogsPage() {
     );
 
     return(
-        <ListDetailsPage items={items} Header={HeaderElement} ListView={LogItemListView} DetailsView={LogItemView}/>
+        <ListDetailsLayout items={items} Header={HeaderElement} ListView={LogItemListView} DetailsView={LogItemView}/>
     );
 }
 
@@ -248,15 +251,17 @@ export function RecordsPage() {
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     const newRecordDialogRef = useRef(null);
-    function openDialog(reference) {
-        if(reference.current) {
-            reference.current.open = true;
+    function openDialog() {
+        const dialog = newRecordDialogRef.current;
+        if(dialog) {
+            dialog.open = true;
         }
     }
 
-    function closeDialog(reference) {
-        if(reference.current) {
-            reference.current.open = false;
+    function closeDialog() {
+        const dialog = newRecordDialogRef.current;
+        if(dialog) {
+            dialog.open = false;
         }
     }
 
@@ -281,25 +286,25 @@ export function RecordsPage() {
     const HeaderElement = (
         <>
             <mdui-button ref={loadingAnimationRef} onClick={reloadData} variant="filled" icon="refresh">Refresh records</mdui-button>
-            <mdui-button onClick={() => {openDialog(newRecordDialogRef)}} variant="text" icon="note_add">Add new record</mdui-button>
+            <mdui-button onClick={openDialog} variant="text" icon="note_add">Add new record</mdui-button>
             <mdui-dialog ref={newRecordDialogRef} close-on-esc close-on-overlay-click fullscreen={isSmallerScreen}>
                 <div className="flex-column">
                     <mdui-top-app-bar>
-                        <mdui-button-icon icon="clear" onClick={() => closeDialog(newRecordDialogRef)} />
+                        <mdui-button-icon icon="clear" onClick={closeDialog} />
                         <mdui-top-app-bar-title>Add new record</mdui-top-app-bar-title>
                     </mdui-top-app-bar>
-                    <ItemFormView item={new LogRecordItem()} onSuccess={() => (closeDialog(newRecordDialogRef))} onReset={() => (closeDialog(newRecordDialogRef))} />
+                    <ItemFormView item={new LogRecordItem()} onSuccess={closeDialog} onReset={closeDialog} />
                 </div>
             </mdui-dialog>
         </>
     );
 
     return(
-        <ListDetailsPage items={items} Header={HeaderElement} ListView={RecordItemListView} DetailsView={RecordItemView} />
+        <ListDetailsLayout items={items} Header={HeaderElement} ListView={RecordItemListView} DetailsView={RecordItemView} />
     );
 }
 
-function FeedPage({ children }) {
+function FeedLayout({ children }) {
     return (
         <>
             <style>{`
@@ -369,7 +374,7 @@ export function SettingsPage() {
         // Return Final Component:
         return(
             <mdui-card variant="elevated">
-                <Form action="/api/form/docker-interface" onSuccess={reloadData}>
+                <TextForm action="/api/form/docker-interface" submitButtonText="Save changes" resetButtonText="Discard changes" onSuccess={reloadData}>
                     <mdui-top-app-bar-title>Docker Interface</mdui-top-app-bar-title>
                     <section>
                         <h4>Network Interface</h4>
@@ -390,7 +395,7 @@ export function SettingsPage() {
                             </mdui-tab-panel>
                         </mdui-tabs>
                     </section>
-                </Form>
+                </TextForm>
             </mdui-card>
         );
     }
@@ -479,7 +484,7 @@ export function SettingsPage() {
         // Return Final Component:
         return (
             <mdui-card variant="elevated">
-                <Form action="/api/form/scanner" onSuccess={reloadData}>
+                <TextForm action="/api/form/scanner" submitButtonText="Save changes" resetButtonText="Discard changes" onSuccess={reloadData}>
                     <mdui-top-app-bar-title>Log Scanner</mdui-top-app-bar-title>
                     <div>
                         <h4>Logs</h4>
@@ -513,7 +518,7 @@ export function SettingsPage() {
                     <section className="flex-row">
                         {Debug}
                     </section>
-                </Form>
+                </TextForm>
             </mdui-card>
         ); 
     }
@@ -534,12 +539,12 @@ export function SettingsPage() {
         // Return Final Component:
         return(
             <mdui-card variant="elevated">
-                <Form action={endpoint} onSuccess={reloadData}>
+                <TextForm action={endpoint} submitButtonText="Save changes" resetButtonText="Discard changes" onSuccess={reloadData}>
                     <mdui-top-app-bar-title>Disk Usage</mdui-top-app-bar-title>
                     <h4>Size</h4>
                     <span>Set the maximum number of logs to keep</span>
                     {MaxLogs}
-                </Form>
+                </TextForm>
             </mdui-card>
         )
     };
@@ -580,7 +585,7 @@ export function SettingsPage() {
 
         return(
             <mdui-card variant="elevated">
-                <Form action={endpoint} onSuccess={reloadData}>
+                <TextForm action={endpoint} submitButtonText="Save changes" resetButtonText="Discard changes" onSuccess={reloadData}>
                     <mdui-top-app-bar-title>Database</mdui-top-app-bar-title>
                     <h4>Endpoint</h4>
                     <span>Set the URL and port of the database interface</span>
@@ -596,7 +601,7 @@ export function SettingsPage() {
                     <section>
                         {Key}
                     </section>
-                </Form>
+                </TextForm>
             </mdui-card>
         );
     }
@@ -610,29 +615,29 @@ export function SettingsPage() {
                     <div>Download or upload records file. The file has to be in JSONLines format (.jsonl)</div>
                 </section>
                 <section>
-                        <mdui-button variant="tonal" full-width href={endpoint} >Download File</mdui-button>
+                    <mdui-button variant="outlined" full-width href={endpoint} icon="download">Download File</mdui-button>
                 </section>
                 <section>
-                    <mdui-card variant="filled" style={{width:"100%"}} >
-                        <form action={endpoint} method="POST" encType="multipart/form-data" className="flex-row" style={{alignItems:"stretch"}}>
+                    <FileForm action={endpoint}>
+                        <div className="outlined flex-row">
                             <div style={{flexGrow:"1"}}>
                                 <file-input helper-text="Select a file"></file-input>
                             </div>
-                            <mdui-button variant="outlined" type="submit">Upload File</mdui-button>
-                        </form>
-                    </mdui-card>
+                            <mdui-button variant="tonal" type="submit" icon="upload">Upload File</mdui-button>
+                        </div>
+                    </FileForm>
                 </section>
             </mdui-card>
         );
     }
 
     return(
-        <FeedPage>
+        <FeedLayout>
             <DockerInterfaceForm endpoint="/api/form/docker-interface"/>
             <LogScannerForm endpoint="/api/form/scanner"/>
             <DiskUsageForm endpoint="/api/form/disk-usage"/>
             <DatebaseForm endpoint="/api/form/database"/>
             <FileExchangeForm endpoint="/api/file/records"/>
-        </FeedPage>
+        </FeedLayout>
     );
 }
