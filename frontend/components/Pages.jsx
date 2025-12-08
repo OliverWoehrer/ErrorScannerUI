@@ -543,7 +543,9 @@ export function SettingsPage() {
                     <mdui-top-app-bar-title>Disk Usage</mdui-top-app-bar-title>
                     <h4>Size</h4>
                     <span>Set the maximum number of logs to keep</span>
-                    {MaxLogs}
+                    <section>
+                        {MaxLogs}
+                    </section>
                 </TextForm>
             </mdui-card>
         )
