@@ -47,25 +47,18 @@ function TemplateView({ initItem, readonly }) {
 
     return(
         <>
-            <div className="flex-row">
-                <div></div>
-                <mdui-tooltip content="You can edit values before adding the item to records or before you update the record">
-                    <div className="flex-row hint">
-                        {readonly ? (
-                            <>
+            {readonly && (
+                <div className="flex-row">
+                    <div></div>
+                    <mdui-tooltip content="You can edit values before adding the item to records or before you update the record">
+                        <div className="flex-row hint">
                             <mdui-icon name='lock' style={{fontSize:"1.0rem"}} ></mdui-icon>
                             <div>Read Only Mode</div>
-                            </>
-                        ) : (
-                            <>
-                            <mdui-icon name='edit' style={{fontSize:"1.0rem"}} ></mdui-icon>
-                            <span>Edit Mode</span>
-                            </>
-                        )}
-                    </div>
-                </mdui-tooltip>
-                <div></div>
-            </div>
+                        </div>
+                    </mdui-tooltip>
+                    <div></div>
+                </div>
+            )}
             <section className="flex-row">
                 <DatePicker name="date" readonly={readonly} datetimeObj={item.datetimeObj} onConfirm={confirmDate} />
                 <TimePicker name="time" readonly={readonly} datetimeObj={item.datetimeObj} onConfirm={confirmTime} />
