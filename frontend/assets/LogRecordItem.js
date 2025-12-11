@@ -36,7 +36,7 @@ export class LogRecordItem {
         if(typeof data.category === "string") {
             this.category = data.category;
         } else {
-            this.category = "Info";
+            this.category = "critical";
         }
 
         if(typeof data.source === "string") {
