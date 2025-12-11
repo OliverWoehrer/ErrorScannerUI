@@ -492,12 +492,19 @@ export function SettingsPage() {
                     </div>
                     <section className="flex-row">
                         <div style={{ width: "100%" }}></div>
-                        <mdui-tooltip content="Enable which message category should be logged">
+                        <mdui-tooltip
+                            variant="rich"
+                            headline="Log Category"
+                            content="Enable which message category should be logged and which ones should be ignored">
                             <div style={{ display: "flex", alignItems: "center" }} className="info-text">
                                 Logging <mdui-icon name="info--outlined" style={{ fontSize: "1rem" }}></mdui-icon>
                             </div>
                         </mdui-tooltip>
-                        <mdui-tooltip content="Enable which message category should be automatically added to records if unknown" style={{ display: "flex", alignItems: "center" }} className="info-text">
+                        <mdui-tooltip
+                            variant="rich"
+                            headline="Auto Record"
+                            content="Enable which message category should be automatically added to records if unknown"
+                            style={{ display: "flex", alignItems: "center" }} className="info-text">
                             <div style={{ display: "flex", alignItems: "center" }} className="info-text">
                                 Record <mdui-icon name="info--outlined" style={{ fontSize: "1rem" }}></mdui-icon>
                             </div>

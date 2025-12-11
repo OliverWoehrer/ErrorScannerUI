@@ -49,13 +49,21 @@ function TemplateView({ initItem, readonly }) {
         <>
             <div className="flex-row">
                 <div></div>
-                <div className="flex-row info-text">
-                    {readonly ? (
-                        <span><mdui-icon name='lock' style={{fontSize:"1.0rem"}} ></mdui-icon> Read Only Mode</span>
-                    ) : (
-                        <span><mdui-icon name='edit' style={{fontSize:"1.0rem"}} ></mdui-icon> Edit Mode</span>
-                    )}
-                </div>
+                <mdui-tooltip content="You can edit values before adding the item to records or before you update the record">
+                    <div className="flex-row hint">
+                        {readonly ? (
+                            <>
+                            <mdui-icon name='lock' style={{fontSize:"1.0rem"}} ></mdui-icon>
+                            <div>Read Only Mode</div>
+                            </>
+                        ) : (
+                            <>
+                            <mdui-icon name='edit' style={{fontSize:"1.0rem"}} ></mdui-icon>
+                            <span>Edit Mode</span>
+                            </>
+                        )}
+                    </div>
+                </mdui-tooltip>
                 <div></div>
             </div>
             <section className="flex-row">
