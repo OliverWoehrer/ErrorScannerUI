@@ -48,15 +48,13 @@ class Scanner():
         global new_logs_count, new_records_count, updated_records_count # TODO: remove after debug
 
         # Read Filter Lists:
-        whitestring = config_data.docker_interface_whitelist()
-        whitelist = set([line.strip() for line in whitestring.splitlines()])
-        blackstring = config_data.docker_interface_blacklist()
-        blacklist = set([line.strip() for line in blackstring.splitlines()])
-        shared_items = whitelist & blacklist # union of both sets
+        whitelist = config_data.docker_interface_whitelist()
+        blacklist = config_data.docker_interface_blacklist()
+        shared_items = set(whitelist) & set(blacklist) # union of both sets
         if shared_items: # same items in whitelist and blacklists not allowed
             error_message = "Whitelist and Blacklist share items, which is bad practice:"
             for item in shared_items:
-                error_message = f"\r\n{item}"
+                error_message += f", {item}"
             raise RuntimeError(error_message)
         
         # Build Watchlist:
@@ -320,7 +318,7 @@ class Scanner():
                 updated_records_count += 1
             else:
                 records_data.add(item)
-                new_records_count += 1                
+                new_records_count += 1
 
         return lastest_timestamp
         

@@ -2,38 +2,10 @@ import json
 from pathlib import Path
 import threading
 
-class TextFileHandler:
-    def __init__(self, filename: str):
-        assert isinstance(filename, str), "Given filename has to be of type 'str'"
-        self.filename = Path(__file__).parent / filename
-        # no mutex needed, as only ConfigHandler uses whitelist and blacklist
-
-    def _load_text(self) -> str:
-        try:
-            file = open(self.filename, mode="r")
-            return file.read()
-        except FileNotFoundError:
-            file = open(self.filename, mode="w")
-            return "" # return empty string
-        finally:
-            file.close()
-
-    def _store_text(self, text: str):
-        try:
-            file = open(self.filename, mode="w")
-            file.write(text)
-            file.flush()
-        except PermissionError as e:
-            print(f"Could not store text in {self.filename}: {e}")
-        finally:
-            file.close()
-
 class ConfigHandler:
     def __init__(self, filename: str = "config.json"):
         assert isinstance(filename, str), "Given filename has to be of type 'str'"
         self.filename = Path(__file__).parent / filename
-        self.whitelist = TextFileHandler("whitelist.txt")
-        self.blacklist = TextFileHandler("blacklist.txt")
         self._lock = threading.Lock() # mutex semaphore
 
 
@@ -52,16 +24,20 @@ class ConfigHandler:
             self.docker_interface(docker_interface)
             return None
         return docker_interface.get("network", "")
-    def docker_interface_whitelist(self, text: str | None = None) -> str | None:
-        if text is not None: # parameter given: setter method
-            self.whitelist._store_text(text)
+    def docker_interface_whitelist(self, whitelist: list[str] | None = None) -> list[str] | None:
+        docker_interface = self.docker_interface()
+        if whitelist:
+            docker_interface["whitelist"] = whitelist
+            self.docker_interface(docker_interface)
             return None
-        return self.whitelist._load_text()
-    def docker_interface_blacklist(self, text: str | None = None) -> str | None:
-        if text is not None: # parameter given: setter method
-            self.blacklist._store_text(text)
+        return docker_interface.get("whitelist", [])
+    def docker_interface_blacklist(self, blacklist: str | None = None) -> str | None:
+        docker_interface = self.docker_interface()
+        if blacklist:
+            docker_interface["blacklist"] = blacklist
+            self.docker_interface(docker_interface)
             return None
-        return self.blacklist._load_text()
+        return docker_interface.get("blacklist", [])
 
 
     # --- Scanner ---

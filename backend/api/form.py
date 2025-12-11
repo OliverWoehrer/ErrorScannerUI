@@ -41,10 +41,14 @@ def delete_record():
 @form.route("/docker-interface", methods=["GET","POST"])
 def docker_interface():
     if request.method == "GET":
+        whitelist = config_data.docker_interface_whitelist()
+        whitestring = "\n".join(whitelist)
+        blacklist = config_data.docker_interface_blacklist()
+        blackstring = "\n".join(blacklist)
         data = {
             "network": config_data.docker_interface_network(),
-            "whitelist": config_data.docker_interface_whitelist(),
-            "blacklist": config_data.docker_interface_blacklist(),
+            "whitelist": whitestring,
+            "blacklist": blackstring,
         }
         response = json.dumps(data)
         return response
@@ -56,9 +60,13 @@ def docker_interface():
         if "network" in payload:
             config_data.docker_interface_network(payload["network"])
         if "whitelist" in payload:
-            config_data.docker_interface_whitelist(payload["whitelist"])
+            whitestring = payload["whitelist"]
+            whitelist = [line.strip() for line in whitestring.splitlines()]
+            config_data.docker_interface_whitelist(whitelist)
         if "blacklist" in payload:
-            config_data.docker_interface_blacklist(payload["blacklist"])
+            blackstring = payload["blacklist"]
+            blacklist = [line.strip() for line in blackstring.splitlines()]
+            config_data.docker_interface_blacklist(blacklist)
 
         return "OK", 200
 

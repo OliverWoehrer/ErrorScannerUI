@@ -1,2 +1,0 @@
-generator-loggen-app-3
-generator-loggen-app-lost-3
