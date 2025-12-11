@@ -185,7 +185,7 @@ class RecordsFile(RecordsCollection):
         return self.buckets.setdefault(key, {}) # create empty dict as fallback
 
     def _read_lines(self) -> list[str]:
-        lock_obj = portalocker.Lock(self.filename, mode='r', timeout=5, flags=portalocker.LOCK_EX) # locker for file mutex
+        lock_obj = portalocker.Lock(self.filename, mode='r', flags=portalocker.LOCK_EX) # locker for file mutex
         try:
             file = lock_obj.acquire() # open file through locker
             return file.readlines()
@@ -200,7 +200,7 @@ class RecordsFile(RecordsCollection):
             lock_obj.release() # close file and release the lock
 
     def _write_lines(self, lines: list[str]):
-        lock_obj = portalocker.Lock(self.filename, mode='w', timeout=5, flags=portalocker.LOCK_EX) # locker for file mutex
+        lock_obj = portalocker.Lock(self.filename, mode='w', flags=portalocker.LOCK_EX) # locker for file mutex
         try:
             file = lock_obj.acquire() # open file through locker
             file.writelines(lines)

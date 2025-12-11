@@ -181,7 +181,7 @@ class ConfigHandler:
     """
 
     def _load_config(self) -> dict:
-        lock_obj = portalocker.Lock(self.filename, mode='r', timeout=5, flags=portalocker.LOCK_EX) # locker for file mutex
+        lock_obj = portalocker.Lock(self.filename, mode='r', flags=portalocker.LOCK_EX) # locker for file mutex
         try:
             file = lock_obj.acquire() # open file through locker
             return json.load(file)
@@ -199,7 +199,7 @@ class ConfigHandler:
 
     def _store_config(self, configuration: dict) -> None:
         # Create Locker For File Mutex:
-        lock_obj = portalocker.Lock(self.filename, mode='w', timeout=5, flags=portalocker.LOCK_EX)
+        lock_obj = portalocker.Lock(self.filename, mode='w', flags=portalocker.LOCK_EX)
         try:
             file = lock_obj.acquire() # open file through locker
             json.dump(configuration, file ,indent=4)

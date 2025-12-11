@@ -112,16 +112,9 @@ class LogsFile(LogsCollection):
                 self.items.append(item)
 
     def clear(self) -> str:
-        try:
-            self._lock.acquire()
-            file = open(self.filename, mode="w")
-            self.logcount = 0
-            self.items = []
-        except Exception as e:
-            raise RuntimeError(f"Failed to clear file. {e}")
-        finally:
-            file.close()
-            self._lock.release()
+        self.logcount = 0
+        self.items = []
+        self._clear_lines()
 
     def add(self, item: DataItem) -> str:
         if 0 < self.max_logcount and self.max_logcount < len(self.items):
@@ -170,7 +163,7 @@ class LogsFile(LogsCollection):
 
     def _read_lines(self) -> list[str]:
         # Create Locker For File Mutex:
-        lock_obj = portalocker.Lock(self.filename, mode='r', timeout=5, flags=portalocker.LOCK_EX)
+        lock_obj = portalocker.Lock(self.filename, mode='r', flags=portalocker.LOCK_EX)
         try:
             file = lock_obj.acquire() # open file through locker
             return file.readlines()
@@ -190,7 +183,7 @@ class LogsFile(LogsCollection):
         if 0 < self.max_logcount and self.max_logcount < predicted_logcount: # file would be full, trim oldest logs
             lines_to_remove = predicted_logcount - int(self.max_logcount*0.9) # trimmed file should be 90% full
             temp_filename = str(self.filename) + ".temp"
-            lock_obj = portalocker.Lock(self.filename, mode='r', timeout=5, flags=portalocker.LOCK_EX) # locker for file mutex
+            lock_obj = portalocker.Lock(self.filename, mode='r', flags=portalocker.LOCK_EX) # locker for file mutex
             try: # open original file
                 file = lock_obj.acquire() # open file through locker
                 for _ in range(lines_to_remove): # skip the first 'lines_to_remove' lines (the oldest one)
@@ -219,7 +212,7 @@ class LogsFile(LogsCollection):
             finally: # cleanup original file
                 lock_obj.release() # close file and release the lock
         else: # file will not be full, just append
-            lock_obj = portalocker.Lock(self.filename, mode='r', timeout=5, flags=portalocker.LOCK_EX) # locker for file mutex
+            lock_obj = portalocker.Lock(self.filename, mode='a', flags=portalocker.LOCK_EX) # locker for file mutex
             try: # append to original file 
                 file = lock_obj.acquire() # open file through locker
                 file.writelines(lines) # no need to trim file, just append
@@ -236,7 +229,7 @@ class LogsFile(LogsCollection):
         assert expected_logcount == actual_logcount, f"Unexpected linecount {actual_logcount}. Expected {expected_logcount}."
 
     def _count_lines(self) -> int:
-        lock_obj = portalocker.Lock(self.filename, mode='a', timeout=5, flags=portalocker.LOCK_EX) # locker for file mutex
+        lock_obj = portalocker.Lock(self.filename, mode='r', flags=portalocker.LOCK_EX) # locker for file mutex
         try:
             file = lock_obj.acquire() # open file through locker
             return sum(1 for _ in file)
@@ -247,3 +240,13 @@ class LogsFile(LogsCollection):
             RuntimeError(f"Failed to acquire lock while reading {self.filename}. {e}")
         finally:
             lock_obj.release() # close file and release the lock
+
+    def _clear_lines(self):
+        lock_obj = portalocker.Lock(self.filename, mode='w', flags=portalocker.LOCK_EX) # locker for file mutex
+        try:
+            file = lock_obj.acquire() # open file through locker
+        except portalocker.LockException as e:
+            RuntimeError(f"Failed to acquire lock while clearing {self.filename}. {e}")
+        finally:
+            lock_obj.release() # close file and release the lock
+        
