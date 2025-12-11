@@ -103,7 +103,7 @@ export function DatePicker({ name, readonly, datetimeObj, onConfirm }) {
     return(
         <>
             {/* Input Field */}
-            <mdui-text-field label="Last Seen (Date)" value={toDateString(dateObj)} defaultValue={toDateString(dateObj)} name={name?(name+"-date"):"date"} readonly onClick={openDialog}>
+            <mdui-text-field label="Last Seen (Date)" value={toDateString(dateObj)} defaultValue={toDateString(dateObj)} name={name} readonly onClick={openDialog}>
                 <mdui-icon slot="icon" name="calendar_month"></mdui-icon>
             </mdui-text-field>
             {/* Dialog with Picker */}
@@ -191,7 +191,7 @@ export function TimePicker({ name, readonly, datetimeObj, onConfirm }) {
     return(
         <>
             {/* Input Field */}
-            <mdui-text-field label="Last Seen (Time)" value={toTimeString(dateObj)} defaultValue={toTimeString(dateObj)} name={name?(name+"-time"):"time"} readonly onClick={openDialog}>
+            <mdui-text-field label="Last Seen (Time)" value={toTimeString(dateObj)} defaultValue={toTimeString(dateObj)} name={name} readonly onClick={openDialog}>
                 <mdui-icon slot="icon" name="access_time"></mdui-icon>
             </mdui-text-field>
             {/* Dialog with Picker */}
