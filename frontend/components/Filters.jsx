@@ -4,7 +4,10 @@ import { useEffect, useState, useRef, useMemo } from 'react';
 // Material Components:
 import 'mdui/components/card.js';
 import 'mdui/components/chip.js';
+import 'mdui/components/linear-progress.js';
 import 'mdui/components/list.js';
+import 'mdui/components/radio-group.js';
+import 'mdui/components/radio.js';
 import 'mdui/components/range-slider.js';
 import 'mdui/components/text-field.js';
 import 'mdui/components/tooltip.js';
@@ -25,7 +28,8 @@ function Filters({items, updateFilteredItems}) {
     }
 
     function applyFilters() {
-        return items.filter(item => {
+        // Only Select Filtered Items:
+        const filteredItems = items.filter(item => {
             console.assert(item instanceof LogRecordItem, "'item' has to be of type 'LogRecordItem'");
 
             // Check Category:
@@ -48,12 +52,30 @@ function Filters({items, updateFilteredItems}) {
 
             return true;
         });
+
+        // Sort Items:
+        if(filters.order === "new") {
+            filteredItems.sort((itemA,itemB) => itemB.timestamp - itemA.timestamp);
+        } else if(filters.order === "old") {
+            filteredItems.sort((itemA,itemB) => itemA.timestamp - itemB.timestamp);
+        }
+        return filteredItems;
     }
     
     // Handler For Search Input:
     function updateSearchQuery() {
         const query = textSearchRef.current.value;
         updateFilter("searchQuery", String(query));
+    }
+
+    // Handler for Order Selection:
+    function updateOrder() {
+        if(loadingRef.current) {
+            loadingRef.current.style.display = "block";
+            // loadingRef.current.max = items.length;
+        }
+        const order = orderRef.current.value;
+        updateFilter("order", String(order));
     }
 
     // Handler for Category Chip Clicks:
@@ -131,11 +153,13 @@ function Filters({items, updateFilteredItems}) {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     const [filters, setFilters] = useState({
         categories: [],
-        searchQuery: '',
+        searchQuery: "",
         startDatetime: new Date(0),
         endDatetime: new Date(),
+        order: "",
     });
     const textSearchRef = useRef(null);
+    const orderRef = useRef(null);
     const categoriesRef = useRef(null);
 
     // Initialization:
@@ -144,6 +168,12 @@ function Filters({items, updateFilteredItems}) {
         if(textSearchRef.current) {
             textSearchRef.current.addEventListener("input", updateSearchQuery);
             updateFilter("searchQuery", ""); // set default value
+        }
+
+        // Initialize Order Selection:
+        if(orderRef.current) {
+            orderRef.current.addEventListener("change", updateOrder);
+            updateFilter("order", "new"); // set default value
         }
         
         // Initialze Category Filter:
@@ -190,6 +220,15 @@ function Filters({items, updateFilteredItems}) {
                         <DatePicker datetimeObj={filters.endDatetime} onConfirm={confirmEndDate} />
                         <TimePicker datetimeObj={filters.endDatetime} onConfirm={confirmEndTime} />
                     </mdui-card>
+            </section>
+            <section className="flex-row">
+                <div className="flex-row">
+                    <span>Sort by</span>
+                    <mdui-radio-group ref={orderRef} value="new">
+                        <mdui-radio value="new">new</mdui-radio>
+                        <mdui-radio value="old">old</mdui-radio>
+                    </mdui-radio-group>
+                </div>
             </section>
             <section ref={categoriesRef} className="flex-row" style={{justifyContent:"flex-start",overflowX:"auto"}}>
                 <mdui-chip variant="filter" onClick={() => updateCategory("critical")} selectable selected>Critical</mdui-chip>
