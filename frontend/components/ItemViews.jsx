@@ -15,9 +15,9 @@ import 'mdui/components/tooltip.js';
 
 // Local Import:
 import { DatePicker, TimePicker } from './Pickers.jsx';
+import { LogRecordItem } from "../assets/LogRecordItem.js";
 import ZeroMd from 'zero-md';
 customElements.define('zero-md', ZeroMd);
-import "../assets/TimePicker.js"
 
 function TemplateView({ initItem, readonly }) {
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,19 +74,19 @@ function TemplateView({ initItem, readonly }) {
                 <mdui-text-field label="Name of Docker Container" value={item.source} defaultValue={item.source} name="source" readonly={readonly}></mdui-text-field>
             </section>
             <section>
-                <mdui-text-field label="Search Key" value={item.searchkey} defaultValue={item.searchkey} name="searchkey" readonly={readonly}>
+                <mdui-text-field label="Search Key" value={item.searchkey || ""} defaultValue={item.searchkey || ""} name="searchkey" readonly={readonly}>
                     <span slot="helper">String to identify this record. Should be a sub-string of the original log message.</span>
                 </mdui-text-field>
             </section>
             <section>
-                <mdui-text-field label="Log Message" value={item.message} defaultValue={item.message} name="message" readonly={readonly} autosize enterkeyhint="enter"></mdui-text-field>
+                <mdui-text-field label="Log Message" value={item.message || ""} defaultValue={item.message || ""} name="message" readonly={readonly} autosize enterkeyhint="enter"></mdui-text-field>
             </section>
             {readonly && item.solution && (
                 <section>
                     <mdui-card variant="filled" style={{width:"100%"}}>
                         <zero-md>
                             <template>
-                                <link rel="stylesheet" href="/github-markdown.css" />
+                                <link rel="stylesheet" href="/github-markdown.css" type="text/css"/>
                             </template>
                             <script type="text/markdown">
                                 {item.solution}
@@ -97,7 +97,7 @@ function TemplateView({ initItem, readonly }) {
             )}
             {!readonly && (
                 <section>
-                    <mdui-text-field label="Edit Solution" value={item.solution} defaultValue={item.solution} name="message" readonly={readonly} autosize enterkeyhint="enter"></mdui-text-field>
+                    <mdui-text-field label="Edit Solution" value={item.solution || ""} defaultValue={item.solution || ""} name="solution" readonly={readonly} autosize enterkeyhint="enter"></mdui-text-field>
                 </section>
             )}
             <input type="hidden" name="id" value={item.id}/>
@@ -147,6 +147,7 @@ export function RecordItemView({ item }) {
         return(
             <TextForm action="/api/form/delete-record" submitButtonText="Delete record" resetButtonText="Cancel" onSuccess={updateMode} onReset={updateMode}>
                 <div>Are you sure you want to delete this record?</div>
+                <input type="hidden" name="id" value={item.id}/>
             </TextForm>
         );
     } else if(mode == 1) { // edit mode: confirm updated changes
