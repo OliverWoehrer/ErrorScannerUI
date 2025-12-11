@@ -1,12 +1,11 @@
 import json
 from pathlib import Path
-import threading
+import portalocker
 
 class ConfigHandler:
     def __init__(self, filename: str = "config.json"):
         assert isinstance(filename, str), "Given filename has to be of type 'str'"
         self.filename = Path(__file__).parent / filename
-        self._lock = threading.Lock() # mutex semaphore
 
 
     # --- Docker Interface ---
@@ -182,27 +181,31 @@ class ConfigHandler:
     """
 
     def _load_config(self) -> dict:
+        lock_obj = portalocker.Lock(self.filename, mode='r', timeout=5, flags=portalocker.LOCK_EX) # locker for file mutex
         try:
-            self._lock.acquire()
-            file = open(self.filename, mode="r")
+            file = lock_obj.acquire() # open file through locker
             return json.load(file)
         except FileNotFoundError:
-            file = open(self.filename, mode="w")
             return {} # return empty json
         except json.decoder.JSONDecodeError as e:
             text = file.read()
             if text: # check file content
                 print(f"Could not parse JSON ({text}): {e}")
             return {} # return empty json
+        except portalocker.LockException as e:
+            RuntimeError(f"Failed to acquire lock while reading {self.filename}. {e}")
         finally:
-            file.close()
-            self._lock.release()
+            lock_obj.release() # close file and release the lock
 
     def _store_config(self, configuration: dict) -> None:
+        # Create Locker For File Mutex:
+        lock_obj = portalocker.Lock(self.filename, mode='w', timeout=5, flags=portalocker.LOCK_EX)
         try:
-            file = open(self.filename, mode="w")
+            file = lock_obj.acquire() # open file through locker
             json.dump(configuration, file ,indent=4)
+        except portalocker.LockException as e:
+            RuntimeError(f"Failed to acquire lock while writing {self.filename}. {e}")
         except PermissionError as e:
-            print(f"Could not store configuration in {self.filename}: {e}")
+            print(f"Could not store configuration in {self.filename}. {e}")
         finally:
-            file.close()
+            lock_obj.release() # close file and release the lock

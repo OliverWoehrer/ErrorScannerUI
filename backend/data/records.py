@@ -3,11 +3,11 @@ from .data_item import DataItem
 from datetime import datetime
 import json
 from pathlib import Path
-import threading
+import portalocker
 
 class RecordsCollection(ABC):
     @abstractmethod
-    def load():
+    def load(self) -> str:
         """
         Load log items into memory
         """
@@ -47,33 +47,30 @@ class RecordsCollection(ABC):
         pass
 
     @abstractmethod
-    def find(self, item: DataItem) -> tuple[str,float]:
+    def candidates(self, item: DataItem) -> list[DataItem]:
         """
         Tries to find a record in this collection that is similar to the given item. It looks for
-        similarities in the properties of items and returns the ID of the best match along with its
-        similarity score.
-        A similarity score of 0.0 means no record shares properties with the given item. The
-        returned ID is undefined. A similarity score of 1.0 means a perfect match was found.
+        records that share the source and category. These are possible candidates and worth to
+        further check.
         
-        :param item: Item to find a matching record
+        :param item: Item to find candidates for
         :type item: DataItem
-        :return: Tuple of the best match along with its corresponding similarity score
-        :rtype: tuple[DataItem,float]
+        :return: List of candidates that are possibly similar 
+        :rtype: list[DataItem]
         """
         pass
 
     @abstractmethod
-    def replace(self, id: str, item: DataItem) -> str:
+    def update(self, item: DataItem) -> str:
         """
-        Looks for the item with the given ID and updates all its properties using the values from
-        the given item.
+        Updates the item with the same ID with the given item. It uses the ID of the given item
+        to find the exsiting item and replaces it. This is helpfull if multiple properties
+        changed and this data structure needs to be resorted.
         
-        :param id: ID of the item to update
-        :type id: str
-        :param item: Item with new updates values
+        :param item: New item with the same ID as the old one
         :type item: DataItem
-        :return: True on success, false otherwise
-        :rtype: bool
+        :return: Error message on failure, 'None' on success
+        :rtype: str
         """
         pass
 
@@ -99,127 +96,118 @@ class RecordsCollection(ABC):
 class RecordsFile(RecordsCollection):
     def __init__(self, filename):
         assert isinstance(filename, str), "Given filename has to be of type 'str'"
-        self._filename = Path(__file__).parent / filename
-        self._lock = threading.Lock() # mutex semaphore
-        self._records = {}
-        # [INFO]
-        # The '_records' dictionary structures the record items based on their source and category.
-        # It follows the hierachy Source --> Category --> IDs. Here is an example:
-        #   "Source1": {
-        #       "critical": {
-        #           "A35BCD": {...},
-        #           "98D881": {...},
-        #       },
-        #       "error": {
-        #           "38F6C3": {...}
-        #       },
-        #       ...
-        #   },
-        #   "Source2": {
-        #       "critical": {
-        #           "BC442D": {...},
-        #           "883982": {...},
-        #       },
-        #       "error": {
-        #           "9ABDFC": {...}
-        #       },
-        #       ...
-        #   }
-
-    def load(self):
-        try:
-            self._lock.acquire()
-            file = open(self._filename, mode="r")
+        self.filename = Path(__file__).parent / filename
+        self.records: dict[str, DataItem] = {} # maps IDs to items
+        self.buckets: dict[tuple[str, str], dict[str, DataItem]] = {} # sorts items by source and category
+    
+    def load(self) -> str:
+        lines = self._read_lines()
+        for line in lines:
             try:
-                self._records = json.load(file, object_hook=DataItem.parse)
+                item = json.loads(line, object_hook=DataItem.parse)
             except TypeError as e:
-                print(f"Could not parse JSON. {e}")
-                self._records = {} # empty dict
-        except FileNotFoundError as e:
-            file = open(self._filename, mode="w") # create new file
-            self._records = {} # empty dict
-            json.dump(self._records, file)
-        except Exception as e:
-            raise RuntimeError(f"Failed to read JSON. {e}")
-        finally: # clean up
-            file.close()
-            self._lock.release()
+                print(f"Could not parse {line}. {e}.")
+                continue # skip this line
+            except json.decoder.JSONDecodeError as e:
+                print(f"Could not parse {line}. {e}.")
+                continue # skip this line
+            else:
+                self.add(item)
+        return None
 
     def clear(self) -> str:
-        self._records = {}
-        self.flush()
+        self._write_lines([])
+        self.records = {}
+        self.buckets = {}
+        return None
 
     def add(self, item: DataItem) -> str:
-        source_records = self._records.setdefault(item.source, {})
-        category_records = source_records.setdefault(item.category, {})
-        if item.id in category_records:
-            return f"Record with ID {item.id} already present ({category_records[item.id]})"
-        category_records[item.id] = item
+        if item.id in self.records:
+            return f"Item with ID {item.id} already in collection"
+        self.records[item.id] = item
+        bucket = self._get_bucket(item)
+        bucket[item.id] = item
         return None
 
     def get_items(self) -> list[DataItem]:
-        items = []
-        # Iterate All Record Items:
-        for source_records in self._records.values():
-            for category_records in source_records.values():
-                for record_item in category_records.values():
-                    items.append(record_item)
-        return items
+        return self.records.values()
 
-    def find(self, item: DataItem) -> tuple[DataItem,float]:
-        source_records = self._records.get(item.source, {})
-        if not source_records:
-            return None, 0.0 # no record from the same source
-        category_records = source_records.get(item.category, {})
-        if not category_records:
-            return None, 0.0 # no record with the same category
-        
-        best_score = 0.0
-        best_match = None
-        for record_item in category_records.values():
-            score = item.similarity_score(record_item)
-            if score > best_score:
-                best_score = score
-                best_match = record_item
-            if best_score == 1.0:
-                break # found perfect match, skip rest of loop
-        return best_match, best_score
+    def candidates(self, item: DataItem) -> list[DataItem]:
+        bucket = self._get_bucket(item)
+        return bucket.values()
 
-    def replace(self, id: str, item: DataItem) -> str:
-        # Iterate All Record Items:
-        for source, source_records in self._records.items():
-            for category, category_records in source_records.items():
-                for record_id, record_item in category_records.items():
-                    if id == record_id: # check ID
-                        self.remove(record_item)
-                        self.add(item)
+    def update(self, item: DataItem) -> str:
+        old_item = self.records.get(item.id)
+        if not old_item:
+            return f"No item found with ID {item.id}."
+        result = self.remove(old_item)
+        if result:
+            return f"Failed to remove old item {old_item.id}. {result}"
+        result = self.add(item)
+        if result:
+            return f"Failed to add new item {item.id}. {result}"
 
     def remove(self, item: DataItem) -> str:
-        source_records = self._records.get(item.source, {})
-        if not source_records:
-            return None # could not remove, no record from the same source
-        category_records = source_records.get(item.category, {})
-        if not category_records:
-            return None # could not remove, no record with the same category
-        if item.id not in category_records:
-            return None # could not remove, no matching ID found
-        del category_records[item.id]
-        return None
+        # Remove From ID Map:
+        if item.id not in self.records:
+            return f"No item found with ID {item.id}."
+        self.records.pop(item.id)
 
+        # Remove From Bucket:
+        bucket = self._get_bucket(item)
+        assert item.id in bucket, f"Expected #{item.id} to be in bucket [{item.source}/{item.category}]."
+        if item.id not in bucket:
+            return f"No item found with ID {item.id}."
+        bucket.pop(item.id)
+
+        # Return None on Success:
+        return None
+        
     def flush(self) -> str:
+        lines = []
+        try: # stringify log record items
+            for record in self.records.values():
+                dumped = json.dumps(record, default=DataItem.serialize)
+                lines.append(dumped+"\n")
+        except json.JSONDecodeError as e:
+            raise RuntimeError(f"Could not serialize JSON: {e}")
+        except TypeError as e:
+            raise RuntimeError(f"Could not serialize JSON: {e}")
+        else:
+            self._write_lines(lines)
+
+    """
+    Private Methods
+    """
+
+    def _get_bucket(self, item: DataItem) -> list[DataItem]:
+        key = (item.source,item.category)
+        return self.buckets.setdefault(key, {}) # create empty dict as fallback
+
+    def _read_lines(self) -> list[str]:
+        lock_obj = portalocker.Lock(self.filename, mode='r', timeout=5, flags=portalocker.LOCK_EX) # locker for file mutex
         try:
-            self._lock.acquire()
-            file = open(self._filename, mode="w")
-            try:
-                json.dump(self._records, file, indent=4, default=DataItem.serialize)
-            except json.JSONDecodeError as e:
-                raise RuntimeError(f"Could not serialize JSON. {e}")
-            except TypeError as e:
-                raise RuntimeError(f"Could not serialize JSON. {e}")
+            file = lock_obj.acquire() # open file through locker
+            return file.readlines()
         except FileNotFoundError as e:
-            file = open(self._filename, mode="w") # create new file
+            file = open(self.filename, mode="w") # create new file
+            return [] # empty list
+        except portalocker.LockException as e:
+            RuntimeError(f"Failed to acquire lock while reading {self.filename}. {e}")
         except Exception as e:
-            raise RuntimeError(f"Failed to write JSON. {e}")
+            raise RuntimeError(f"Failed to read lines. {e}")
         finally: # clean up
-            file.close()
-            self._lock.release()
+            lock_obj.release() # close file and release the lock
+
+    def _write_lines(self, lines: list[str]):
+        lock_obj = portalocker.Lock(self.filename, mode='w', timeout=5, flags=portalocker.LOCK_EX) # locker for file mutex
+        try:
+            file = lock_obj.acquire() # open file through locker
+            file.writelines(lines)
+            file.flush()
+        except portalocker.LockException as e:
+            RuntimeError(f"Failed to acquire lock while writing {self.filename}. {e}")
+        except Exception as e:
+            raise RuntimeError(f"Failed to write lines. {e}")
+        finally:
+            lock_obj.release() # close file and release the lock
