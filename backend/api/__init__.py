@@ -11,7 +11,7 @@ from pathlib import Path
 import random
 import time
 import traceback
-from werkzeug.exceptions import HTTPException, NotImplemented
+from werkzeug.exceptions import HTTPException, NotImplemented, UnprocessableEntity
 
 
 
@@ -54,6 +54,17 @@ def my_traceback(exception: Exception) -> str:
     else:
         return "No application-specific traceback frames found"
 
+def parse_items(items: list[DataItem]):
+    for item in items:
+        try:
+            dumped = json.dumps(item, default=DataItem.serialize)
+            json_line = dumped + "\r\n"
+            yield json_line.encode('utf-8') # yield the string (Flask sends this chunk immediately)
+        except json.JSONDecodeError as e:
+            raise RuntimeError(f"Could not serialize JSON. {e}")
+        except TypeError as e:
+            raise RuntimeError(f"Could not serialize JSON. {e}")
+
 def generate_logs(num_items: int = 20, with_solution: bool = False):
     """
     A generator that yields JSON Line strings with a delay.
@@ -93,26 +104,34 @@ def index():
 
 @api.route("/logs", methods=["GET"])
 def logs():
-    def parse_items():
-        lines = logs_data._read_lines()
-        for line in lines:
-            yield line.encode('utf-8') # yield the string (Flask sends this chunk immediately)
-    # return Response(generate_logs(), mimetype="application/json-lines")
-    return Response(parse_items(), mimetype="application/json-lines")
+    # Parse Query Params:
+    start = None
+    stop = None
+    start_param = request.args.get("start")
+    if start_param:
+        try:
+            start = datetime.strptime(start_param, "%d.%m.%Y %H:%M:%S.%f") # format DD.MM.YYYY hh:mm:ss.ssssss
+        except ValueError as e:
+            raise UnprocessableEntity(f"Could not parse timestamp {start_param}. {e}")
+    stop_param = request.args.get("stop")
+    if stop_param:
+        try:
+            stop = datetime.strptime(stop_param, "%d.%m.%Y %H:%M:%S.%f") # format DD.MM.YYYY hh:mm:ss.ssssss
+        except ValueError as e:
+            raise UnprocessableEntity(f"Could not parse timestamp {stop_param}. {e}")
+    
+    # Fetch Logs:
+    items = []
+    if start_param and stop_param:
+        items = logs_data.get_between(start,stop)
+    else:
+        items = logs_data.get_last(5000)
+
+    return Response(parse_items(items), mimetype="application/json-lines")
 
 @api.route("/records", methods=["GET"])
 def records():
-    def parse_items():
-        items = records_data.get_items()
-        for item in items:
-            try:
-                dumped = json.dumps(item, default=DataItem.serialize)
-                json_line = dumped + "\r\n"
-                yield json_line.encode('utf-8') # yield the string (Flask sends this chunk immediately)
-            except json.JSONDecodeError as e:
-                raise RuntimeError(f"Could not serialize JSON. {e}")
-            except TypeError as e:
-                raise RuntimeError(f"Could not serialize JSON. {e}")
+    
 
     # return Response(generate_logs(), mimetype="application/json-lines")
     return Response(parse_items(), mimetype="application/json-lines")

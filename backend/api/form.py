@@ -2,10 +2,11 @@
 This module implements the functions to handle routes of /form
 """
 # System Imports:
-from data import config_data
+from data import config_data, records_data, DataItem
+from datetime import datetime
 from flask import Blueprint, Response, request
 import json
-from werkzeug.exceptions import NotImplemented
+from werkzeug.exceptions import NotImplemented, BadRequest, UnprocessableEntity, BadGateway
 
 # Register Blueprint Hierarchy:
 form = Blueprint("form", __name__, url_prefix="/form")
@@ -16,26 +17,113 @@ def index():
 
 @form.route("/new-record", methods=["POST"])
 def new_record():
+    # Parse Request Body:
     body = request.data.decode("utf-8")
-    payload = json.loads(body)
-    # TODO: parse body and append to "records.json"
-    raise NotImplemented(f"Endpoint not yet implemented.")
+    try:
+        payload = json.loads(body)
+    except TypeError as e:
+        raise UnprocessableEntity(f"Failed to parse request body {body}.")
+
+    # Parse Required Params:
+    if "date" not in payload:
+        raise BadRequest("Missing parameter 'date'.")
+    if "time" not in payload:
+        raise BadRequest("Missing parameter 'time'.")
+    category = payload.get("category",None)
+    if category is None:
+        raise BadRequest("Missing parameter 'category'.")
+    if category not in ["critical","error","warning","info","debug"]:
+        raise BadRequest(f"Unknown value for field 'category' ({payload['category']}).")
+    source = payload.get("source",None)
+    if source is None:
+        raise BadRequest("Missing parameter 'source'.")
+    
+    # Optional Params:
+    searchkey = payload.get("searchkey","")
+    message = payload.get("message","")
+    solution = payload.get("solution",None)
+
+    # Parse Timestamp:
+    timestamp = None
+    try:
+        date = payload["date"]
+        time = payload["time"]
+        timestamp = datetime.strptime(f"{date} {time}", "%d.%m.%Y %H:%M:%S.%f") # format DD.MM.YYYY hh:mm:ss.ssssss
+    except ValueError as e:
+        raise UnprocessableEntity(f"Could not parse timestamp {date} {time}. {e}")
+    
+    # Add to Database:
+    item = DataItem(timestamp,category,source,message,solution,searchkey)
+    result = records_data.add(item)
+    if result:
+        raise BadGateway(f"Failed to add item. {result}")
     return "OK", 200
 
 @form.route("/edit-record", methods=["POST"])
 def edit_record():
+    # Parse Request Body:
     body = request.data.decode("utf-8")
-    payload = json.loads(body)
-    # TODO: parse body, find in "records.json" and edit
-    raise NotImplemented(f"Endpoint not yet implemented.")
+    try:
+        payload = json.loads(body)
+    except TypeError as e:
+        raise UnprocessableEntity(f"Failed to parse request body {body}.")
+
+    # Parse Required Params:
+    if "date" not in payload:
+        raise BadRequest("Missing parameter 'date'.")
+    if "time" not in payload:
+        raise BadRequest("Missing parameter 'time'.")
+    category = payload.get("category",None)
+    if category is None:
+        raise BadRequest("Missing parameter 'category'.")
+    if category not in ["critical","error","warning","info","debug"]:
+        raise BadRequest(f"Unknown value for field 'category' ({payload['category']}).")
+    source = payload.get("source",None)
+    if source is None:
+        raise BadRequest("Missing parameter 'source'.")
+    id = payload.get("id",None)
+    if id is None:
+        raise BadRequest("Missing parameter 'id'.")
+    
+    # Optional Params:
+    searchkey = payload.get("searchkey","")
+    message = payload.get("message","")
+    solution = payload.get("solution",None)
+
+    # Parse Timestamp:
+    timestamp = None
+    try:
+        date = payload["date"]
+        time = payload["time"]
+        timestamp = datetime.strptime(f"{date} {time}", "%d.%m.%Y %H:%M:%S.%f") # format DD.MM.YYYY hh:mm:ss.ssssss
+    except ValueError as e:
+        raise UnprocessableEntity(f"Could not parse timestamp {date} {time}. {e}")
+    
+    item = DataItem(timestamp,category,source,message,solution,searchkey,id)
+    result = records_data.update(item)
+    if result:
+        raise BadGateway(f"Failed to update item {id}. {result}")
     return "OK", 200
 
 @form.route("/delete-record", methods=["POST"])
 def delete_record():
+    # Parse Request Body:
     body = request.data.decode("utf-8")
-    payload = json.loads(body)
-    # TODO: parse body, find in "records.json" and edit
-    raise NotImplemented(f"Endpoint not yet implemented.")
+    payload = None
+    try:
+        payload = json.loads(body)
+    except TypeError as e:
+        raise UnprocessableEntity(f"Failed to parse request body {body}.")
+
+    # Parse Required Params:
+    id = payload.get("id",None)
+    if id is None:
+        raise BadRequest("Missing parameter 'id'.")
+
+    # Remove From Database:
+    result = records_data.remove(id)
+    if result:
+        raise BadGateway(f"Failed to remove item {id}. {result}")
     return "OK", 200
 
 @form.route("/docker-interface", methods=["GET","POST"])
