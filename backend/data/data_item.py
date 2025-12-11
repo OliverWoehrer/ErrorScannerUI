@@ -131,11 +131,29 @@ class DataItem:
     def parse(input: dict) -> dict:
         if not input:
             raise TypeError("Could not parse 'None'")
-        datetime_string = input.get("timestamp", None)
-        if not datetime_string:
-            return input # no timestamp, no parsing needed, return as is
-        try: # creat new data object
-            timestamp = datetime.fromisoformat(datetime_string) # parse timestamp
-            return DataItem(timestamp,input["category"],input["source"],input["message"],input["solution"],input["searchkey"])            
+
+        # Parse Mandatory Properties:
+        if "timestamp" not in input:
+            raise TypeError(f"Could not parse 'timestamp' from {input}.")
+        timestamp = None
+        try: 
+            timestamp = datetime.fromisoformat(input["timestamp"]) # parse timestamp
         except ValueError as e:
-            raise TypeError(f"Invalid timestamp string '{datetime_string}': {e}")
+            raise TypeError(f"Invalid timestamp string '{input["timestamp"]}'. {e}")
+        if "category" not in input:
+            raise TypeError(f"Could not parse 'category' from {input}.")
+        category = input["category"]
+        if "source" not in input:
+            raise TypeError(f"Could not parse 'source' from {input}.")
+        source = input["source"]
+        if "id" not in input:
+            raise TypeError(f"Could not parse 'id' from {input}.")
+        id = input["id"]
+
+        # Try to Parse Optional Properties:
+        message = input.get("message",None)
+        solution = input.get("solution",None)
+        searchkey = input.get("searchkey",None)
+        
+        # Create New Data Item:
+        return DataItem(timestamp,category,source,message,solution,searchkey,id)
