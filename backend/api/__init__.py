@@ -131,10 +131,8 @@ def logs():
 
 @api.route("/records", methods=["GET"])
 def records():
-    
-
-    # return Response(generate_logs(), mimetype="application/json-lines")
-    return Response(parse_items(), mimetype="application/json-lines")
+    items = records_data.get_items()
+    return Response(parse_items(items), mimetype="application/json-lines")
 
 @api.errorhandler(Exception)
 def error(e: Exception):
