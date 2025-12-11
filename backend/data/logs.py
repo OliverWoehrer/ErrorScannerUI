@@ -90,26 +90,21 @@ class LogsFile(LogsCollection):
         self.filename = Path(__file__).parent / filename
         self.logcount = self._count_lines()
         self.max_logcount = 0
-        self.items = deque([])
+        self.items = []
 
     def load(self):
         lines = self._read_lines()
         for line in lines:
             try:
-                data = json.loads(line, object_hook=DataItem.parse)
+                item = json.loads(line, object_hook=DataItem.parse)
             except TypeError as e:
                 print(f"Could not parse {line}. {e}")
                 continue # skip this line
+            except json.decoder.JSONDecodeError as e:
+                print(f"Could not parse {line}. {e}.")
+                continue # skip this line
             else:
-                timestamp = data.get("timestamp",None)
-                category = data.get("category",None)
-                source = data.get("source",None)
-                message = data.get("message",None)
-                solution = data.get("solution",None)
-                searchkey = data.get("searchkey",None)
-                id = data.get("id", None)
-                item = DataItem(timestamp=timestamp, category=category, source=source, message=message, solution=solution, searchkey=searchkey, id=id)
-                self.items.append(item)
+                self.add(item)
 
     def clear(self) -> str:
         self.logcount = 0
@@ -119,7 +114,7 @@ class LogsFile(LogsCollection):
     def add(self, item: DataItem) -> str:
         if 0 < self.max_logcount and self.max_logcount < len(self.items):
             print(f"Will not store more then {self.max_logcount} items")
-            self.items.popleft() # remove first item to use at most the last '_max_logcount' items
+            self.items = self.items[1:] # remove first item to use at most the last '_max_logcount' items
         self.items.append(item)
         return None
     
@@ -128,10 +123,10 @@ class LogsFile(LogsCollection):
             return self.items[-count:] # slice last 'count' number of items
         return self.items
     
-    def get_between(self, start: datetime, end: datetime) -> list[DataItem]:
+    def get_between(self, start: datetime, stop: datetime) -> list[DataItem]:
         result = []
         for item in self.items:
-            if item.timestamp <= start or end <= item.timestamp < end:
+            if item.timestamp <= start or stop <= item.timestamp < stop:
                 continue # skip, timestamp not inside interval
             result.append(item)
         return result
