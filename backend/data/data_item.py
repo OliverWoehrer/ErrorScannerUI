@@ -122,7 +122,7 @@ class DataItem:
         try:
             serialized = dict(obj.__dict__) # shallow copy to dict
             assert isinstance(obj.timestamp, datetime), "Property 'timestamp' has to be of type 'datetime'"
-            serialized["timestamp"] = obj.timestamp.strftime("%Y-%m-%dT%H:%M:%S.%f") # format YYYY-MM-DDThh:mm:ss.ssssss
+            serialized["timestamp"] = obj.timestamp.strftime("%Y-%m-%dT%H:%M:%S.%fZ") # format YYYY-MM-DDThh:mm:ss.ssssssZ
             return serialized # replaced 'null' values of non-default types
         except Exception as e:
             raise TypeError(f"Could not serialize item {obj.id}: {e}.")

@@ -4,7 +4,7 @@ export class LogRecordItem {
 
         if(data instanceof LogRecordItem) {
             this.id = data.id;
-            this.timestamp = new Date(data.timestamp); 
+            this.timestamp = new Date(data.timestamp);
             this.category = data.category;
             this.source = data.source;
             this.message = data.message;
@@ -83,10 +83,6 @@ export class LogRecordItem {
         }
     }
 
-    get unixtime() {
-        return this.timestamp.getTime();
-    }
-
     /**
      * Return date in format DD.MM.YYYY
      */
@@ -110,31 +106,6 @@ export class LogRecordItem {
         const date = this.dateString;
         const time = this.timeString;
         return date+" "+time;
-    }
-
-    /**
-     * Return date in format YYYY-MM-DD
-     */
-    get dateISOString() {
-        return this.timestamp.toLocaleString("sv-SE").split(" ")[0];
-    }
-
-    /**
-     * Return time in format hh:mm:ss.sss
-     */
-    get timeISOString() {
-        const time = this.timestamp.toLocaleString("sv-SE").split(" ")[1];
-        const millis = this.timestamp.getMilliseconds();
-        return time+"."+("000"+millis).slice(-3);
-    }
-
-    /**
-     * Return date and time in format YYYY-MM-DDThh:mm:ss.sss
-     */
-    get datetimeISOString() {
-        const date = this.dateISOString;
-        const time = this.timeISOString;
-        return date+"T"+time;
     }
 
     /**
@@ -169,8 +140,8 @@ export class LogRecordItem {
      * @returns 'true' if the string is a valid format
      */
     #isValidDatetimeString(str) {
-        // const ISO_FORMAT = /^\d{4}  (-\d{2}(-\d{2})?)?  (T\d{2}:\d{2}(:\d{2}(\.\d{1,6})?)?)?  ([Z+-]\d{2}:\d{2})?$/;
-        const ISO_FORMAT = /^\d{4}(-\d{2}(-\d{2})?)?(T\d{2}:\d{2}(:\d{2}(\.\d{1,6})?)?)?([Z+-]\d{2}:\d{2})?$/;
+        // const ISO_FORMAT = /^\d{4}  (-\d{2}(-\d{2})?)?  (T\d{2}:\d{2}(:\d{2}(\.\d{1,6})?)?)?  (([Z])|([+-]\d{2}:\d{2}))?$/;
+        const ISO_FORMAT = /^\d{4}(-\d{2}(-\d{2})?)?(T\d{2}:\d{2}(:\d{2}(\.\d{1,6})?)?)?(([Z])|([+-]\d{2}:\d{2}))?$/;
         return ISO_FORMAT.test(str);
     }
 }

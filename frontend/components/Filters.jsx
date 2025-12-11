@@ -45,7 +45,7 @@ function Filters({items, updateFilteredItems}) {
             // Check Datetime Range:
             const start = filters.startDatetime.getTime();
             const end = filters.endDatetime.getTime();
-            const current = item.unixtime;
+            const current = item.datetimeObj;
             if(!((start <= current) && (current <= end))) {
                 return false;
             }
@@ -70,10 +70,6 @@ function Filters({items, updateFilteredItems}) {
 
     // Handler for Order Selection:
     function updateOrder() {
-        if(loadingRef.current) {
-            loadingRef.current.style.display = "block";
-            // loadingRef.current.max = items.length;
-        }
         const order = orderRef.current.value;
         updateFilter("order", String(order));
     }
@@ -189,9 +185,9 @@ function Filters({items, updateFilteredItems}) {
     // Update Datetime Filter on New Items:
     useEffect(() => {
         if(items.length > 0) {
-            const unixtimes = items.map(item => item.unixtime);
-            const initStartDate = new Date(Math.min(...unixtimes));
-            const initEndDate = new Date(Math.max(...unixtimes));
+            const epochtimes = items.map(item => item.datetimeObj?.getTime());
+            const initStartDate = new Date(Math.min(...epochtimes));
+            const initEndDate = new Date(Math.max(...epochtimes));
             updateFilter("startDatetime", new Date(initStartDate));
             updateFilter("endDatetime", new Date(initEndDate));
         }
