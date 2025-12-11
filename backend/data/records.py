@@ -75,7 +75,7 @@ class RecordsCollection(ABC):
         pass
 
     @abstractmethod
-    def remove(self, item: DataItem) -> str:
+    def remove(self, id: str) -> str:
         """
         Removes the item with the same ID as the given item from this collection
         
@@ -137,31 +137,44 @@ class RecordsFile(RecordsCollection):
         return bucket.values()
 
     def update(self, item: DataItem) -> str:
+        # Remove Old Item:
         old_item = self.records.get(item.id)
         if not old_item:
             return f"No item found with ID {item.id}."
-        result = self.remove(old_item)
+        result = self.remove(old_item.id)
         if result:
             return f"Failed to remove old item {old_item.id}. {result}"
+        
+        # Add New Item:
         result = self.add(item)
         if result:
             return f"Failed to add new item {item.id}. {result}"
+        
+        # Commit Changes:
+        result = self.flush()
+        if result:
+            return f"Failed to comit changes to file. {result}"
+        return None # no error message on success
 
-    def remove(self, item: DataItem) -> str:
-        # Remove From ID Map:
-        if item.id not in self.records:
-            return f"No item found with ID {item.id}."
-        self.records.pop(item.id)
-
+    def remove(self, id: str) -> str:
         # Remove From Bucket:
-        bucket = self._get_bucket(item)
-        assert item.id in bucket, f"Expected #{item.id} to be in bucket [{item.source}/{item.category}]."
-        if item.id not in bucket:
-            return f"No item found with ID {item.id}."
-        bucket.pop(item.id)
+        old_item = self.records.get(id)
+        if not old_item:
+            return f"No item found with ID {id}."
+        bucket = self._get_bucket(old_item)
+        assert old_item.id in bucket, f"Expected #{old_item.id} to be in bucket [{old_item.source}/{old_item.category}]."
+        if old_item.id not in bucket:
+            return f"No item found with ID {old_item.id}."
+        bucket.pop(old_item.id)
 
-        # Return None on Success:
-        return None
+        # Remove From ID Map:
+        self.records.pop(id)
+
+        # Commit Changes:
+        result = self.flush()
+        if result:
+            return f"Failed to comit changes to file. {result}"
+        return None # no error message on success
         
     def flush(self) -> str:
         lines = []
