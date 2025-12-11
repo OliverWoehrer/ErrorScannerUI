@@ -93,6 +93,8 @@ class LogsFile(LogsCollection):
         self.items = []
 
     def load(self):
+        self.logcount = 0
+        self.items = []
         lines = self._read_lines()
         for line in lines:
             try:
@@ -107,7 +109,6 @@ class LogsFile(LogsCollection):
                 self.add(item)
 
     def clear(self) -> str:
-        self.logcount = 0
         self.items = []
         self._clear_lines()
 
@@ -243,5 +244,6 @@ class LogsFile(LogsCollection):
         except portalocker.LockException as e:
             RuntimeError(f"Failed to acquire lock while clearing {self.filename}. {e}")
         finally:
+            self.logcount = 0
             lock_obj.release() # close file and release the lock
         

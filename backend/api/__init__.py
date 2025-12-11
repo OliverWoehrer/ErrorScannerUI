@@ -122,6 +122,7 @@ def logs():
     
     # Fetch Logs:
     items = []
+    logs_data.load() # fetch items from database
     if start_param and stop_param:
         items = logs_data.get_between(start,stop)
     else:
