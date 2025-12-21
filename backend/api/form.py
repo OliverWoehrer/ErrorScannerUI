@@ -27,8 +27,6 @@ def new_record():
     # Parse Required Params:
     if "date" not in payload:
         raise BadRequest("Missing parameter 'date'.")
-    if "time" not in payload:
-        raise BadRequest("Missing parameter 'time'.")
     category = payload.get("category",None)
     if category is None:
         raise BadRequest("Missing parameter 'category'.")
@@ -47,10 +45,9 @@ def new_record():
     timestamp = None
     try:
         date = payload["date"]
-        time = payload["time"]
-        timestamp = datetime.strptime(f"{date} {time}", "%d.%m.%Y %H:%M:%S.%f") # format DD.MM.YYYY hh:mm:ss.ssssss
+        timestamp = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ") # format YYYY-MM-DDThh:mm:ss.ssssssZ
     except ValueError as e:
-        raise UnprocessableEntity(f"Could not parse timestamp {date} {time}. {e}")
+        raise UnprocessableEntity(f"Could not parse timestamp {date}. {e}")
     
     # Add to Database:
     item = DataItem(timestamp,category,source,message,solution,searchkey)
@@ -94,10 +91,9 @@ def edit_record():
     timestamp = None
     try:
         date = payload["date"]
-        time = payload["time"]
-        timestamp = datetime.strptime(f"{date} {time}", "%d.%m.%Y %H:%M:%S.%f") # format DD.MM.YYYY hh:mm:ss.ssssss
+        timestamp = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ") # format YYYY-MM-DDThh:mm:ss.ssssssZ
     except ValueError as e:
-        raise UnprocessableEntity(f"Could not parse timestamp {date} {time}. {e}")
+        raise UnprocessableEntity(f"Could not parse timestamp {date}. {e}")
     
     item = DataItem(timestamp,category,source,message,solution,searchkey,id)
     result = records_data.update(item)
