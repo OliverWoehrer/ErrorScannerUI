@@ -27,6 +27,10 @@ function toTimeString(date) {
     return split[1]+"."+millis;
 }
 
+function toISOString(date) {
+    return date.toISOString()
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // Exported Components:
@@ -102,10 +106,12 @@ export function DatePicker({ name, readonly, datetimeObj, onConfirm }) {
 
     return(
         <>
-            {/* Input Field */}
-            <mdui-text-field label="Last Seen (Date)" value={toDateString(dateObj)} defaultValue={toDateString(dateObj)} name={name} readonly onClick={openDialog}>
+            {/* Text Representation */}
+            <mdui-text-field label="Last Seen (Date)" value={toDateString(dateObj)} defaultValue={toDateString(dateObj)} readonly onClick={openDialog}>
                 <mdui-icon slot="icon" name="calendar_month"></mdui-icon>
             </mdui-text-field>
+            {/* Hidden Input Field */}
+            <input type="hidden" name={name} value={toISOString(dateObj)} />
             {/* Dialog with Picker */}
             <mdui-dialog ref={dialogRef} close-on-esc close-on-overlay-click>
                 <date-picker ref={pickerRef}>
@@ -191,9 +197,11 @@ export function TimePicker({ name, readonly, datetimeObj, onConfirm }) {
     return(
         <>
             {/* Input Field */}
-            <mdui-text-field label="Last Seen (Time)" value={toTimeString(dateObj)} defaultValue={toTimeString(dateObj)} name={name} readonly onClick={openDialog}>
+            <mdui-text-field label="Last Seen (Time)" value={toTimeString(dateObj)} defaultValue={toTimeString(dateObj)} readonly onClick={openDialog}>
                 <mdui-icon slot="icon" name="access_time"></mdui-icon>
             </mdui-text-field>
+            {/* Hidden Input Field */}
+            <input type="hidden" name={name} value={toISOString(dateObj)} />
             {/* Dialog with Picker */}
             <mdui-dialog ref={dialogRef} close-on-esc close-on-overlay-click>
                 <time-picker ref={pickerRef}>
