@@ -7,23 +7,6 @@ import portalocker
 
 class RecordsCollection(ABC):
     @abstractmethod
-    def load(self) -> str:
-        """
-        Load log items into memory
-        """
-        pass
-
-    @abstractmethod
-    def clear(self) -> str:
-        """
-        Clear the entire data structure
-        
-        :return: Error message in case of an error. Otherwise this is 'None'
-        :rtype: str
-        """
-        pass
-
-    @abstractmethod
     def add(self, item: DataItem) -> str:
         """
         Add the given item to this collection. This only updates the cached data. To confirm any
@@ -87,9 +70,12 @@ class RecordsCollection(ABC):
         pass
 
     @abstractmethod
-    def flush(self) -> str:
+    def clear(self) -> str:
         """
-        Write updated log items from memory to database
+        Clear the entire data structure
+        
+        :return: Error message in case of an error. Otherwise this is 'None'
+        :rtype: str
         """
         pass
 
@@ -99,103 +85,127 @@ class RecordsFile(RecordsCollection):
         self.filename = Path(__file__).parent / filename
         self.records: dict[str, DataItem] = {} # maps IDs to items
         self.buckets: dict[tuple[str, str], dict[str, DataItem]] = {} # sorts items by source and category
-    
-    def load(self) -> str:
-        lines = self._read_lines()
-        for line in lines:
-            try:
-                item = json.loads(line, object_hook=DataItem.parse)
-            except TypeError as e:
-                print(f"Could not parse {line}. {e}.")
-                continue # skip this line
-            except json.decoder.JSONDecodeError as e:
-                print(f"Could not parse {line}. {e}.")
-                continue # skip this line
-            else:
-                self.add(item)
-        return None
 
-    def clear(self) -> str:
-        self._write_lines([])
-        self.records = {}
-        self.buckets = {}
-        return None
-
-    def add(self, item: DataItem) -> str:
-        if item.id in self.records:
-            return f"Item with ID {item.id} already in collection"
-        self.records[item.id] = item
-        bucket = self._get_bucket(item)
-        bucket[item.id] = item
-        return None
+    def add(self, item: DataItem):
+        line = None
+        try:
+            line = self._item_to_line(item)
+        except RuntimeError as e:
+            raise RuntimeError(f"Failed to stringify item {item.id}. {e}")
+        try:
+            self._append_lines([line])
+        except RuntimeError as e:
+            raise RuntimeError(f"Failed to update data file. {e}")
 
     def get_items(self) -> list[DataItem]:
-        return self.records.values()
+        lines = []
+        try:
+            lines = self._read_lines()
+        except RuntimeError as e:
+            raise RuntimeError(f"Failed to read lines from data file. {e}")
+        items = []
+        for line in lines:
+            try:
+                item = self._line_to_item(line)
+            except RuntimeError as e:
+                raise RuntimeError(f"Failed to parse item from string \"{line}\". {e}")
+            else:
+                items.append(item)
+        return items
 
     def candidates(self, item: DataItem) -> list[DataItem]:
-        bucket = self._get_bucket(item)
-        return bucket.values()
+        records = []
+        try:
+            records = self.get_items()
+        except RuntimeError as e:
+            raise RuntimeError(f"Failed to fetch items from data file. {e}")
+        candidates = []
+        for record in records:
+            if record.source == item.source and record.category == item.category:
+                candidates.append(record)
+        return candidates
 
     def update(self, item: DataItem) -> str:
-        # Remove Old Item:
-        old_item = self.records.get(item.id)
-        if not old_item:
-            return f"No item found with ID {item.id}."
-        result = self.remove(old_item.id)
-        if result:
-            return f"Failed to remove old item {old_item.id}. {result}"
+        # Stringify Item:
+        new_line = None
+        try:
+            new_line = self._item_to_line(item)
+        except RuntimeError as e:
+            raise RuntimeError(f"Failed to stringify item {item.id}. {e}")
         
-        # Add New Item:
-        result = self.add(item)
-        if result:
-            return f"Failed to add new item {item.id}. {result}"
+        # Fetch Lines:
+        lines = []
+        try:
+            lines = self._read_lines()
+        except RuntimeError as e:
+            raise RuntimeError(f"Failed to read lines from data file. {e}")
+
+        # Update Line:
+        updated = False
+        for line in lines:
+            if item.id not in line:
+                continue
+            lines.remove(line) # remove old item
+            lines.append(new_line) # add new item to the end
+            updated = True
+            break
+        if not updated:
+            raise RuntimeError(f"No item found with ID {item.id}")
         
-        # Commit Changes:
-        result = self.flush()
-        if result:
-            return f"Failed to comit changes to file. {result}"
-        return None # no error message on success
+        # Confirm Changes:
+        try:
+            self._write_lines(lines)
+        except RuntimeError as e:
+            raise RuntimeError(f"Failed to confirm changes to data file. {e}")
 
     def remove(self, id: str) -> str:
-        # Remove From Bucket:
-        old_item = self.records.get(id)
-        if not old_item:
-            return f"No item found with ID {id}."
-        bucket = self._get_bucket(old_item)
-        assert old_item.id in bucket, f"Expected #{old_item.id} to be in bucket [{old_item.source}/{old_item.category}]."
-        if old_item.id not in bucket:
-            return f"No item found with ID {old_item.id}."
-        bucket.pop(old_item.id)
-
-        # Remove From ID Map:
-        self.records.pop(id)
-
-        # Commit Changes:
-        result = self.flush()
-        if result:
-            return f"Failed to comit changes to file. {result}"
-        return None # no error message on success
-        
-    def flush(self) -> str:
+        # Fetch Lines:
         lines = []
-        try: # stringify log record items
-            for record in self.records.values():
-                dumped = json.dumps(record, default=DataItem.serialize)
-                lines.append(dumped+"\n")
-        except json.JSONDecodeError as e:
-            raise RuntimeError(f"Could not serialize JSON: {e}")
-        except TypeError as e:
-            raise RuntimeError(f"Could not serialize JSON: {e}")
-        else:
+        try:
+            lines = self._read_lines()
+        except RuntimeError as e:
+            raise RuntimeError(f"Failed to read lines from data file. {e}")
+
+        # Remove Line:
+        removed = False
+        for line in lines:
+            if id not in line:
+                continue
+            lines.remove(line) # remove old item
+            removed = True
+            break
+        if not removed:
+            raise RuntimeError(f"No item found with ID {id}")
+        
+        # Confirm Changes:
+        try:
             self._write_lines(lines)
+        except RuntimeError as e:
+            raise RuntimeError(f"Failed to confirm changes to data file. {e}")
+
+    def clear(self):
+        self._write_lines([])
 
     """
     Private Methods
     """
 
-    def _get_bucket(self, item: DataItem) -> list[DataItem]:
-        key = (item.source,item.category)
-        return self.buckets.setdefault(key, {}) # create empty dict as fallback
+    def _line_to_item(self, line: str) -> DataItem:
+        try:
+            return json.loads(line, object_hook=DataItem.parse)
+        except TypeError as e:
+            RuntimeError(f"Could not parse \"{line}\". {e}.")
+        except json.decoder.JSONDecodeError as e:
+            RuntimeError(f"Could not parse \"{line}\". {e}.")
+    
+    def _item_to_line(self, item: DataItem) -> str:
+        try:
+            dumped = json.dumps(item, default=DataItem.serialize)
+            return dumped+"\n" # add new line
+        except json.JSONDecodeError as e:
+            raise RuntimeError(f"Could not serialize item. {e}")
+        except TypeError as e:
+            raise RuntimeError(f"Could not serialize item. {e}")
 
     def _read_lines(self) -> list[str]:
         lock_obj = portalocker.Lock(self.filename, mode='r', flags=portalocker.LOCK_EX) # locker for file mutex
@@ -210,6 +220,19 @@ class RecordsFile(RecordsCollection):
         except Exception as e:
             raise RuntimeError(f"Failed to read lines. {e}")
         finally: # clean up
+            lock_obj.release() # close file and release the lock
+
+    def _append_lines(self, lines: list[str]):
+        lock_obj = portalocker.Lock(self.filename, mode='a', flags=portalocker.LOCK_EX) # locker for file mutex
+        try:
+            file = lock_obj.acquire() # open file through locker
+            file.writelines(lines)
+            file.flush()
+        except portalocker.LockException as e:
+            RuntimeError(f"Failed to acquire lock while appending {self.filename}. {e}")
+        except Exception as e:
+            raise RuntimeError(f"Failed to append lines. {e}")
+        finally:
             lock_obj.release() # close file and release the lock
 
     def _write_lines(self, lines: list[str]):
