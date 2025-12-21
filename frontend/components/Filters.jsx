@@ -9,6 +9,8 @@ import 'mdui/components/list.js';
 import 'mdui/components/radio-group.js';
 import 'mdui/components/radio.js';
 import 'mdui/components/range-slider.js';
+import 'mdui/components/segmented-button-group.js';
+import 'mdui/components/segmented-button.js';
 import 'mdui/components/text-field.js';
 import 'mdui/components/tooltip.js';
 
@@ -54,10 +56,14 @@ function Filters({items, updateFilteredItems}) {
         });
 
         // Sort Items:
-        if(filters.order === "new") {
+        if(filters.order === "newest") {
             filteredItems.sort((itemA,itemB) => itemB.timestamp - itemA.timestamp);
-        } else if(filters.order === "old") {
+        } else if(filters.order === "oldest") {
             filteredItems.sort((itemA,itemB) => itemA.timestamp - itemB.timestamp);
+        } else if(filters.order === "solved") {
+            filteredItems.sort((itemA,itemB) => itemA.solution && itemB.solution ? 0 : (itemA.solution ? -1 : +1));
+        } else if(filters.order === "unsolved") {
+            filteredItems.sort((itemA,itemB) => itemA.solution && itemB.solution ? 0 : (itemA.solution ? +1 : -1));
         }
         return filteredItems;
     }
@@ -209,21 +215,25 @@ function Filters({items, updateFilteredItems}) {
             </section>
             <section className="flex-row">
                     <mdui-card variant="filled" style={{ width: "100%" }}>
+                        <div className="info-text">Earliest timestamp</div>
                         <DatePicker datetimeObj={filters.startDatetime} onConfirm={confirmStartDate} />
                         <TimePicker datetimeObj={filters.startDatetime} onConfirm={confirmStartTime} />
                     </mdui-card>
                     <mdui-card variant="filled" style={{ width: "100%" }}>
+                        <div className="info-text">Latest timestamp</div>
                         <DatePicker datetimeObj={filters.endDatetime} onConfirm={confirmEndDate} />
                         <TimePicker datetimeObj={filters.endDatetime} onConfirm={confirmEndTime} />
                     </mdui-card>
             </section>
             <section className="flex-row">
-                <div className="flex-row">
-                    <span>Sort by</span>
-                    <mdui-radio-group ref={orderRef} value="new">
-                        <mdui-radio value="new">new</mdui-radio>
-                        <mdui-radio value="old">old</mdui-radio>
-                    </mdui-radio-group>
+                <div className="flex-row" style={{boxSizing:"border-box",overflow:"hidden"}}>
+                    <span>Sort by:</span>
+                    <mdui-segmented-button-group ref={orderRef} selects="single" value="newest" full-width>
+                        <mdui-segmented-button value="newest">newest</mdui-segmented-button>
+                        <mdui-segmented-button value="oldest">oldest</mdui-segmented-button>
+                        <mdui-segmented-button value="solved">solved</mdui-segmented-button>
+                        <mdui-segmented-button value="unsolved">unsolved</mdui-segmented-button>
+                    </mdui-segmented-button-group>
                 </div>
             </section>
             <section ref={categoriesRef} className="flex-row" style={{justifyContent:"flex-start",overflowX:"auto"}}>
