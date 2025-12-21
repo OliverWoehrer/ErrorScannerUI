@@ -3,7 +3,7 @@ This module implements the functions to handle routes of /file
 """
 # System Imports:
 from data import records_data
-from flask import Blueprint, Response, request, redirect
+from flask import Blueprint, Response, request, redirect, send_file
 import json
 from pathlib import Path
 from werkzeug.exceptions import BadRequest, NotImplemented, UnprocessableEntity, InternalServerError
@@ -18,15 +18,15 @@ def index():
 
 @file.route("/records", methods=["GET","POST"])
 def records():
-    FILENAME = "records.jsonl"
+    NAME = "records"
+    EXTENSION = "jsonl"
+    FILENAME = NAME+"."+EXTENSION
     if request.method == "GET":
         filepath = Path(__file__).parent.parent / "data" / FILENAME
         file = open(filepath, mode="rb")
         if file is None:
             raise InternalServerError("Failed to open file")
-        response = Response(records_data.stream_bytes(), mimetype="application/jsonl") #mimetype=application/octet-stream, as_attachment=True, download_name="records.jsonl",
-        response.headers["Content-Disposition"] = f"attachment; filename={FILENAME}"
-        return response
+        return send_file(filepath, as_attachment=True)
 
     if request.method == "POST":
         # Parse File Upload:
@@ -36,8 +36,8 @@ def records():
         filename = input_file_storage.filename
         if filename == '':
             raise UnprocessableEntity("No selected records file.")
-        if filename.rsplit('.', 1)[1].lower() != "jsonl":
-            raise BadRequest(f"Unexpected file extension. Expected '.jsonl' but got '{filename}'")
+        if filename.rsplit('.', 1)[1].lower() != EXTENSION:
+            raise BadRequest(f"Unexpected file extension. Expected '{EXTENSION}' but got '{filename}'")
     
         # Save File:
         filename = secure_filename(filename) # convert to ASCII friendly format
