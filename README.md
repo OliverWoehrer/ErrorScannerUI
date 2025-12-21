@@ -89,33 +89,25 @@ Möglich wären Email, git push oder ähnliches.
    - kein GIT push oder pull
    - Dokumentation
 
-
-## 6. Ideas for Web UI:
-Tabs: "Documented Errors", "Fixed Errors", "Add New Error"
-### Colors:
-```
-:root[data-theme="light"] {
-  --text: #040316;
-  --background: #fbfbfe;
-  --primary: #006699;
-  --secondary: #646262;
-  --accent: #008073;
-}
-:root[data-theme="dark"] {
-  --text: #eae9fc;
-  --background: #010104;
-  --primary: #66ccff;
-  --secondary: #9d9b9b;
-  --accent: #80fff2;
-}
-
-```
-
 ## TODO:
-- Anzeigen der Details mit Markdown format (solution)
-- Logs nach Zeit range filtern
-- Settings für die datenbank:
-   - URL
-   - PORT
-   - Key
-   - etc.
+- [x] Anzeigen der Details mit Markdown format (solution)
+- [x] Logs nach Zeit range filtern
+- [x] Settings für die datenbank: URL, PORT, Key, etc.
+- [x] TimePicker: fix broken time on record form (edit record)
+- [x] implement maximum disk usage (value from settings)
+- [x] implement file exchange (parse every item on input, with proper error messages)
+- [x] implement disabled state for pickers
+- [x] implement record forms
+   - [x] send item ID with item forms (hidden)
+   - [x] implement delete-item form
+- [x] implement the pickers as react components
+- [x] replace picker components in Filters.jsx
+- [x] maybe implement the pages in the same file to share code?
+- [x] datetime string not removed from actual log message
+- [x] Inconsistencies with category filter on initialization
+- [x] DatePicker: add rendering of selected date in neighboring months
+- [x] fix broken backend API for settings
+- [ ] update list + item when they were edited
+- [ ] implement SQLite file with SQLAlchemy
+- [ ] use Markdown string to test md styles
+- [ ] write documention (README with Usuability, and high-level code structure)
