@@ -1,5 +1,5 @@
 // React Components:
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { List, AutoSizer } from 'react-virtualized';
 import ItemFilters from './Filters.jsx';
 import { TextForm, FileForm } from './Forms.jsx';
@@ -20,11 +20,11 @@ import 'mdui/components/tooltip.js';
 // Local Imports:
 import { useFetchData, useFetchDataStream } from '../hooks/useFetchData.js';
 import useScreenSize from '../hooks/useScreenSize.js';
-import { LogRecordItem } from '../assets/LogRecordItem.js';
+import { DataItem } from '../assets/DataItem.js';
 import "./../assets/styles.css"
 import "./../assets/FileInput.js"
 
-function ListDetailsLayout({ items, Header, ListView, DetailsView }) {
+function ListDetailsLayout({ isLoading, items, Header, ListView, DetailsView }) {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Global Properties
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,7 +35,11 @@ function ListDetailsLayout({ items, Header, ListView, DetailsView }) {
     
     // Filtered Items:
     const [filteredItems, setFilteredItems] = useState(items);
-    const [selectedItem, setSelectedItem] = useState(null);
+    const [selectedId, setSelectedId] = useState(null); // holds ground truth
+    const selectedItem = useMemo( // updates currently selected item in details pane based on ground truth
+        () => filteredItems.find((it) => it.id === selectedId) ?? null,
+        [filteredItems, selectedId]
+    );
     
     // Layout Conditionals:
     const { isAtMost } = useScreenSize();
@@ -46,13 +50,17 @@ function ListDetailsLayout({ items, Header, ListView, DetailsView }) {
     // Helper Functions:
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    function showDetails(id) {
-        setSelectedItem(items.find(item => item.id === id));
-    };
+    // Update Selected ID:
+    function showDetails(id) { setSelectedId(id); }
+    function hideDetails() { setSelectedId(null); }
 
-    function hideDetails() {
-        setSelectedItem(null);
-    };
+    // Replace Updated Item:
+    function onItemUpdate(newItem) {
+        function updateFunction(prevItems) {
+            return prevItems.map(it => it.id === newItem.id ? newItem : it);
+        }
+        setFilteredItems(updateFunction);
+    }
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -161,7 +169,7 @@ function ListDetailsLayout({ items, Header, ListView, DetailsView }) {
         </main>
     );
 
-    const DetailElement = selectedItem && (
+    const DetailElement = (!isLoading && selectedItem) ? (
         <div className='flex-column'>
             <header>
                 <mdui-top-app-bar>
@@ -172,10 +180,10 @@ function ListDetailsLayout({ items, Header, ListView, DetailsView }) {
                 </mdui-top-app-bar>
             </header>
             <main>
-                <DetailsView item={selectedItem} />
+                <DetailsView item={selectedItem} onUpdate={onItemUpdate} />
             </main>
         </div>
-    );
+    ) : null; // return 'null' to trigger an unmount of DetailElement in <DetailPane />
 
     function DetailPane() {
         if(isSmallerScreen) { // make details fullscreen overlay on smaller screens
@@ -271,7 +279,7 @@ export function LogsPage() {
     );
 
     return(
-        <ListDetailsLayout items={items} Header={HeaderElement} ListView={LogItemListView} DetailsView={LogItemView}/>
+        <ListDetailsLayout isLoading={isLoading} items={items} Header={HeaderElement} ListView={LogItemListView} DetailsView={LogItemView}/>
     );
 }
 
@@ -330,14 +338,14 @@ export function RecordsPage() {
                         <mdui-button-icon icon="clear" onClick={closeDialog} />
                         <mdui-top-app-bar-title>Add new record</mdui-top-app-bar-title>
                     </mdui-top-app-bar>
-                    <ItemFormView item={new LogRecordItem()} onSuccess={closeDialog} onReset={closeDialog} />
+                    <ItemFormView item={new DataItem()} onSuccess={closeDialog} onReset={closeDialog} />
                 </div>
             </mdui-dialog>
         </>
     );
 
     return(
-        <ListDetailsLayout items={items} Header={HeaderElement} ListView={RecordItemListView} DetailsView={RecordItemView} />
+        <ListDetailsLayout isLoading={isLoading} items={items} Header={HeaderElement} ListView={RecordItemListView} DetailsView={RecordItemView} />
     );
 }
 
@@ -652,13 +660,13 @@ export function SettingsPage() {
         );
     }
 
-    function FileExchangeForm({endpoint}) {
+    function FileExchangeForm({endpoint, heading}) {
         return(
             <mdui-card variant="elevated">
                 <mdui-top-app-bar-title>File Exchange</mdui-top-app-bar-title>
                 <section>
-                    <h4>Records File</h4>
-                    <div>Download or upload records file. The file has to be in JSONLines format (.jsonl)</div>
+                    <h4>{heading}</h4>
+                    <div>Download or select and upload file.</div>
                 </section>
                 <section>
                     <mdui-button variant="outlined" full-width href={endpoint} icon="download">Download File</mdui-button>
@@ -683,7 +691,8 @@ export function SettingsPage() {
             <LogScannerForm endpoint="/api/form/scanner"/>
             <DiskUsageForm endpoint="/api/form/disk-usage"/>
             <DatebaseForm endpoint="/api/form/database"/>
-            <FileExchangeForm endpoint="/api/file/records"/>
+            <FileExchangeForm endpoint="/api/file/records" heading="Records File"/>
+            <FileExchangeForm endpoint="/api/file/config" heading="Config File"/>
         </FeedLayout>
     );
 }

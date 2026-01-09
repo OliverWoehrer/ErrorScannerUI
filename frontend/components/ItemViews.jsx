@@ -15,11 +15,13 @@ import 'mdui/components/tooltip.js';
 
 // Local Import:
 import { DatePicker, TimePicker } from './Pickers.jsx';
-import { LogRecordItem } from "../assets/LogRecordItem.js";
+import { DataItem } from "../assets/DataItem.js";
 import ZeroMd from 'zero-md';
 customElements.define('zero-md', ZeroMd);
 
-function TemplateView({ initItem, readonly }) {
+function TemplateView({ item = new DataItem(), readonly }) {
+    const [, forceRender] = useState(0); // simple revision counter
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Confirm Picker Handler Functions:
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,21 +29,20 @@ function TemplateView({ initItem, readonly }) {
         item.datetimeObj.setFullYear(confirmedDateObj.getFullYear());
         item.datetimeObj.setMonth(confirmedDateObj.getMonth());
         item.datetimeObj.setDate(confirmedDateObj.getDate());
-        setItem(new LogRecordItem(item)); // create new item (deep copy) to trigger reload
+        forceRender(n => n + 1); // increment it to force a re-render of this component
     }
     function confirmTime(confirmedDateObj) {
         item.datetimeObj.setHours(confirmedDateObj.getHours());
         item.datetimeObj.setMinutes(confirmedDateObj.getMinutes());
         item.datetimeObj.setSeconds(confirmedDateObj.getSeconds());
         item.datetimeObj.setMilliseconds(confirmedDateObj.getMilliseconds());
-        setItem(new LogRecordItem(item)); // create new item (deep copy) to trigger reload
+        forceRender(n => n + 1); // increment it to force a re-render of this component
     }
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Hooks:
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    const [item, setItem] = useState(initItem ?? new LogRecordItem()); // if no record is given, use default as fallback
 
     useEffect(() => {}, []);
 
@@ -116,7 +117,7 @@ export function LogItemView({ item }) {
         return(
             <div className="flex-column">
                 <main>
-                    <TemplateView initItem={item} readonly={true} />
+                    <TemplateView item={item} readonly={true} />
                 </main>
                 <footer className="flex-row">
                     <mdui-button onclick={toggleMode} variant="outlined" icon="add">Add to records</mdui-button>
@@ -126,46 +127,44 @@ export function LogItemView({ item }) {
     } else {
         return(
             <TextForm action="/api/form/new-record" submitButtonText="Save new record" resetButtonText="Cancel" onSuccess={toggleMode} onReset={toggleMode}>
-                <TemplateView initItem={item} readonly={false} />
+                <TemplateView item={item} readonly={false} />
             </TextForm>
         );
     }
 }
 
-export function RecordItemView({ item }) {
+export function RecordItemView({ item, onUpdate }) {
     const [mode, setMode] = useState(0);
 
-    function updateMode(mode) {
-        if(mode) {
-            setMode(mode);
-        } else {
-            setMode(0);
-        }
+    function successCallback(payload) {
+        const updatedItem = new DataItem(payload); // create new item from response
+        if(onUpdate) { onUpdate(updatedItem); }
+        setMode(0);
     }
 
     if(mode == 2) { // delete mode: confirm delete operation
         return(
-            <TextForm action="/api/form/delete-record" submitButtonText="Delete record" resetButtonText="Cancel" onSuccess={updateMode} onReset={updateMode}>
+            <TextForm action="/api/form/delete-record" submitButtonText="Delete record" resetButtonText="Cancel" onSuccess={successCallback} onReset={() => {setMode(0)}}>
                 <div>Are you sure you want to delete this record?</div>
                 <input type="hidden" name="id" value={item.id}/>
             </TextForm>
         );
     } else if(mode == 1) { // edit mode: confirm updated changes
         return(
-            <TextForm action="/api/form/edit-record" submitButtonText="Update record" resetButtonText="Cancel" onSuccess={updateMode} onReset={updateMode}>
-                <TemplateView initItem={item} readonly={false} />
+            <TextForm action="/api/form/edit-record" submitButtonText="Update record" resetButtonText="Cancel" onSuccess={successCallback} onReset={() => {setMode(0)}}>
+                <TemplateView item={item} readonly={false} />
             </TextForm>
         );
     } else { // default mode: view details
         return(
             <div className="flex-column">
                 <main>
-                    <TemplateView initItem={item} readonly={true} />
+                    <TemplateView item={item} readonly={true} />
                 </main>
                 <footer className="flex-row">
                     <div>
-                        <mdui-button onclick={() => {updateMode(1)}} variant="outlined" icon="edit">Edit Record</mdui-button>
-                        <mdui-button onclick={() => {updateMode(2)}} variant="text" icon="delete">Delete Record</mdui-button>
+                        <mdui-button onclick={() => {setMode(1)}} variant="outlined" icon="edit">Edit Record</mdui-button>
+                        <mdui-button onclick={() => {setMode(2)}} variant="text" icon="delete">Delete Record</mdui-button>
                     </div>
                 </footer>
             </div>
@@ -176,7 +175,7 @@ export function RecordItemView({ item }) {
 export function ItemFormView({ item, onSuccess, onReset }) {
     return(
         <TextForm action="/api/form/new-record" submitButtonText="Add new record" resetButtonText="Cancel" onSuccess={onSuccess} onReset={onReset}>
-            <TemplateView initItem={item} readonly={false} />
+            <TemplateView item={item} readonly={false} />
         </TextForm>
     );
 }
