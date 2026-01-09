@@ -14,6 +14,15 @@ function defaultSubmit(event) {
     event.preventDefault(); // prevent automatic form submisson
 };
 
+async function parseResponse(response) {
+    const contentType = response.headers.get("content-type");
+    if(contentType && contentType.includes("application/json")) {
+        return await response.json();
+    } else {
+        return await response.text();
+    }
+}
+
 async function sendData(event, isFileUpload, onSuccess) {
     // Validate Form:
     const form = event.target.closest("form");
@@ -56,9 +65,8 @@ async function sendData(event, isFileUpload, onSuccess) {
             printMessage(`Failed to submit data to '${endpoint}': [${response.status} ${response.statusText}] ${text}`);
             return;
         }
-        if(onSuccess) {
-            onSuccess(); // callback function on success
-        }
+        const payload = await parseResponse(response);
+        if(onSuccess) { onSuccess(payload); } // callback function on success
         printMessage(`Submitted data successfully`, 3000);
     } catch(error) {
         printMessage(`Failed to submit data to '${endpoint}' [${error}]`);

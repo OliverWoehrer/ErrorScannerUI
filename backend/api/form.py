@@ -54,7 +54,9 @@ def new_record():
     result = records_data.add(item)
     if result:
         raise BadGateway(f"Failed to add item. {result}")
-    return "OK", 200
+    
+    # Return Item in Response:
+    return Response(response=json.dumps(item, default=DataItem.serialize), status=200, mimetype="application/json")
 
 @form.route("/edit-record", methods=["POST"])
 def edit_record():
@@ -95,11 +97,14 @@ def edit_record():
     except ValueError as e:
         raise UnprocessableEntity(f"Could not parse timestamp {date}. {e}")
     
+    # Update Database:
     item = DataItem(timestamp,category,source,message,solution,searchkey,id)
     result = records_data.update(item)
     if result:
         raise BadGateway(f"Failed to update item {id}. {result}")
-    return "OK", 200
+    
+    # Return Item in Response:
+    return Response(response=json.dumps(item, default=DataItem.serialize), status=200, mimetype="application/json")
 
 @form.route("/delete-record", methods=["POST"])
 def delete_record():
