@@ -209,3 +209,21 @@ class ConfigHandler:
             print(f"Could not store configuration in {self.filename}. {e}")
         finally:
             lock_obj.release() # close file and release the lock
+
+    def replace_storage(self, file_storage):
+        """
+        Replaces the entire database with the given file storage
+        
+        :param file_storage: Description
+        :type file_storage: werkzeug.datastructures.file_storage.FileStorage
+        """
+        lock_obj = portalocker.Lock(self.filename, mode='r', flags=portalocker.LOCK_EX) # locker for file mutex
+        try:
+            lock_obj.acquire() # acquire mutex access through locker
+            file_storage.save(str(self.filename))
+        except portalocker.LockException as e:
+            raise RuntimeError(f"Failed to acquire lock for replacing {self.filename}. {e}")
+        except Exception as e:
+            raise RuntimeError(f"Failed to replace storage file. {e}")
+        finally: # clean up
+            lock_obj.release() # close file and release the lock

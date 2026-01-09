@@ -5,7 +5,8 @@
 __pycache__
 
 # Ignore Data Files:
-data/*json
-data/*jsonl
-data/*txt
+data/*.db
+data/*.json
+data/*.jsonl
+data/*.txt
 checker.py
