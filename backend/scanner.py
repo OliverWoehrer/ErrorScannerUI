@@ -8,16 +8,140 @@ import os
 import re
 import signal
 from threading import Event
+import time
 import warnings
 
 warnings.filterwarnings("error") # handle warning from libraries as exceptions
 
-#TODO: remove after debug
-new_logs_count = 0
-new_records_count = 0
-updated_records_count = 0
+class SimilarityMatcher:
+    """
+    This implements a data structure to efficiently search and compare a collection of DataItem. It
+    uses a weighted Jaccard matrix to compare two strings. The parameter alpha helps to balance
+    between string length and similar junks of words.
+    The data structur of the SimilarityMatcher needs to be filled (load_items) before it can be
+    used. Each comparision gives a similarity score between 0...1
+    """
+    def __init__(self, alpha: float = 0.5):
+        """
+        The alpha parameter changes how much short static words in a message template are weighted
+        versus long variable sections between.
+        alpha high (0.9) penalizes extra junk, good for strict matches.
+        alpha low (0.1) ignores extra junk, good for skeleton-only matches.
+        
+        :param self: Description
+        :param alpha: Description
+        :type alpha: float
+        """
+        self.alpha = alpha
+        self.items =[]
+
+    def load_items(self, items: list[DataItem]):
+        """
+        Loads the given items into the matchers datastructure. The given items are searched by the
+        algorithm to find the best match.
+        
+        :param items: Items to search through
+        :type items: list[DataItem]
+        """
+        self.items = items
+
+    def find_match(self, item: DataItem) -> tuple[DataItem,float]:
+        """
+        Tries to find the best match for the given item in the loaded items. It computes the
+        similarity of the given item and already loaded items and returns the item with the
+        best similarity score along with the score. The similarity score is between 0.0 and 1.0.
+        The heigher the score the more similar the text are. If the score is 0.0 the texts do not
+        match at all. If the score is 1.0 the texts are a perfect match and are equal.
+        
+        :param item: Item to find a match for
+        :type item: DataItem
+        :return: Tuple of the item with the highest similarity score and the score itself
+        :rtype: tuple[DataItem,float]
+        """
+        best_match = None
+        best_score = 0.0
+        for candidate in self.items:
+            # Check Category and Source:
+            if item.source != candidate.source:
+                continue
+            if item.category != candidate.category:
+                continue
+
+            # Check For Perfect Matching Messages:
+            if item.message == candidate.message:
+                best_score = 1.00
+                best_match = candidate
+                break
+
+            # Check With Searchkey:
+            if candidate.searchkey and candidate.searchkey in item.message: # searchkey is part of message text:
+                best_score = 0.99
+                best_match = candidate
+                break
+
+            # Calculate Similarity Score:
+            score = self.score(item.message, candidate.message)
+            if score > best_score:
+                best_match = candidate
+                best_score = score
+        return best_match, best_score
+
+    def score(self, msgA: str, msgB: str) -> float:
+        """
+        alpha high (0.9) penalizes extra junk, good for strict matches.
+        alpha low (0.1) ignores extra junk, good for skeleton-only matches.
+        """
+        vecA, vecB = SimilarityMatcher.vectorize(msgA), SimilarityMatcher.vectorize(msgB)
+        wj = SimilarityMatcher.weighted_jaccard(vecA, vecB)
+        cont = SimilarityMatcher.containment(vecA, vecB)
+        return self.alpha * wj + (1 - self.alpha) * cont
+    
+    """
+    Static Methods
+    """
+
+    @staticmethod
+    def weight_token(token: str) -> float:
+        # Simple heuristic: skeleton words get 1.0, variable tokens get 0.1
+        if token.isalpha() and len(token) <= 15:
+            return 1.0
+        if len(token) > 15 or any(c.isdigit() for c in token) or "/" in token or "\\" in token:
+            return 0.1
+        return 0.5
+
+    @staticmethod
+    def vectorize(text: str) -> dict[str, float]:
+        TOKEN_REGEX = re.compile(r"[A-Za-z0-9_/.\-@:]+")
+        tokens = TOKEN_REGEX.findall(text)
+        vec = {}
+        for token in tokens:
+            token = token.lower()
+            vec[token] = SimilarityMatcher.weight_token(token)
+        return vec
+
+    @staticmethod
+    def weighted_jaccard(vecA: dict[str, float], vecB: dict[str, float]) -> float:
+        keys = set(vecA) | set(vecB)
+        num = sum(min(vecA.get(k, 0), vecB.get(k, 0)) for k in keys)
+        den = sum(max(vecA.get(k, 0), vecB.get(k, 0)) for k in keys)
+        return num / den if den > 0 else 0.0
+
+    @staticmethod
+    def containment(vecA: dict[str, float], vecB: dict[str, float]) -> float:
+        num = sum(min(vecA.get(k, 0), vecB.get(k, 0)) for k in vecA)
+        den = sum(vecA.values())
+        return num / den if den > 0 else 0.0
+
+
 
 class Scanner():
+    """
+    This implements the scanner process. It periodically reads log messages from docker containers
+    and stores them into the logs data storage.   It uses the SimilarityMatcher to check if any new
+    log messages are part of the already known records. Records are log messages that where
+    previsously saved (typically error messages), ideally with a description on how to solve the
+    problem. This helps to see if any new errors occured or find solutions to known errors. 
+    """
     def __init__(self):
         # Initialize Properties:
         self.stop_event = Event()
@@ -45,8 +169,6 @@ class Scanner():
         self.stop_event.set()
 
     def run(self):
-        global new_logs_count, new_records_count, updated_records_count # TODO: remove after debug
-
         # Read Filter Lists:
         whitelist = config_data.docker_interface_whitelist()
         blacklist = config_data.docker_interface_blacklist()
@@ -68,11 +190,6 @@ class Scanner():
             self.categories_to_log = config_data.scanner_logging() # list of categories to store to the log file
             self.categories_to_record = config_data.scanner_recording() # list of categories to auto-record if the log message was not already recorded
             self.similarity_threshold = config_data.scanner_threshold() # similarity threshold if no searchkey is available
-            
-            #TODO: remove after debug
-            new_logs_count = 0
-            new_records_count = 0
-            updated_records_count = 0
 
             for container in watchlist:
                 # Read New Logs:
@@ -81,27 +198,24 @@ class Scanner():
                 if not log_items:
                     continue # no logs, skip to the next container
 
-                print(f"Processing {len(log_items)} logs from {container.name}")
-                
+                                
                 # Check Which Item to Log and Record:
-                lastest_timestamp = self._process_log_items(items=log_items)
+                print(f"Scanning {len(log_items)} item from {container.name}:")
+                start = time.time()
+                lastest_timestamp = self._scan_log_items(items=log_items)
+                stop = time.time()
+                print(f"Scanned {len(log_items)} in {stop-start:.6f} sec ({(stop-start)/len(log_items):.6f} sec/item)")
 
                 # Update Last Scanned Timestamp (use timestamp of the *last* log entry)
                 last_scanned[container.name] = lastest_timestamp
 
-            if new_records_count or updated_records_count:
-                print(f"New Logs: {new_logs_count:>5} | New Records: {new_records_count:>5} | Updated Records: {updated_records_count:>5}")
-
             # Write Items to Database:
             max_log_count = config_data.disk_usage_max_logs()
-            logs_data.max_log_count(max_log_count)
-            logs_data.flush() # confirm newly added logs
-            records_data.flush()
+            logs_data.set_max_log_count(max_log_count)
 
             # Wait Before Next Iteration:
             interval = config_data.scanner_interval()
             self.stop_event.wait(interval) # wait until the stop event is set, but at most 'interval' seconds
-
 
     """
     Private Methods
@@ -291,16 +405,19 @@ class Scanner():
             print(f"╚{"":═^50}╝")
         return logs
 
-    def _process_log_items(self, items: list[DataItem]) -> tuple[list[DataItem],datetime]:
-        global new_logs_count, new_records_count, updated_records_count # TODO: remove after debug
+    def _scan_log_items(self, items: list[DataItem]) -> datetime:
+        total_length = len(items)
         lastest_timestamp = datetime.fromtimestamp(0, tz=timezone.utc) # will hold the timestamp of the latest log item
-        for item in items:
+        for idx,item in enumerate(items):
+            progress = int(idx*50 / total_length)
+            print(f"\r[{ f"{'':=<{progress}}"    }{   f"{'': <{49-progress}}"     }]", end="", flush=True)
             lastest_timestamp = max(item.timestamp, lastest_timestamp)
+            if self.stop_event.is_set():
+                break
 
             # 1. check if its category should be logged
             if item.category in self.categories_to_log:
                 logs_data.add(item) # store this item to logs collection
-                new_logs_count += 1
             elif item.category not in self.categories_to_record:
                 continue # skip, do not further process this item
             
@@ -310,16 +427,25 @@ class Scanner():
             # recorded previously, we automatically add it to the records.
 
             # 2 check if log message was already recorded previously
-            best_match, best_score = records_data.find(item)
+            # 2.1 check if there are candidates (possibly similar items)
+            candidates = records_data.candidates(item)
+            if not candidates:
+                records_data.add(item) # add item as new record
+                continue # skip rest of loop
+            
+            # 2.2 find best candidate
+            matcher = SimilarityMatcher(alpha=0.5)
+            matcher.load_items(candidates)
+            best_match, best_score = matcher.find_match(item)
 
             # 3. update records
             if best_score > self.similarity_threshold:
                 best_match.timestamp = item.timestamp
-                updated_records_count += 1
+                records_data.update(best_match)
             else:
                 records_data.add(item)
-                new_records_count += 1
 
+        print(f"\r\n", end="", flush=True) # add final linebreak
         return lastest_timestamp
         
 
