@@ -16,7 +16,7 @@ import 'mdui/components/tooltip.js';
 
 // Local Imports:
 import { DatePicker, TimePicker } from './Pickers.jsx'
-import { LogRecordItem } from "../assets/LogRecordItem.js";
+import { DataItem } from "../assets/DataItem.js";
 import "../assets/DatePicker.js"
 import "../assets/TimePicker.js"
 
@@ -32,7 +32,7 @@ function Filters({items, updateFilteredItems}) {
     function applyFilters() {
         // Only Select Filtered Items:
         const filteredItems = items.filter(item => {
-            console.assert(item instanceof LogRecordItem, "'item' has to be of type 'LogRecordItem'");
+            console.assert(item instanceof DataItem, "'item' has to be of type 'DataItem'");
 
             // Check Category:
             if (!filters.categories.includes(item.category)) {
@@ -175,7 +175,7 @@ function Filters({items, updateFilteredItems}) {
         // Initialize Order Selection:
         if(orderRef.current) {
             orderRef.current.addEventListener("change", updateOrder);
-            updateFilter("order", "new"); // set default value
+            updateFilter("order", orderRef.current.value); // set default value
         }
         
         // Initialze Category Filter:

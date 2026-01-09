@@ -1,8 +1,19 @@
-export class LogRecordItem {
-    constructor(jsonObject = null) {
-        const data = jsonObject || {};
+export class DataItem {
+    constructor(data) {
+        // Default Fallback Construct:
+        if(!data) { // if no json object was given, create item with default values
+            this.id = "";
+            this.timestamp = new Date();
+            this.category = "critical";
+            this.source = "";
+            this.message = "";
+            this.solution = "";
+            this.searchkey = "";
+            return;
+        }
 
-        if(data instanceof LogRecordItem) {
+        // Copy Construct:
+        if(data instanceof DataItem) { // given object is of type DataItem
             this.id = data.id;
             this.timestamp = new Date(data.timestamp);
             this.category = data.category;
@@ -13,63 +24,34 @@ export class LogRecordItem {
             return;
         }
 
-        if(typeof data.id === "string") {
-            this.id = data.id;
-        } else if(typeof data.id === "number") {
-            this.id = data.id;
-        } else {
-            this.id = "";
+        // Parse Mandatory JSON Properties:
+        if(!data.hasOwnProperty("timestamp")) {
+            throw new Error(`Could not parse 'timestamp' from ${data}.`);
         }
+        if(!this.#isValidDatetimeString(data.timestamp)) {
+            throw new Error(`Invalid 'timestamp' string ${data.timestamp}.`);
+        }
+        this.timestamp = new Date(data.timestamp);
 
-        if(data.timestamp instanceof Date) {
-            this.timestamp = new Date(data.timestamp);
-        } else if(typeof data.timestamp === "string") {
-            if(this.#isValidDatetimeString(data.timestamp)) {
-                this.timestamp = new Date(data.timestamp);
-            } else {
-                this.timestamp = new Date();
-            }
-        } else {
-            this.timestamp = new Date();
+        if(!data.hasOwnProperty("category")) {
+            throw new Error(`Could not parse 'category' from ${data}.`);
         }
+        this.category = data.category;
 
-        if(typeof data.category === "string") {
-            this.category = data.category;
-        } else {
-            this.category = "critical";
+        if(!data.hasOwnProperty("source")) {
+            throw new Error(`Could not parse 'source' from ${data}.`);
         }
+        this.source = data.source;
 
-        if(typeof data.source === "string") {
-            this.source = data.source;
-        } else {
-            this.source = "";
+        if(!data.hasOwnProperty("id")) {
+            throw new Error(`Could not parse 'id' from ${data}`);
         }
+        this.id = data.id;
 
-        if(typeof data.message === "string") {
-            this.message = data.message;
-        } else {
-            this.message = "";
-        }
-
-        if(data.solution) {
-            if(typeof data.solution === "string") {
-                this.solution = data.solution;
-            } else {
-                this.solution = "";
-            }
-        } else {
-            this.solution = "";
-        }
-
-        if(data.searchkey) {
-            if(typeof data.searchkey === "string") {
-                this.searchkey = data.searchkey;
-            } else {
-                this.searchkey = null;
-            }
-        } else {
-            this.searchkey = null;
-        }
+        // Try to Parse Optional Properties:
+        this.message = data.message || "";
+        this.solution = data.solution || "";
+        this.searchkey = data.searchkey || "";
     }
 
     get datetimeObj() {

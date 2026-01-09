@@ -1,6 +1,6 @@
 // React Imports:
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { LogRecordItem } from "../assets/LogRecordItem.js";
+import { DataItem } from "../assets/DataItem.js";
 
 // Material Components:
 import { snackbar } from 'mdui/functions/snackbar.js';
@@ -101,7 +101,7 @@ export function useFetchDataStream(endpoint) {
                     if(!trimmed) { continue; } // skip loop on empty line 
                     try {
                         const jsonObject = JSON.parse(trimmed);
-                        const item = new LogRecordItem(jsonObject);
+                        const item = new DataItem(jsonObject);
                         setData(prevData => [...prevData, item]);
                     } catch(e) {
                         console.warn(`Error parsing JSON "${trimmed}": ${e}`);
