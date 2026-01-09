@@ -107,7 +107,8 @@ Möglich wären Email, git push oder ähnliches.
 - [x] Inconsistencies with category filter on initialization
 - [x] DatePicker: add rendering of selected date in neighboring months
 - [x] fix broken backend API for settings
-- [ ] update list + item when they were edited
-- [ ] implement SQLite file with SQLAlchemy
+- [x] update list + item when they were edited
+- [x] implement SQLite file with SQLAlchemy
+- [x] fix details pane during reload
 - [ ] use Markdown string to test md styles
 - [ ] write documention (README with Usuability, and high-level code structure)
