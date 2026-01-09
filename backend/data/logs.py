@@ -1,51 +1,35 @@
+from __future__ import annotations
 from abc import ABC, abstractmethod
-from collections import deque
-from .data_item import DataItem
+from data import DataItem, Base, DataItemEntity
 from datetime import datetime
 import json
 import os
 from pathlib import Path
 import portalocker
+from sqlalchemy import create_engine, text
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.orm import sessionmaker
 import time
+
 
 class LogsCollection(ABC):
     @abstractmethod
-    def load(self):
+    def add(self, item: DataItem):
         """
-        Load log items into memory
-        """
-        pass
-
-    @abstractmethod
-    def clear(self) -> str:
-        """
-        Clear the entire data structure
-        
-        :return: Error message in case of an error. Otherwise this is 'None'
-        :rtype: str
-        """
-        pass
-
-    @abstractmethod
-    def add(self, item: DataItem) -> str:
-        """
-        Add the given item to this collection. This only updates the cached data. To confirm any
-        changes you need to call 'flush()'
+        Add the new given item to this collection.
         
         :param item: Data item to add to this collection
         :type item: DataItem
-        :return: Hold any error message in case of an error. Otherwise it is 'None'
-        :rtype: str
         """
         pass
 
     @abstractmethod
-    def get_last(self, num: int) -> list[DataItem]:
+    def get_last(self, count: int) -> list[DataItem]:
         """
-        Loads the last 'num' data items from this collection
+        Fetches the last 'count' data items from this collection
         
-        :param num: Number of items to return
-        :type num: int
+        :param count: Number of items to return
+        :type count: int
         :return: List of data items
         :rtype: list[DataItem]
         """
@@ -55,7 +39,7 @@ class LogsCollection(ABC):
     def get_between(self, start: datetime, end: datetime) -> list[DataItem]:
         """
         Returns all log items between the given start and end date. Log items with the same date
-        as start or end are NOT included.
+        as start or end are NOT included. Return items with start < timestamp < end (exclusive).
         
         :param start: start datetime of the interval
         :type start: datetime
@@ -69,8 +53,8 @@ class LogsCollection(ABC):
     @abstractmethod
     def set_max_log_count(self, size: int):
         """
-        Set the maximum cache size. If the size is set to zero, no limit is enforced and the
-        collection uses as much space as need.
+        Set the maximum number of logs items to keep. If the size is set to zero, no limit is enforced and the
+        collection uses as much space as available.
         
         :param size: Number of items to cache
         :type size: int
@@ -78,88 +62,77 @@ class LogsCollection(ABC):
         pass
 
     @abstractmethod
-    def flush(self) -> str:
+    def clear(self):
         """
-        Write updated log items from memory to database
+        Clear the entire data structure
         """
         pass
+
+
 
 class LogsFile(LogsCollection):
     def __init__(self, filename: str):
         assert isinstance(filename, str), "Given filename has to be of type 'str'"
         self.filename = Path(__file__).parent / filename
-        self.logcount = self._count_lines()
-        self.max_logcount = 0
-        self.items = []
-
-    def load(self):
         self.logcount = 0
-        self.items = []
-        lines = self._read_lines()
-        for line in lines:
-            try:
-                item = json.loads(line, object_hook=DataItem.parse)
-            except TypeError as e:
-                print(f"Could not parse {line}. {e}")
-                continue # skip this line
-            except json.decoder.JSONDecodeError as e:
-                print(f"Could not parse {line}. {e}.")
-                continue # skip this line
-            else:
-                self.add(item)
-
-    def clear(self) -> str:
-        self.items = []
-        self._clear_lines()
+        self.max_logcount = 0
 
     def add(self, item: DataItem) -> str:
-        if 0 < self.max_logcount and self.max_logcount < len(self.items):
-            print(f"Will not store more then {self.max_logcount} items")
-            self.items = self.items[1:] # remove first item to use at most the last '_max_logcount' items
+        predicted_logcount = self.logcount + 1
+        if 0 < self.max_logcount and self.max_logcount < predicted_logcount:
+            print(f"Cannot store more then {self.max_logcount} items. Trimming logs file.")
+            lines_to_remove = predicted_logcount - int(self.max_logcount*0.9) # trimmed file should be 90% full
+            self._trim_lines(lines_to_remove)
         self.items.append(item)
-        return None
+        self.logcount += 1
     
-    def get_last(self, count: int = None) -> list[DataItem]:
-        if count:
-            return self.items[-count:] # slice last 'count' number of items
-        return self.items
+    def get_last(self, count: int = 0) -> list[DataItem]:
+        items: list[DataItem] = []
+        lines = self._read_lines()
+        for line in lines:
+            item = self._line_to_item(line)
+            items.append(item)
+        return items[-count:] # slice last 'count' number of items
     
     def get_between(self, start: datetime, stop: datetime) -> list[DataItem]:
-        result = []
-        for item in self.items:
-            if item.timestamp <= start or stop <= item.timestamp < stop:
+        items: list[DataItem] = []
+        lines = self._read_lines()
+        for line in lines:
+            item = self._line_to_item(line)
+            if item.timestamp <= start or stop <= item.timestamp:
                 continue # skip, timestamp not inside interval
-            result.append(item)
-        return result
+            items.append(item)
+        return items
     
     def set_max_log_count(self, size: int):
         self.max_logcount = size
     
-    def flush(self) -> str:
-        lines = []
-        try: # stringify items
-            for item in self.items:
-                dumped = json.dumps(item, default=DataItem.serialize)
-                lines.append(dumped+"\n")
-        except json.JSONDecodeError as e:
-            raise RuntimeError(f"Could not serialize JSON. {e}")
-        except TypeError as e:
-            raise RuntimeError(f"Could not serialize JSON. {e}")
-        
-        if 0 <  self.max_logcount and self.max_logcount < len(self.items):
-            print(f"Will not store more then {self.max_logcount} items")
-            lines = lines[-self.max_logcount:] # use at most the last '_max_logcount' items
-        self._append_lines(lines)
-        self.items = []
-        return None
-    
+    def clear(self) -> str:
+        self._write_lines([])
+
     """
     Private Methods:
     """
 
+    def _line_to_item(self, line: str) -> DataItem:
+        try:
+            return json.loads(line, object_hook=DataItem.parse)
+        except TypeError as e:
+            RuntimeError(f"Could not parse \"{line}\". {e}.")
+        except json.decoder.JSONDecodeError as e:
+            RuntimeError(f"Could not parse \"{line}\". {e}.")
+    
+    def _item_to_line(self, item: DataItem) -> str:
+        try:
+            dumped = json.dumps(item, default=DataItem.serialize)
+            return dumped+"\n" # add new line
+        except json.JSONDecodeError as e:
+            raise RuntimeError(f"Could not serialize item. {e}")
+        except TypeError as e:
+            raise RuntimeError(f"Could not serialize item. {e}")
+
     def _read_lines(self) -> list[str]:
-        # Create Locker For File Mutex:
-        lock_obj = portalocker.Lock(self.filename, mode='r', flags=portalocker.LOCK_EX)
+        lock_obj = portalocker.Lock(self.filename, mode='r', flags=portalocker.LOCK_EX) # locker for file mutex
         try:
             file = lock_obj.acquire() # open file through locker
             return file.readlines()
@@ -169,81 +142,202 @@ class LogsFile(LogsCollection):
         except portalocker.LockException as e:
             RuntimeError(f"Failed to acquire lock while reading {self.filename}. {e}")
         except Exception as e:
-            raise RuntimeError(f"Failed to read lines from {self.filename}. {e}")
+            raise RuntimeError(f"Failed to read lines. {e}")
         finally: # clean up
             lock_obj.release() # close file and release the lock
 
     def _append_lines(self, lines: list[str]):
-        assert self.max_logcount == 0 or len(lines) <= self.max_logcount, f"Cannot append more then {self.max_logcount} lines"
-        predicted_logcount = self.logcount + len(lines)
-        if 0 < self.max_logcount and self.max_logcount < predicted_logcount: # file would be full, trim oldest logs
-            lines_to_remove = predicted_logcount - int(self.max_logcount*0.9) # trimmed file should be 90% full
-            temp_filename = str(self.filename) + ".temp"
-            lock_obj = portalocker.Lock(self.filename, mode='r', flags=portalocker.LOCK_EX) # locker for file mutex
-            try: # open original file
-                file = lock_obj.acquire() # open file through locker
-                for _ in range(lines_to_remove): # skip the first 'lines_to_remove' lines (the oldest one)
-                    self.logcount -= 1
-                    next(file, None) # iterate file object
-                try: # open temporary file
-                    temp = open(temp_filename, mode="w")
-                    for line in file: # write remaining lines to temp file
-                        temp.write(line)
-                    for line in lines: # write new lines to temp file
-                        self.logcount += 1
-                        temp.write(line)
-                except Exception as e:
-                    raise RuntimeError(f"Could not copy files to temporary file. {e}")
-                finally:
-                    temp.flush()
-                    temp.close()
-            except Exception as e:
-                raise RuntimeError(f"Failed to append lines to {self.filename}. {e}")
-            except portalocker.LockException as e:
-                RuntimeError(f"Failed to acquire lock while reading {self.filename}. {e}")
-            else: # on success, replace original file with temporary file
-                file.close() # close early
-                time.sleep(0.1) # wait until file is closed
-                os.replace(temp_filename, self.filename)
-            finally: # cleanup original file
-                lock_obj.release() # close file and release the lock
-        else: # file will not be full, just append
-            lock_obj = portalocker.Lock(self.filename, mode='a', flags=portalocker.LOCK_EX) # locker for file mutex
-            try: # append to original file 
-                file = lock_obj.acquire() # open file through locker
-                file.writelines(lines) # no need to trim file, just append
-                file.flush()
-                self.logcount += len(lines)
-            except Exception as e:
-                raise RuntimeError(f"Failed to append lines: {e}")
-            finally:
-                lock_obj.release() # close file and release the lock
-        
-        # Check Linecount:
-        expected_logcount = self.logcount
-        actual_logcount = self._count_lines()
-        assert expected_logcount == actual_logcount, f"Unexpected linecount {actual_logcount}. Expected {expected_logcount}."
-
-    def _count_lines(self) -> int:
-        lock_obj = portalocker.Lock(self.filename, mode='r', flags=portalocker.LOCK_EX) # locker for file mutex
+        lock_obj = portalocker.Lock(self.filename, mode='a', flags=portalocker.LOCK_EX) # locker for file mutex
         try:
             file = lock_obj.acquire() # open file through locker
-            return sum(1 for _ in file)
-        except FileNotFoundError as e:
-            file = open(self.filename, mode="w") # create new file
-            return 0
+            file.writelines(lines)
+            file.flush()
         except portalocker.LockException as e:
-            RuntimeError(f"Failed to acquire lock while reading {self.filename}. {e}")
+            RuntimeError(f"Failed to acquire lock while appending {self.filename}. {e}")
+        except Exception as e:
+            raise RuntimeError(f"Failed to append lines. {e}")
         finally:
             lock_obj.release() # close file and release the lock
 
-    def _clear_lines(self):
+    def _write_lines(self, lines: list[str]):
         lock_obj = portalocker.Lock(self.filename, mode='w', flags=portalocker.LOCK_EX) # locker for file mutex
         try:
             file = lock_obj.acquire() # open file through locker
+            file.writelines(lines)
+            file.flush()
         except portalocker.LockException as e:
-            RuntimeError(f"Failed to acquire lock while clearing {self.filename}. {e}")
+            RuntimeError(f"Failed to acquire lock while writing {self.filename}. {e}")
+        except Exception as e:
+            raise RuntimeError(f"Failed to write lines. {e}")
         finally:
-            self.logcount = 0
             lock_obj.release() # close file and release the lock
-        
+
+    def _trim_lines(self, count: int):
+        # copy all but the first 'count' lines into a temporary files
+        # delete the original file and rename the temporary file
+        temp_filename = str(self.filename) + ".temp"
+        lock_obj = portalocker.Lock(self.filename, mode='r', flags=portalocker.LOCK_EX) # locker for file mutex
+        try: # open original file
+            file = lock_obj.acquire() # open file through locker
+            for _ in range(count): # skip the first 'count' lines
+                next(file, None) # iterate file object
+            try: # open temporary file
+                self.logcount = 0
+                temp = open(temp_filename, mode="w")
+                for line in file: # write remaining lines to temp file
+                    temp.write(line)
+                    self.logcount += 1
+            except Exception as e:
+                raise RuntimeError(f"Could not copy files to temporary file. {e}")
+            finally:
+                temp.flush()
+                temp.close()
+        except Exception as e:
+            raise RuntimeError(f"Failed to trim lines in {self.filename}. {e}")
+        except portalocker.LockException as e:
+            RuntimeError(f"Failed to acquire lock while reading {self.filename}. {e}")
+        else: # on success, replace original file with temporary file
+            file.close() # close early
+            time.sleep(0.1) # wait until file is closed
+            os.replace(temp_filename, self.filename)
+        finally: # cleanup original file
+            lock_obj.release() # close file and release the lock
+
+
+
+
+class LogsSQL(LogsCollection, ABC):
+    """
+    SQLAlchemy ORM-backed LogsCollection.
+
+    Defaults to a SQLite DB file 'logs.db' next to this module.
+    Change `db_url` to migrate to Postgres/MySQL with minimal code changes.
+    """
+
+    def __init__(self, db_url: str | None = None, echo: bool = False, filename: str = "logs.db"):
+        if db_url is None:
+            db_path = Path(__file__).parent / filename
+            db_url = f"sqlite:///{db_path}"
+            self.filename = db_path
+
+        self.engine = create_engine(db_url, future=True, echo=echo)
+
+        # Optional: tune SQLite behavior (see notes below)
+        if db_url.startswith("sqlite:///"):
+            conn = None
+            try:
+                conn = self.engine.connect()
+                conn.execute(text("PRAGMA journal_mode=DELETE;"))
+                conn.execute(text("PRAGMA synchronous=NORMAL;"))
+                conn.execute(text("PRAGMA foreign_keys=ON;"))
+            finally:
+                if conn is not None:
+                    conn.close()
+
+        # Create tables if they don't exist
+        try:
+            Base.metadata.create_all(self.engine)
+        except SQLAlchemyError as e:
+            raise RuntimeError(f"Failed to create schema. {e}") from e
+
+        self.SessionLocal = sessionmaker(bind=self.engine, expire_on_commit=False, future=True)
+
+        # Retention configuration (0 => no limit)
+        self.max_logcount: int = 0
+
+    def add(self, item: DataItem):
+        session = None
+        try:
+            session = self.SessionLocal()
+
+            # Retention: only if a limit is configured
+            if self.max_logcount > 0:
+                current = session.query(DataItemEntity).count()
+                predicted = current + 1
+                if predicted > self.max_logcount:
+                    # Trim so that the table ends up ~90% full
+                    to_remove = predicted - int(self.max_logcount * 0.9)
+                    if to_remove > 0:
+                        # Delete the oldest 'to_remove' rows by timestamp
+                        queriedEntities = session.query(DataItemEntity.id)
+                        orderedEntities = queriedEntities.order_by(DataItemEntity.timestamp.asc())
+                        trimmedEntities = orderedEntities.limit(to_remove)
+                        oldest_ids = [entity.id for entity in trimmedEntities]
+                        if oldest_ids:
+                            queriedEntities = session.query(DataItemEntity)
+                            filteredEntities = queriedEntities.filter(DataItemEntity.id.in_(oldest_ids))
+                            filteredEntities.delete(synchronize_session=False)
+
+            # Insert the new item
+            entity = DataItemEntity.from_data_item(item)
+            session.add(entity)
+            session.commit()
+        except IntegrityError as e:
+            if session is not None:
+                try:
+                    session.rollback()
+                except Exception:
+                    pass
+            raise RuntimeError(f"Item with ID {item.id} already exists. {e}") from e
+        except SQLAlchemyError as e:
+            if session is not None:
+                try:
+                    session.rollback()
+                except Exception:
+                    pass
+            raise RuntimeError(f"Failed to insert log item {item.id}. {e}") from e
+        finally:
+            if session is not None:
+                session.close()
+
+    def get_last(self, count: int = 0) -> list[DataItem]:
+        if count < 0:
+            return []
+
+        try: # fetch latest N in DESC order, then reverse to return ascending
+            session = self.SessionLocal()
+            queriedEntities = session.query(DataItemEntity)
+            orderedEntities = queriedEntities.order_by(DataItemEntity.timestamp.desc())
+            trimmedEntities = orderedEntities.limit(count)
+            rows_desc = trimmedEntities.all()
+            rows_asc = list(reversed(rows_desc))
+            return [row.to_data_item() for row in rows_asc]
+        except SQLAlchemyError as e:
+            raise RuntimeError(f"Failed to read last {count} log items. {e}")
+        finally:
+            if session is not None:
+                session.close()
+
+    def get_between(self, start: datetime, end: datetime) -> list[DataItem]:
+        session = None
+        try:
+            session = self.SessionLocal()
+            queriedEntities = session.query(DataItemEntity)
+            filteredEntities = queriedEntities.filter(start < DataItemEntity.timestamp, DataItemEntity.timestamp < end)
+            orderedEntities = filteredEntities.order_by(DataItemEntity.timestamp.asc())
+            rows = orderedEntities.all()
+            return [row.to_data_item() for row in rows]
+        except SQLAlchemyError as e:
+            raise RuntimeError(f"Failed to read logs between {start} and {end}. {e}")
+        finally:
+            if session is not None:
+                session.close()
+
+    def set_max_log_count(self, size: int):
+        self.max_logcount = int(size or 0)
+
+    def clear(self):
+        try:
+            session = self.SessionLocal()
+            session.query(DataItemEntity).delete()
+            session.commit()
+        except SQLAlchemyError as e:
+            if session is not None:
+                try:
+                    session.rollback()
+                except Exception:
+                    pass
+            raise RuntimeError(f"Failed to clear logs. {e}") from e
+        finally:
+            if session is not None:
+                session.close()
