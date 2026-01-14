@@ -13,14 +13,20 @@ import 'mdui/components/top-app-bar.js';
 import 'mdui/components/top-app-bar-title.js';
 import 'mdui/components/tooltip.js';
 
+// Markdown Render Library:
+import ZeroMd from 'zero-md';
+if(!customElements.get('zero-md')) {
+    customElements.define('zero-md', ZeroMd);
+}
+
 // Local Import:
 import { DatePicker, TimePicker } from './Pickers.jsx';
 import { DataItem } from "../assets/DataItem.js";
-import ZeroMd from 'zero-md';
-customElements.define('zero-md', ZeroMd);
 
-function TemplateView({ item = new DataItem(), readonly }) {
-    const [, forceRender] = useState(0); // simple revision counter
+function TemplateView({ initialItem = new DataItem(), readonly }) {
+    
+
+    const [item, setItem] = useState(initialItem); // simple revision counter
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Confirm Picker Handler Functions:
@@ -29,14 +35,14 @@ function TemplateView({ item = new DataItem(), readonly }) {
         item.datetimeObj.setFullYear(confirmedDateObj.getFullYear());
         item.datetimeObj.setMonth(confirmedDateObj.getMonth());
         item.datetimeObj.setDate(confirmedDateObj.getDate());
-        forceRender(n => n + 1); // increment it to force a re-render of this component
+        setItem(new DataItem(item)); // create new item object to trigger re-render of this component
     }
     function confirmTime(confirmedDateObj) {
         item.datetimeObj.setHours(confirmedDateObj.getHours());
         item.datetimeObj.setMinutes(confirmedDateObj.getMinutes());
         item.datetimeObj.setSeconds(confirmedDateObj.getSeconds());
         item.datetimeObj.setMilliseconds(confirmedDateObj.getMilliseconds());
-        forceRender(n => n + 1); // increment it to force a re-render of this component
+        setItem(new DataItem(item)); // create new item object to trigger re-render of this component
     }
 
 
@@ -51,10 +57,10 @@ function TemplateView({ item = new DataItem(), readonly }) {
             {readonly && (
                 <div className="flex-row">
                     <div></div>
-                    <mdui-tooltip content="You can edit values before adding the item to records or before you update the record">
+                    <mdui-tooltip content="You can edit values by clicking the button at the bottom">
                         <div className="flex-row hint">
                             <mdui-icon name='lock' style={{fontSize:"1.0rem"}} ></mdui-icon>
-                            <div>Read Only Mode</div>
+                            <div>Read Only View</div>
                         </div>
                     </mdui-tooltip>
                     <div></div>
@@ -87,7 +93,7 @@ function TemplateView({ item = new DataItem(), readonly }) {
                     <mdui-card variant="filled" style={{width:"100%"}}>
                         <zero-md>
                             <template>
-                                <link rel="stylesheet" href="/github-markdown.css" type="text/css"/>
+                                <link rel="stylesheet" href="/github-markdown.css" type="text/html"/>
                             </template>
                             <script type="text/markdown">
                                 {item.solution}
@@ -117,7 +123,7 @@ export function LogItemView({ item }) {
         return(
             <div className="flex-column">
                 <main>
-                    <TemplateView item={item} readonly={true} />
+                    <TemplateView initialItem={item} readonly={true} />
                 </main>
                 <footer className="flex-row">
                     <mdui-button onclick={toggleMode} variant="outlined" icon="add">Add to records</mdui-button>
@@ -127,16 +133,21 @@ export function LogItemView({ item }) {
     } else {
         return(
             <TextForm action="/api/form/new-record" submitButtonText="Save new record" resetButtonText="Cancel" onSuccess={toggleMode} onReset={toggleMode}>
-                <TemplateView item={item} readonly={false} />
+                <TemplateView initialItem={item} readonly={false} />
             </TextForm>
         );
     }
 }
 
-export function RecordItemView({ item, onUpdate }) {
+export function RecordItemView({ item, onUpdate, onDelete }) {
     const [mode, setMode] = useState(0);
 
-    function successCallback(payload) {
+    function deleteCallback() {
+        if(onDelete) { onDelete(item.id); }
+        setMode(0);
+    }
+
+    function updateCallback(payload) {
         const updatedItem = new DataItem(payload); // create new item from response
         if(onUpdate) { onUpdate(updatedItem); }
         setMode(0);
@@ -144,22 +155,22 @@ export function RecordItemView({ item, onUpdate }) {
 
     if(mode == 2) { // delete mode: confirm delete operation
         return(
-            <TextForm action="/api/form/delete-record" submitButtonText="Delete record" resetButtonText="Cancel" onSuccess={successCallback} onReset={() => {setMode(0)}}>
+            <TextForm action="/api/form/delete-record" submitButtonText="Delete record" resetButtonText="Cancel" onSuccess={deleteCallback} onReset={() => {setMode(0)}}>
                 <div>Are you sure you want to delete this record?</div>
                 <input type="hidden" name="id" value={item.id}/>
             </TextForm>
         );
     } else if(mode == 1) { // edit mode: confirm updated changes
         return(
-            <TextForm action="/api/form/edit-record" submitButtonText="Update record" resetButtonText="Cancel" onSuccess={successCallback} onReset={() => {setMode(0)}}>
-                <TemplateView item={item} readonly={false} />
+            <TextForm action="/api/form/edit-record" submitButtonText="Update record" resetButtonText="Cancel" onSuccess={updateCallback} onReset={() => {setMode(0)}}>
+                <TemplateView initialItem={item} readonly={false} />
             </TextForm>
         );
     } else { // default mode: view details
         return(
             <div className="flex-column">
                 <main>
-                    <TemplateView item={item} readonly={true} />
+                    <TemplateView initialItem={item} readonly={true} />
                 </main>
                 <footer className="flex-row">
                     <div>
@@ -175,7 +186,7 @@ export function RecordItemView({ item, onUpdate }) {
 export function ItemFormView({ item, onSuccess, onReset }) {
     return(
         <TextForm action="/api/form/new-record" submitButtonText="Add new record" resetButtonText="Cancel" onSuccess={onSuccess} onReset={onReset}>
-            <TemplateView item={item} readonly={false} />
+            <TemplateView initialItem={item} readonly={false} />
         </TextForm>
     );
 }
