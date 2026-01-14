@@ -72,6 +72,15 @@ def generate_logs(num_items: int = 20, with_solution: bool = False):
     START_DATE = datetime(2025, 10, 25)
     END_DATE = datetime(2025, 10, 31)
     TIME_RANGE_SECONDS = int((END_DATE - START_DATE).total_seconds())
+    SOLUTIONS = [
+        "### ⚠️ Critical Resolution\nThe database connection pool is exhausted.\n\n**Immediate Actions:**\n* [ ] Check `max_connections` in postgresql.conf\n* [ ] Restart service: `docker restart thirsty-wombat` \n\n> **Note:** Do not manually kill the PID unless the container fails to stop.",
+        "### Access Violation\nUser attempted to reach a restricted endpoint.\n\n| Attribute | Value |\n| :--- | :--- |\n| **Required Level** | `ADMIN` |\n| **Actual Level** | `GUEST` |\n\n**Solution:** Verify JWT claims for the user.",
+        "### Serialization Failure\nNull value found in required field `name`.\n\n```json\n{\n  \"id\": \"123\",\n  \"name\": null,\n  \"status\": \"active\"\n}\n```\n**Fix:** Ensure upstream API provides a default string.",
+        "## 🚨 Disk Space Recovery\nSystem disk usage is at **95%**.\n\n**Cleanup Status:**\n1. Cleaned dangling images: `SUCCESS`\n2. Purged logs > 7 days: `SUCCESS`\n3. Vacuum Database: `PENDING`",
+        "### Standard Recovery\n1. **Pray.**\n2. If step 1 fails, restart the container:\n   `docker restart <source>`\n3. Delete `node_modules` and walk away.",
+        "Just pray at this point",
+        None
+    ]
 
     for idx in range(0, num_items):
         random_offset = random.randint(0, TIME_RANGE_SECONDS*1000)
@@ -81,7 +90,7 @@ def generate_logs(num_items: int = 20, with_solution: bool = False):
             "category": random.choice(["critical","error","warning","info","debug"]),
             "source": random.choice(["Thirsty-Wombat","Jumpy-Giraffe","Sleepy-Koala"]),
             "message": random.choice(["User 'alice' attempted to access restricted resource /admin/settings.", "Database connection pool initialized successfully with 10 connections.", "Failed to serialize response object for container 'zealous-pony': null value found in required field 'name'.", "Starting garbage collection cycle. Memory usage before: 128MB.", "System wide disk space usage exceeded 95%. Automated cleanup initiated.", "Mounted disk with 128MB."]),
-            "solution": random.choice(["Just pray at this point", "Try to restart the container", None]) if with_solution else None
+            "solution": random.choice(SOLUTIONS) if with_solution else None
         }
         json_line = json.dumps(log_item) + "\r\n"        
         yield json_line.encode('utf-8') # yield the string (Flask sends this chunk immediately)
