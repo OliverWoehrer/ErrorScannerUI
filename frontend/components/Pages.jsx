@@ -44,6 +44,8 @@ function ListDetailsLayout({ isLoading, items, Header, ListView, DetailsView }) 
     // Layout Conditionals:
     const { isAtMost } = useScreenSize();
     const isSmallerScreen = isAtMost('medium'); // split view for medium (601-992px) and large (993px+)
+    const [leftWidth, setLeftWidth] = useState(50); // width of list pane (left side of layout)
+    const [isResizing, setIsResizing] = useState(false); // state is true during drag&drop-resize
     
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,13 +56,30 @@ function ListDetailsLayout({ isLoading, items, Header, ListView, DetailsView }) 
     function showDetails(id) { setSelectedId(id); }
     function hideDetails() { setSelectedId(null); }
 
-    // Replace Updated Item:
+    // Remove And Replace Updated Item:
     function onItemUpdate(newItem) {
         function updateFunction(prevItems) {
-            return prevItems.map(it => it.id === newItem.id ? newItem : it);
+            return prevItems.map(obj => obj.id === newItem.id ? newItem : obj);
         }
         setFilteredItems(updateFunction);
     }
+    function onItemDelete(id) {
+        function updateFunction(prevItems) {
+            return prevItems.filter(obj => obj.id !== id); // 'filter' returns 'true' on items to keep
+        }
+        setFilteredItems(updateFunction);
+    }
+
+    // Drag&Drop Resize: 
+    function startResizing() { setIsResizing(true); }
+    function stopResizing() { setIsResizing(false); };
+    function resize(mouseMoveEvent) {
+        if(!isResizing) { return; }
+        const newWidth = ((mouseMoveEvent.clientX-56) / window.innerWidth) * 100; // calculate percentage based on window width
+        if(20 < newWidth && newWidth < 80) { // constrain between 20% and 80%
+            setLeftWidth(newWidth);
+        }
+    };
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -90,6 +109,16 @@ function ListDetailsLayout({ isLoading, items, Header, ListView, DetailsView }) 
             });
         }
     }, []);
+
+    // Add/Remove Listeners For Drag&Drop:
+    useEffect(() => {
+        window.addEventListener("mousemove", resize);
+        window.addEventListener("mouseup", stopResizing);
+        return () => {
+            window.removeEventListener("mousemove", resize);
+            window.removeEventListener("mouseup", stopResizing);
+        };
+    }, [resize, stopResizing]);
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -144,7 +173,7 @@ function ListDetailsLayout({ isLoading, items, Header, ListView, DetailsView }) 
     };
 
     const ListPane = (
-        <main className="flex-column">
+        <>
             <header>
                 <mdui-collapse ref={collapseRef}>
                     <mdui-collapse-item trigger="#showFilters">
@@ -166,7 +195,7 @@ function ListDetailsLayout({ isLoading, items, Header, ListView, DetailsView }) 
             <main>
                 <ListElements />
             </main>
-        </main>
+        </>
     );
 
     const DetailElement = (!isLoading && selectedItem) ? (
@@ -180,7 +209,7 @@ function ListDetailsLayout({ isLoading, items, Header, ListView, DetailsView }) 
                 </mdui-top-app-bar>
             </header>
             <main>
-                <DetailsView item={selectedItem} onUpdate={onItemUpdate} />
+                <DetailsView item={selectedItem} onUpdate={onItemUpdate} onDelete={onItemDelete} />
             </main>
         </div>
     ) : null; // return 'null' to trigger an unmount of DetailElement in <DetailPane />
@@ -194,19 +223,15 @@ function ListDetailsLayout({ isLoading, items, Header, ListView, DetailsView }) 
             );
         } else if(DetailElement) { // details on bigger screen, wrap the details within a card element
             return(
-                <aside>
-                    <mdui-card variant="elevated" style={{height:"100%",width:"100%"}}>
-                        {DetailElement}
-                    </mdui-card>
-                </aside>
+                <mdui-card variant="elevated" style={{height:"100%",width:"100%"}}>
+                    {DetailElement}
+                </mdui-card>
             );
         } else { // no details to show on bigger screen, display placeholder instead
             return(
-                <aside>
-                    <div>
-                        Select a log to see more details
-                    </div>
-                </aside>
+                <div>
+                    Select a log to see more details
+                </div>
             );
         }
     }
@@ -216,21 +241,21 @@ function ListDetailsLayout({ isLoading, items, Header, ListView, DetailsView }) 
             <style>{`
             .list-detail-layout {
                 align-items: stretch;
+                box-sizing: border-box;
                 display: flex;
                 flex-direction: row;
                 height: 100%;
-                box-sizing: border-box;
             }
             .list-detail-layout > main {
-                flex-basis: 0%;
-                flex-grow: 1;
+                flex-basis: auto;
+                flex-grow: 0;
                 flex-shrink: 1;
                 min-width: 0;
                 height: 100%;
             }
             .list-detail-layout > aside {
                 box-sizing: border-box;
-                flex-basis: 0%;
+                flex-basis: 0;
                 flex-grow: 1;
                 flex-shrink: 1;
                 padding: 12px;
@@ -241,10 +266,33 @@ function ListDetailsLayout({ isLoading, items, Header, ListView, DetailsView }) 
                 height: 100%;
                 justify-content: center;
             }
+            .divider {
+                align-items: center;
+                cursor: col-resize;
+                display: flex;
+                justify-content: center;
+                user-select: none;
+            }
+            .divider:hover {
+                background-color: rgb(var(--mdui-color-surface-container));
+            }
             `}</style>
             <div className="list-detail-layout">
-                {ListPane}
-                <DetailPane />
+                <main className="flex-column" style={{ width: isSmallerScreen ? '100%' : `${leftWidth}%` }}>
+                    {ListPane}
+                </main>
+                {isSmallerScreen ? ( // just render details pane
+                    <DetailPane />
+                ) : ( // render divider and details pane aside
+                    <>
+                    <div className='divider' onMouseDown={startResizing}>
+                        <mdui-icon name="drag_indicator"></mdui-icon>
+                    </div>
+                    <aside>
+                        <DetailPane />
+                    </aside>
+                    </>
+                )}
             </div>
         </>
     );
@@ -302,12 +350,16 @@ export function RecordsPage() {
             dialog.open = true;
         }
     }
-
     function closeDialog() {
         const dialog = newRecordDialogRef.current;
         if(dialog) {
             dialog.open = false;
         }
+    }
+
+    function onNewItem(newItem) {
+        items.push(newItem); // TODO: test
+        closeDialog();
     }
 
 
@@ -338,7 +390,7 @@ export function RecordsPage() {
                         <mdui-button-icon icon="clear" onClick={closeDialog} />
                         <mdui-top-app-bar-title>Add new record</mdui-top-app-bar-title>
                     </mdui-top-app-bar>
-                    <ItemFormView item={new DataItem()} onSuccess={closeDialog} onReset={closeDialog} />
+                    <ItemFormView item={new DataItem()} onSuccess={onNewItem} onReset={closeDialog} />
                 </div>
             </mdui-dialog>
         </>
