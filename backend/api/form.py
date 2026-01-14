@@ -51,9 +51,10 @@ def new_record():
     
     # Add to Database:
     item = DataItem(timestamp,category,source,message,solution,searchkey)
-    result = records_data.add(item)
-    if result:
-        raise BadGateway(f"Failed to add item. {result}")
+    try:
+        records_data.add(item)
+    except Exception as e:
+        raise BadGateway(f"Failed to add item. {e}")
     
     # Return Item in Response:
     return Response(response=json.dumps(item, default=DataItem.serialize), status=200, mimetype="application/json")
@@ -99,9 +100,10 @@ def edit_record():
     
     # Update Database:
     item = DataItem(timestamp,category,source,message,solution,searchkey,id)
-    result = records_data.update(item)
-    if result:
-        raise BadGateway(f"Failed to update item {id}. {result}")
+    try:
+        records_data.update(item)
+    except Exception as e:
+        raise BadGateway(f"Failed to update item {id}. {e}")
     
     # Return Item in Response:
     return Response(response=json.dumps(item, default=DataItem.serialize), status=200, mimetype="application/json")
@@ -122,9 +124,10 @@ def delete_record():
         raise BadRequest("Missing parameter 'id'.")
 
     # Remove From Database:
-    result = records_data.remove(id)
-    if result:
-        raise BadGateway(f"Failed to remove item {id}. {result}")
+    try:
+        records_data.remove(id)
+    except Exception as e:
+        raise BadGateway(f"Failed to remove item {id}. {e}")
     return "OK", 200
 
 @form.route("/docker-interface", methods=["GET","POST"])
