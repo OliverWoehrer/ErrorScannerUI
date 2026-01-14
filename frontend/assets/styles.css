@@ -97,6 +97,11 @@ mdui-text-field[variant="filled"]::part(container) {
     border-radius: var(--mdui-shape-corner-large);
 }
 
+mdui-select::part(text-field__container) {
+    box-shadow: 0px 0px;
+    border-radius: var(--mdui-shape-corner-large);
+}
+
 mdui-dialog::part(body) {
     height: 100%;
     width: 100%;
