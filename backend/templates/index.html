@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="mdui-theme-auto">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error Scanning UI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no"/>
+    <meta name="renderer" content="webkit"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <title>Error Scanner</title>
 </head>
-<body>
-    <h1>Welcome to the Error Scanning UI</h1>
-    <p>This is the main page of the application.</p>
+<body id="root">
+    <script type="module" src="{{url_for('static',filename='index.js')}}"></script>
 </body>
 </html>

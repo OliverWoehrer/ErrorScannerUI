@@ -10,9 +10,11 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@fontsource/ubuntu": "^5.2.8",
         "@material/web": "^2.4.0",
         "@vitejs/plugin-react": "^5.0.2",
         "g": "^2.0.1",
+        "material-icons": "^1.13.14",
         "mdui": "^2.1.4",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",

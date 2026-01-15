@@ -5,7 +5,7 @@ from flask import Flask, render_template
 from api import api
 
 
-# Initalize Flask App:
+# Initialize Flask App:
 app = Flask(__name__, template_folder="./templates", static_folder="./static")
 app.secret_key = "t0ps3cr3t"
 
@@ -13,13 +13,14 @@ app.secret_key = "t0ps3cr3t"
 app.register_blueprint(api, url_prefix="/api")
 
 
-@app.route("/", methods=["GET"])
-def index():
+@app.route("/", methods=["GET"]) # handles the bare root URL (e.g., http://localhost:5000/)
+@app.route("/<path:path>", methods=["GET"]) # handle other page paths on the same endpoint as the frontend is implemented as a single-page-application (SPA)
+def index(path):
     return render_template("index.html")
 
 @app.errorhandler(Exception)
 def error(e: Exception):
-    return e.description, e.code
+    return str(e), 500
 
 
 if __name__ == "__main__":

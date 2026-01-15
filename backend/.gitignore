@@ -1,12 +1,14 @@
 # Development Environment:
 .venv
 
-# Cache and Build Files:
+# Cache Files:
 __pycache__
 
-# Ignore Data Files:
+# Data Files:
 data/*.db
 data/*.json
 data/*.jsonl
 data/*.txt
-checker.py
+
+# Build Files:
+static
