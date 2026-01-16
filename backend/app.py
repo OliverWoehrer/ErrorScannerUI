@@ -15,7 +15,7 @@ app.register_blueprint(api, url_prefix="/api")
 
 @app.route("/", methods=["GET"]) # handles the bare root URL (e.g., http://localhost:5000/)
 @app.route("/<path:path>", methods=["GET"]) # handle other page paths on the same endpoint as the frontend is implemented as a single-page-application (SPA)
-def index(path):
+def index(path=None):
     return render_template("index.html")
 
 @app.errorhandler(Exception)
