@@ -3,3 +3,4 @@ node_modules/
 
 #Build Files:
 package-lock.json
+dist

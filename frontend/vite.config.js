@@ -8,7 +8,7 @@ export default defineConfig(({ command }) => {
         base: command === 'build' ? '/static/' : '/', // serve files under '/static/' for deployed project
         root: path.resolve(__dirname), // ensure root is the frontend folder
         build: {
-            outDir: path.resolve(__dirname, '../backend/static'), // build to Flask's static folder
+            outDir: path.resolve(__dirname, 'dist'), // compile to 'dist/' folder
             emptyOutDir: true, // clean output directory before every build
             rollupOptions: {
                 input: path.resolve(__dirname, 'index.jsx'), // react entry file
