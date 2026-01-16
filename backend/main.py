@@ -4,8 +4,14 @@ from multiprocessing import Process
 from scanner import scanner
 import signal
 
-docker_scanner = Process(target=scanner.run)
-flask_server = Process(target=app.run, kwargs={"host":"0.0.0.0", "port":5000, "debug":True})
+def run_scanner():
+    scanner.run()
+
+def run_server():
+    app.run(host="0.0.0.0", port=5000, debug=False)
+
+docker_scanner = Process(target=run_scanner)
+flask_server = Process(target=run_server)
 
 def stop(sig, frame):
     print("Stopping Program ...")
