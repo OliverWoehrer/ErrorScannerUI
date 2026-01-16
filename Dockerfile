@@ -1,22 +1,41 @@
-# Use an official Python runtime as a parent image
-# FROM python:3.9-slim-buster
-FROM python:3.14.0b3-alpine3.21
+# Stage 1: Build the React Frontend
+FROM node:22-alpine AS build-stage
+WORKDIR /frontend
 
-# Set Environment Variables:
+# Install packages
+COPY ./frontend/package*.json ./
+RUN npm install
+
+# Copy and build (This creates a /frontend/build or /frontend/dist folder)
+COPY ./frontend/ .
+RUN npm run build
+
+
+
+
+# Stage 2: Python Backend
+FROM python:3.12-alpine AS requirements-stage
+WORKDIR /backend
+
+# Do not compile files to __pycache__
+ENV PYTHONDONTWRITEBYTECODE=1
+# ENV PYTHONUNBUFFERED=1
+
+# Set path of Docker host so the scanner can access it
 ENV DOCKER_HOST=unix:///var/run/docker.sock
 
-# Set the working directory in the container
-WORKDIR /app
-
-# Copy the current directory contents into the container at /app
-COPY ./backend .
-COPY requirements.txt requirements.txt
-
-# Install any needed Python packages
+# Install Python requirements
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy Python scripts
+COPY ./backend .
+
+# Copy compiled frontend /frontend/dist/ from stage 1 to /backend/static
+COPY --from=build-stage /frontend/dist /app/static
 
 # Expose port 5000 to allow external access to the web server
 EXPOSE 5000
 
 # Command to run the Python script
-CMD ["python","-u","main.py"]
+CMD ["python", "-u", "main.py"]
