@@ -358,7 +358,7 @@ export function RecordsPage() {
     }
 
     function onNewItem(newItem) {
-        items.push(newItem); // TODO: test
+        items.push(newItem);
         closeDialog();
     }
 
