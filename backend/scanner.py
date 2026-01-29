@@ -196,7 +196,7 @@ class Scanner():
 
             for container in watchlist:
                 # Read New Logs:
-                since_time = last_scanned.get(container.name, datetime.fromtimestamp(0, tz=timezone.utc)) # use posix timestamp 0 as fallback
+                since_time = last_scanned.get(container.name, datetime.min.replace(tzinfo=timezone.utc)) # use posix timestamp 0 as fallback
                 log_items = self._get_log_items(container, since=since_time)
                 if not log_items:
                     continue # no logs, skip to the next container
@@ -301,7 +301,7 @@ class Scanner():
                 watchlist.discard(container)
         
         # Display Watchlist:
-        print("Watchlist:")
+        print(f"Watchlist: {"" if watchlist else "empty"}")
         for container in watchlist:
             print(f"- {container.name}")
 
@@ -402,7 +402,7 @@ class Scanner():
     def _scan_log_items(self, items: list[DataItem]) -> datetime:
         BAR_WIDTH = 50
         total_length = len(items)
-        latest_timestamp = datetime.fromtimestamp(0, tz=timezone.utc) # will hold the timestamp of the latest log item
+        latest_timestamp = datetime.min.replace(tzinfo=timezone.utc) # will hold the timestamp of the latest log item
         for idx,item in enumerate(items):
             progress = ((idx+1)/total_length) * BAR_WIDTH
             print(f"\r[{ f"{'':=<{progress}}"    }{   f"{'': <{BAR_WIDTH-progress}}"     }]", end="", flush=True)
@@ -435,14 +435,15 @@ class Scanner():
 
             # 3. update records
             if best_score > self.similarity_threshold:
-                best_match.timestamp = item.timestamp
-                records_data.update(best_match)
+                if item.timestamp > best_match.timestamp: # check if item is actually newer then existing record
+                    best_match.timestamp = item.timestamp
+                    records_data.update(best_match)
             else:
                 records_data.add(item)
 
         print(f"\r\n", end="", flush=True) # add final linebreak
         return latest_timestamp
-        
+
 
 scanner = Scanner()
 
