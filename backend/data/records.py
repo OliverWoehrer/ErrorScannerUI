@@ -334,14 +334,14 @@ class RecordsSQL(RecordsCollection):
                     session.rollback()
                 except Exception:
                     pass
-            raise RuntimeError(f"Item with ID {item.id} already exists. {e}")
+            raise RuntimeError(f"Item with ID {item.id} already exists. {e}") from None
         except SQLAlchemyError as e:
             if session:
                 try:
                     session.rollback()
                 except Exception:
                     pass
-            raise RuntimeError(f"Failed to insert item {item.id}. {e}")
+            raise RuntimeError(f"Failed to insert item {item.id}. {e}") from None
         finally: # cleanup
             if session:
                 session.close()
@@ -352,7 +352,7 @@ class RecordsSQL(RecordsCollection):
             rows = session.query(DataItemEntity).all()
             return [row.to_data_item() for row in rows]
         except SQLAlchemyError as e:
-            raise RuntimeError(f"Failed to read items. {e}") from e
+            raise RuntimeError(f"Failed to read items. {e}") from None
         finally: # cleanup
             if session:
                 session.close()
@@ -365,7 +365,7 @@ class RecordsSQL(RecordsCollection):
             entities = query_filter.all()
             return [entity.to_data_item() for entity in entities]
         except SQLAlchemyError as e:
-            raise RuntimeError(f"Failed to fetch candidates. {e}")
+            raise RuntimeError(f"Failed to fetch candidates. {e}") from None
         finally: # cleanup
             if session:
                 session.close()
@@ -389,7 +389,7 @@ class RecordsSQL(RecordsCollection):
         except SQLAlchemyError as e:
             if session:
                 session.rollback()
-            raise RuntimeError(f"Failed to update item {item.id}. {e}")
+            raise RuntimeError(f"Failed to update item {item.id}. {e}") from None
         finally: # cleanup
             if session:
                 session.close()
@@ -409,7 +409,7 @@ class RecordsSQL(RecordsCollection):
                     session.rollback()
                 except Exception:
                     pass
-            raise RuntimeError(f"Failed to remove item {id}. {e}")
+            raise RuntimeError(f"Failed to remove item {id}. {e}") from None
         finally:
             if session:
                 session.close()
@@ -426,7 +426,7 @@ class RecordsSQL(RecordsCollection):
                     session.rollback()
                 except Exception:
                     pass
-            raise RuntimeError(f"Failed to clear records. {e}")
+            raise RuntimeError(f"Failed to clear records. {e}") from None
         finally:
             if session:
                 session.close()
@@ -439,7 +439,7 @@ class RecordsSQL(RecordsCollection):
             # 3. Optional: Re-run pragmas or schema check 
             # (The engine will automatically reconnect on the next query)
         except Exception as e:
-            raise RuntimeError(f"Failed to replace SQL storage. {e}")
+            raise RuntimeError(f"Failed to replace SQL storage. {e}") from None
 
     """
     Private Methods

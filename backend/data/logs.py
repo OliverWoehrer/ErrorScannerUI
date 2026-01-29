@@ -238,7 +238,7 @@ class LogsSQL(LogsCollection, ABC):
         try:
             Base.metadata.create_all(self.engine)
         except SQLAlchemyError as e:
-            raise RuntimeError(f"Failed to create schema. {e}") from e
+            raise RuntimeError(f"Failed to create schema. {e}") from None
 
         self.SessionLocal = sessionmaker(bind=self.engine, expire_on_commit=False, future=True)
 
@@ -278,14 +278,14 @@ class LogsSQL(LogsCollection, ABC):
                     session.rollback()
                 except Exception:
                     pass
-            raise RuntimeError(f"Item with ID {item.id} already exists. {e}") from e
+            raise RuntimeError(f"Item with ID {item.id} already exists. {e}") from None
         except SQLAlchemyError as e:
             if session is not None:
                 try:
                     session.rollback()
                 except Exception:
                     pass
-            raise RuntimeError(f"Failed to insert log item {item.id}. {e}") from e
+            raise RuntimeError(f"Failed to insert log item {item.id}. {e}") from None
         finally:
             if session is not None:
                 session.close()
@@ -303,7 +303,7 @@ class LogsSQL(LogsCollection, ABC):
             rows_asc = list(reversed(rows_desc))
             return [row.to_data_item() for row in rows_asc]
         except SQLAlchemyError as e:
-            raise RuntimeError(f"Failed to read last {count} log items. {e}")
+            raise RuntimeError(f"Failed to read last {count} log items. {e}") from None
         finally:
             if session is not None:
                 session.close()
@@ -318,7 +318,7 @@ class LogsSQL(LogsCollection, ABC):
             rows = orderedEntities.all()
             return [row.to_data_item() for row in rows]
         except SQLAlchemyError as e:
-            raise RuntimeError(f"Failed to read logs between {start} and {end}. {e}")
+            raise RuntimeError(f"Failed to read logs between {start} and {end}. {e}") from None
         finally:
             if session is not None:
                 session.close()
@@ -337,7 +337,7 @@ class LogsSQL(LogsCollection, ABC):
                     session.rollback()
                 except Exception:
                     pass
-            raise RuntimeError(f"Failed to clear logs. {e}") from e
+            raise RuntimeError(f"Failed to clear logs. {e}") from None
         finally:
             if session is not None:
                 session.close()
