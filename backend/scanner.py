@@ -147,8 +147,6 @@ class Scanner():
     def __init__(self):
         # Initialize Properties:
         self.stop_event = Event()
-        signal.signal(signal.SIGTERM, self.stop)
-        signal.signal(signal.SIGINT, self.stop)
 
         # Initialize Docker Client:
         host = os.environ.get("DOCKER_HOST")
@@ -166,11 +164,15 @@ class Scanner():
         # Initialize Data Collections:
         logs_data.clear() # clear previous logs
 
-    def stop(self, segnum, frame):
+    def stop(self, signum, frame):
         print(f"Stopping scanner...")
         self.stop_event.set()
 
     def run(self):
+        # Register Signal Handler:
+        signal.signal(signal.SIGTERM, self.stop) # signal from OS
+        signal.signal(signal.SIGINT, self.stop) # signal from keyboard interrupt, e.g. CTRL+C
+        
         # Read Filter Lists:
         whitelist = config_data.docker_interface_whitelist()
         blacklist = config_data.docker_interface_blacklist()
