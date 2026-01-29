@@ -80,11 +80,13 @@ function TemplateView({ initialItem = new DataItem(), readonly }) {
                 </mdui-select>
                 <mdui-text-field label="Name of Docker Container" value={item.source} defaultValue={item.source} name="source" readonly={readonly}></mdui-text-field>
             </section>
-            <section>
-                <mdui-text-field label="Search Key" value={item.searchkey || ""} defaultValue={item.searchkey || ""} name="searchkey" readonly={readonly}>
-                    <span slot="helper">String to identify this record. Should be a sub-string of the original log message.</span>
-                </mdui-text-field>
-            </section>
+            {((readonly && item.searchkey) || (!readonly)) && ( // show if a searchkey is available or always when in edit-mode
+                <section>
+                    <mdui-text-field label="Search Key" value={item.searchkey || ""} defaultValue={item.searchkey || ""} name="searchkey" readonly={readonly}>
+                        <span slot="helper">Enter a Regex to identify this record based on its message string. This helps the system to check if a matching record already exists. Should be as strict as possible to prevent false positive matches.</span>
+                    </mdui-text-field>
+                </section>
+            )}
             <section>
                 <mdui-text-field label="Log Message" value={item.message || ""} defaultValue={item.message || ""} name="message" readonly={readonly} autosize enterkeyhint="enter"></mdui-text-field>
             </section>
