@@ -37,7 +37,7 @@ def new_record():
         raise BadRequest("Missing parameter 'source'.")
     
     # Optional Params:
-    searchkey = payload.get("searchkey","")
+    matchpattern = payload.get("matchpattern","")
     message = payload.get("message","")
     solution = payload.get("solution",None)
 
@@ -50,7 +50,7 @@ def new_record():
         raise UnprocessableEntity(f"Could not parse timestamp {date}. {e}")
     
     # Add to Database:
-    item = DataItem(timestamp,category,source,message,solution,searchkey)
+    item = DataItem(timestamp,category,source,message,solution,matchpattern)
     try:
         records_data.add(item)
     except Exception as e:
@@ -86,7 +86,7 @@ def edit_record():
         raise BadRequest("Missing parameter 'id'.")
     
     # Optional Params:
-    searchkey = payload.get("searchkey","")
+    matchpattern = payload.get("matchpattern","")
     message = payload.get("message","")
     solution = payload.get("solution",None)
 
@@ -99,7 +99,7 @@ def edit_record():
         raise UnprocessableEntity(f"Could not parse timestamp {date}. {e}")
     
     # Update Database:
-    item = DataItem(timestamp,category,source,message,solution,searchkey,id)
+    item = DataItem(timestamp,category,source,message,solution,matchpattern,id)
     try:
         records_data.update(item)
     except Exception as e:

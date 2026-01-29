@@ -15,7 +15,7 @@ warnings.filterwarnings("error") # handle warning from libraries as exceptions
 
 class SimilarityMatcher:
     """
-    This implements a data structure to efficiently search and compare a collection of DataItem. It
+    This implements a data structure to efficiently match and compare a collection of DataItem. It
     uses a weighted Jaccard matrix to compare two strings. The parameter alpha helps to balance
     between string length and similar junks of words.
     The data structur of the SimilarityMatcher needs to be filled (load_items) before it can be
@@ -73,9 +73,9 @@ class SimilarityMatcher:
                 best_match = candidate
                 break
 
-            # Check With Searchkey:
-            if candidate.searchkey:
-                matches = re.findall(candidate.searchkey, item.message)
+            # Check With Match Pattern:
+            if candidate.matchpattern:
+                matches = re.findall(candidate.matchpattern, item.message)
                 if matches: # check for any matches
                     best_score = 0.99
                     best_match = candidate
@@ -192,7 +192,7 @@ class Scanner():
             # Initialize Iteration:
             self.categories_to_log = config_data.scanner_logging() # list of categories to store to the log file
             self.categories_to_record = config_data.scanner_recording() # list of categories to auto-record if the log message was not already recorded
-            self.similarity_threshold = config_data.scanner_threshold() # similarity threshold if no searchkey is available
+            self.similarity_threshold = config_data.scanner_threshold() # similarity threshold if no match pattern is available
 
             for container in watchlist:
                 # Read New Logs:

@@ -8,7 +8,7 @@ export class DataItem {
             this.source = "";
             this.message = "";
             this.solution = "";
-            this.searchkey = "";
+            this.matchpattern = "";
             return;
         }
 
@@ -20,7 +20,7 @@ export class DataItem {
             this.source = data.source;
             this.message = data.message;
             this.solution = data.solution;
-            this.searchkey = data.searchkey;
+            this.matchpattern = data.matchpattern;
             return;
         }
 
@@ -51,7 +51,7 @@ export class DataItem {
         // Try to Parse Optional Properties:
         this.message = data.message || "";
         this.solution = data.solution || "";
-        this.searchkey = data.searchkey || "";
+        this.matchpattern = data.matchpattern || "";
     }
 
     get datetimeObj() {
@@ -91,7 +91,9 @@ export class DataItem {
     }
 
     /**
-     * Checks if the given query text is in the given item
+     * Checks if the given query text is in the given item. For a query text search the ID,
+     * category, name of the container, match pattern, solution string and the message string are
+     * checked. The result has to contain all query words at least once. 
      * @param {JSON} item item to search
      * @param {String} query query text to look for
      * @returns true if a match was found, false otherwise
@@ -107,7 +109,7 @@ export class DataItem {
             if(this.source && String(this.source).toLocaleLowerCase().includes(word)) { hasMatch &= true; continue; }
             if(this.message && String(this.message).toLocaleLowerCase().includes(word)) { hasMatch &= true; continue; }
             if(this.solution && String(this.solution).toLocaleLowerCase().includes(word)) { hasMatch &= true; continue; }
-            if(this.searchkey && String(this.solution).toLocaleLowerCase().includes(word)) { hasMatch &= true; continue; }
+            if(this.matchpattern && String(this.solution).toLocaleLowerCase().includes(word)) { hasMatch &= true; continue; }
             hasMatch = false; // not match found for this word
         }
         return hasMatch;

@@ -383,7 +383,7 @@ class RecordsSQL(RecordsCollection):
             entity.source = item.source
             entity.message = item.message or ""
             entity.solution = item.solution
-            entity.searchkey = item.searchkey or ""
+            entity.matchpattern = item.matchpattern or ""
 
             session.commit()
         except SQLAlchemyError as e:

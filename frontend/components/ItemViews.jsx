@@ -80,9 +80,9 @@ function TemplateView({ initialItem = new DataItem(), readonly }) {
                 </mdui-select>
                 <mdui-text-field label="Name of Docker Container" value={item.source} defaultValue={item.source} name="source" readonly={readonly}></mdui-text-field>
             </section>
-            {((readonly && item.searchkey) || (!readonly)) && ( // show if a searchkey is available or always when in edit-mode
+            {((readonly && item.matchpattern) || (!readonly)) && ( // show if a matchpattern is available or always when in edit-mode
                 <section>
-                    <mdui-text-field label="Search Key" value={item.searchkey || ""} defaultValue={item.searchkey || ""} name="searchkey" readonly={readonly}>
+                    <mdui-text-field label="Match Pattern" value={item.matchpattern || ""} defaultValue={item.matchpattern || ""} name="matchpattern" readonly={readonly}>
                         <span slot="helper">Enter a Regex to identify this record based on its message string. This helps the system to check if a matching record already exists. Should be as strict as possible to prevent false positive matches.</span>
                     </mdui-text-field>
                 </section>

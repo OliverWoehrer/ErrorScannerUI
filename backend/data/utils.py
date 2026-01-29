@@ -8,18 +8,18 @@ from typing import Optional
 # Data Item
 # -----------------------------------------
 class DataItem:
-    def __init__(self, timestamp: datetime = None, category: str = None, source : str = None, message: str = None, solution: str = None, searchkey: str = None, id: str = None):
+    def __init__(self, timestamp: datetime = None, category: str = None, source : str = None, message: str = None, solution: str = None, matchpattern: str = None, id: str = None):
         assert (not timestamp) or isinstance(timestamp, datetime), "'timestamp' has to by of time 'datetime'"
         self.timestamp = timestamp or datetime.now() # use current date as fallback
         self.category = category or "critical"
         self.source = source or ""
         self.message = message or ""
         self.solution = solution
-        self.searchkey = searchkey or ""
+        self.matchpattern = matchpattern or ""
         if id:
             self.id = id
         else: # use unsigned hash in HEX as ID if non given
-            signed_hash = hash((self.timestamp,self.category,self.source,self.message,self.searchkey))
+            signed_hash = hash((self.timestamp,self.category,self.source,self.message,self.matchpattern))
             masked = signed_hash & 0xFFFFFFFFFFFFFFFF # 64 bit mask
             self.id = f"{masked:016X}"   
     
@@ -85,10 +85,10 @@ class DataItem:
         # Try to Parse Optional Properties:
         message = input.get("message",None)
         solution = input.get("solution",None)
-        searchkey = input.get("searchkey",None)
+        matchpattern = input.get("matchpattern",None)
         
         # Create New Data Item:
-        return DataItem(timestamp,category,source,message,solution,searchkey,id)
+        return DataItem(timestamp,category,source,message,solution,matchpattern,id)
 
 
 
@@ -105,14 +105,14 @@ class DataItemEntity(Base):
     source: Mapped[str] = mapped_column(String(255), nullable=False, default="")
     message: Mapped[str] = mapped_column(Text, nullable=False, default="")
     solution: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    searchkey: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, default="")
+    matchpattern: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, default="")
 
     __tablename__ = "records"
     __table_args__ = ( Index("ix_records_source_category", "source", "category"), ) # 1-item tuple
 
     def to_data_item(self) -> DataItem:
-        return DataItem(self.timestamp, self.category, self.source, self.message, self.solution, self.searchkey, self.id)
+        return DataItem(self.timestamp, self.category, self.source, self.message, self.solution, self.matchpattern, self.id)
 
     @staticmethod
     def from_data_item(item: DataItem) -> DataItemEntity:
-        return DataItemEntity(id=item.id, timestamp=item.timestamp, category=item.category, source=item.source, message=item.message or "", solution=item.solution, searchkey=item.searchkey or "")
+        return DataItemEntity(id=item.id, timestamp=item.timestamp, category=item.category, source=item.source, message=item.message or "", solution=item.solution, matchpattern=item.matchpattern or "")
