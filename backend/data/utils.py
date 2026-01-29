@@ -1,5 +1,5 @@
 from __future__ import annotations
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import String, Text, DateTime, Index
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from typing import Optional
@@ -100,7 +100,7 @@ class Base(DeclarativeBase):
 
 class DataItemEntity(Base):
     id: Mapped[str] = mapped_column(String(32), primary_key=True)  # 16-char uppercase hex string
-    timestamp: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     category: Mapped[str] = mapped_column(String(64), nullable=False, default="critical")
     source: Mapped[str] = mapped_column(String(255), nullable=False, default="")
     message: Mapped[str] = mapped_column(Text, nullable=False, default="")
@@ -111,6 +111,8 @@ class DataItemEntity(Base):
     __table_args__ = ( Index("ix_records_source_category", "source", "category"), ) # 1-item tuple
 
     def to_data_item(self) -> DataItem:
+        if self.timestamp.tzinfo is None:
+            self.timestamp = self.timestamp.replace(tzinfo=timezone.utc)
         return DataItem(self.timestamp, self.category, self.source, self.message, self.solution, self.matchpattern, self.id)
 
     @staticmethod
