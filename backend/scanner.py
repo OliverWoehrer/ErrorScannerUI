@@ -165,13 +165,12 @@ class Scanner():
         logs_data.clear() # clear previous logs
 
     def stop(self, signum, frame):
-        print(f"Stopping scanner...")
+        print(f"Stop scanner.")
         self.stop_event.set()
 
     def run(self):
         # Register Signal Handler:
         signal.signal(signal.SIGTERM, self.stop) # signal from OS
-        signal.signal(signal.SIGINT, self.stop) # signal from keyboard interrupt, e.g. CTRL+C
         
         # Read Filter Lists:
         whitelist = config_data.docker_interface_whitelist()
@@ -219,7 +218,10 @@ class Scanner():
 
             # Wait Before Next Iteration:
             interval = config_data.scanner_interval()
-            self.stop_event.wait(interval) # wait until the stop event is set, but at most 'interval' seconds
+            try:
+                self.stop_event.wait(interval) # wait until the stop event is set, but at most 'interval' seconds
+            except KeyboardInterrupt as e:
+                pass
 
     """
     Private Methods
@@ -445,5 +447,6 @@ class Scanner():
 scanner = Scanner()
 
 if __name__ == "__main__":
+    signal.signal(signal.SIGINT, scanner.stop) # signal from keyboard interrupt, e.g. CTRL+C
     scanner.run()
-    print("Scanner stopped.")
+    print("Good bye!")
