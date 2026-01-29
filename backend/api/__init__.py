@@ -4,7 +4,7 @@ This module implements the functions to handle routes of /api
 from .form import form
 from .file import file
 from data import logs_data, records_data, DataItem
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from flask import Blueprint, Response, request, current_app
 import json
 from pathlib import Path
@@ -65,12 +65,12 @@ def parse_items(items: list[DataItem]):
         except TypeError as e:
             raise RuntimeError(f"Could not serialize JSON. {e}")
 
-def generate_logs(num_items: int = 20, with_solution: bool = False):
+def generate_items(num_items: int = 20, with_solution: bool = False):
     """
     A generator that yields JSON Line strings with a delay.
     """
-    START_DATE = datetime(2025, 10, 25)
-    END_DATE = datetime(2025, 10, 31)
+    START_DATE = datetime(2025, 10, 25, tzinfo=timezone.utc)
+    END_DATE = datetime(2025, 10, 31, tzinfo=timezone.utc)
     TIME_RANGE_SECONDS = int((END_DATE - START_DATE).total_seconds())
     SOLUTIONS = [
         "### ⚠️ Critical Resolution\nThe database connection pool is exhausted.\n\n**Immediate Actions:**\n* [ ] Check `max_connections` in postgresql.conf\n* [ ] Restart service: `docker restart thirsty-wombat` \n\n> **Note:** Do not manually kill the PID unless the container fails to stop.",
@@ -82,19 +82,22 @@ def generate_logs(num_items: int = 20, with_solution: bool = False):
         None
     ]
 
+    items = []
     for idx in range(0, num_items):
+        # Select Random Data:
         random_offset = random.randint(0, TIME_RANGE_SECONDS*1000)
-        log_item = {
-            "id": str(idx),
-            "timestamp": (START_DATE + timedelta(milliseconds=random_offset)).isoformat(),
-            "category": random.choice(["critical","error","warning","info","debug"]),
-            "source": random.choice(["Thirsty-Wombat","Jumpy-Giraffe","Sleepy-Koala"]),
-            "message": random.choice(["User 'alice' attempted to access restricted resource /admin/settings.", "Database connection pool initialized successfully with 10 connections.", "Failed to serialize response object for container 'zealous-pony': null value found in required field 'name'.", "Starting garbage collection cycle. Memory usage before: 128MB.", "System wide disk space usage exceeded 95%. Automated cleanup initiated.", "Mounted disk with 128MB."]),
-            "solution": random.choice(SOLUTIONS) if with_solution else None
-        }
-        json_line = json.dumps(log_item) + "\r\n"        
-        yield json_line.encode('utf-8') # yield the string (Flask sends this chunk immediately)
-        time.sleep(1/num_items)
+        timestamp = (START_DATE + timedelta(milliseconds=random_offset))
+        category = random.choice(["critical","error","warning","info","debug"])
+        source = random.choice(["Thirsty-Wombat","Jumpy-Giraffe","Sleepy-Koala"])
+        message = random.choice(["User 'alice' attempted to access restricted resource /admin/settings.", "Database connection pool initialized successfully with 10 connections.", "Failed to serialize response object for container 'zealous-pony': null value found in required field 'name'.", "Starting garbage collection cycle. Memory usage before: 128MB.", "System wide disk space usage exceeded 95%. Automated cleanup initiated.", "Mounted disk with 128MB."])
+        solution = random.choice(SOLUTIONS) if with_solution else None
+
+        # Create Item
+        item = DataItem(timestamp,category,source,message,solution,id=idx)
+        items.append(item)
+
+    return items
+    
 
 
 
