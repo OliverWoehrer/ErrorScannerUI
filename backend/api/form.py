@@ -250,13 +250,17 @@ def database():
         body = request.data.decode("utf-8")
         payload = json.loads(body)
 
+        if "protocol" in payload:
+            config_data.database_protocol(payload["protocol"])
+        if "user" in payload:
+            config_data.database_user(payload["user"])
+        if "pwd" in payload:
+            config_data.database_pwd(payload["pwd"])
         if "host" in payload:
             config_data.database_host(payload["host"])
         if "port" in payload:
             config_data.database_port(payload["port"])
         if "path" in payload:
             config_data.database_path(payload["path"])
-        if "key" in payload:
-            config_data.database_key(payload["key"])
 
         return "OK", 200

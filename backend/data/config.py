@@ -109,14 +109,14 @@ class ConfigHandler:
             scanner["logging"] = logging_list
             self.scanner(scanner)
             return None
-        return scanner.get("logging", ["debug"])
+        return scanner.get("logging", ["critical","error","warning"])
     def scanner_recording(self, recording_list: list[str] | None = None) -> list[str] | None:
         scanner = self.scanner()
         if recording_list is not None:
             scanner["recording"] = recording_list
             self.scanner(scanner)
             return None
-        return scanner.get("recording", [])
+        return scanner.get("recording", ["critical","error"])
 
     
     # --- Disk Usage ---
@@ -145,13 +145,34 @@ class ConfigHandler:
             self._store_config(config)
             return None
         return config.get("database", {})
+    def database_protocol(self, protocol: str | None = None) -> str | None:
+        database = self.database()
+        if protocol is not None:
+            database["protocol"] = protocol
+            self.database(database)
+            return None
+        return database.get("protocol", "")
+    def database_user(self, user: str | None = None) -> str | None:
+        database = self.database()
+        if user is not None:
+            database["user"] = user
+            self.database(database)
+            return None
+        return database.get("user", "")
+    def database_pwd(self, pwd: str | None = None) -> str | None:
+        database = self.database()
+        if pwd is not None:
+            database["pwd"] = pwd
+            self.database(database)
+            return None
+        return database.get("pwd", "")
     def database_host(self, host: str | None = None) -> str | None:
         database = self.database()
         if host is not None:
             database["host"] = host
             self.database(database)
             return None
-        return database.get("host", "localhost")
+        return database.get("host", "")
     def database_port(self, port: str | None = None) -> str | None:
         """Getter/Setter for 'database.port' (kept as string per config)."""
         database = self.database()
@@ -167,14 +188,8 @@ class ConfigHandler:
             database["path"] = path
             self.database(database)
             return None
-        return database.get("path", "/")
-    def database_key(self, key: str | None = None) -> str | None:
-        database = self.database()
-        if key is not None:
-            database["key"] = key
-            self.database(database)
-            return None
-        return database.get("key", "")
+        return database.get("path", "")
+    
     
     """
     Private Methods:

@@ -660,6 +660,27 @@ export function SettingsPage() {
         const {isLoading,data,reloadData} = useFetchData(endpoint);
 
         // Conditional Rendering:
+        const Protocol = (isLoading || !data) ? (
+            <mdui-text-field label="Protocol" disabled>
+                <mdui-button-icon slot="icon" disabled loading></mdui-button-icon>
+            </mdui-text-field>
+        ) : (
+            <mdui-text-field label="Protocol" name="protocol" value={data.protocol} defaultValue={data.protocol}></mdui-text-field>
+        );
+        const User = (isLoading || !data) ? (
+            <mdui-text-field label="User" disabled>
+                <mdui-button-icon slot="icon" disabled loading></mdui-button-icon>
+            </mdui-text-field>
+        ) : (
+            <mdui-text-field label="User" name="user" value={data.user} defaultValue={data.user}></mdui-text-field>
+        );
+        const Pwd = (isLoading || !data) ? (
+            <mdui-text-field label="Password" disabled>
+                <mdui-button-icon slot="icon" disabled loading></mdui-button-icon>
+            </mdui-text-field>
+        ) : (
+            <mdui-text-field label="Password" name="pwd" value={data.pwd} defaultValue={data.pwd}></mdui-text-field>
+        );
         const Host = (isLoading || !data) ? (
             <mdui-text-field label="Host" disabled>
                 <mdui-button-icon slot="icon" disabled loading></mdui-button-icon>
@@ -681,20 +702,23 @@ export function SettingsPage() {
         ) : (
             <mdui-text-field label="Path" name="path" value={data.path} defaultValue={data.path}></mdui-text-field>
         );
-        const Key = (isLoading || !data) ? (
-            <mdui-text-field label="Key" disabled>
-                <mdui-button-icon slot="icon" disabled loading></mdui-button-icon>
-            </mdui-text-field>
-        ) : (
-            <mdui-text-field label="Key" name="key" value={data.key} defaultValue={data.key}></mdui-text-field>
-        );
 
         return(
             <mdui-card variant="elevated">
                 <TextForm action={endpoint} submitButtonText="Save changes" resetButtonText="Discard changes" onSuccess={reloadData}>
                     <mdui-top-app-bar-title>Database</mdui-top-app-bar-title>
                     <h4>Endpoint</h4>
-                    <span>Set the URL and port of the database interface</span>
+                    <span>Set the URL for the remote database. If no parameters are set, the system uses a local database file.</span><br/>
+                    <span>Format: <code>[protocol]://[user]:[password]@[host]:[port]/[path]</code></span>
+                    <section>
+                        {Protocol}
+                    </section>
+                    <section>
+                        {User}
+                    </section>
+                    <section>
+                        {Pwd}
+                    </section>
                     <section>
                         {Host}
                     </section>
@@ -703,9 +727,6 @@ export function SettingsPage() {
                     </section>
                     <section>
                         {Path}
-                    </section>
-                    <section>
-                        {Key}
                     </section>
                 </TextForm>
             </mdui-card>
