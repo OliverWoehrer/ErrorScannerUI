@@ -156,10 +156,10 @@ class Scanner():
             docker.from_env()
         except docker.errors.DockerException:
             host = os.environ.get("DOCKER_HOST")
-            raise RuntimeError(f"Could not initialize the docker client!\r\n" \
-                f"Make sure the Docker daemon is running.\r\n" \
-                f"Make sure the environment variable 'DOCKER_HOST' points to your Docker daemon.\r\n" \
-                f"DOCKER_HOST = '{host}'")
+            raise RuntimeError(f"Could not initialize the docker client! Here are things to check:\r\n" \
+                f"> Make sure the Docker daemon is running.\r\n" \
+                f"> Make sure the environment variable 'DOCKER_HOST' points to your Docker daemon.\r\n" \
+                f"  current variable: DOCKER_HOST = '{host}'") from None
         
         # Initialize Data Collections:
         logs_data.clear() # clear previous logs
