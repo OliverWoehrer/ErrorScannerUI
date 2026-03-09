@@ -334,12 +334,12 @@ class DatePicker extends HTMLElement {
     }
 
     /**
-     * Updates the currenlty selected date. The 'select' event is not emitted.
+     * Updates the currently selected date. The 'select' event is not emitted.
      * @param {Date} date selected object to update
      */
     set selectedDateObj(date) {
         console.assert(date instanceof Date, "Given date has to be of type 'Date'");
-        this.#selectDateValue(date.getDate(), date.getMonth(), date.getFullYear(), false); // dont emit 'select' event
+        this.#selectDateValue(date.getDate(), date.getMonth(), date.getFullYear(), false); // do not emit 'select' event
     }
 
     /**
@@ -351,14 +351,14 @@ class DatePicker extends HTMLElement {
     }
 
     /**
-     * Updates the currenlty confirmed date. Updating the confirmed date automatically updates the
+     * Updates the currently confirmed date. Updating the confirmed date automatically updates the
      * selected date. The events 'select' and 'confirm' are not emitted.
      * @param {Date} date confirmedDate date object
      */
     set confirmedDateObj(date) {
         console.assert(date instanceof Date, "Given date has to be of type 'Date'");
-        this.#selectDateValue(date.getDate(), date.getMonth(), date.getFullYear(), false); // dont emit 'select' event
-        this.#confirmDateValue(false); // dont emit 'confirm' event
+        this.#selectDateValue(date.getDate(), date.getMonth(), date.getFullYear(), false); // do not emit 'select' event
+        this.#confirmDateValue(false); // do not emit 'confirm' event
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -672,7 +672,7 @@ class DatePicker extends HTMLElement {
     }
 
     /**
-     * Extracts a readble string from the the given date
+     * Extracts a readable string from the the given date
      * @param {Date} date date object to stringify
      * @returns string in format "18. Oct 2025"
      */
