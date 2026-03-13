@@ -46,7 +46,7 @@ def my_traceback(exception: Exception) -> str:
         if not is_ignored:
             filtered_frames.append(frame) # only append if under PROJECT_ROOT but not in IGNORE_DIRS
 
-    # Return Formated Stracktrace:
+    # Return Formatted Stacktrace:
     if filtered_frames:
         header = "Traceback:"
         content = "".join(traceback.format_list(filtered_frames))
@@ -67,7 +67,7 @@ def parse_items(items: list[DataItem]):
 
 def generate_items(num_items: int = 20, with_solution: bool = False):
     """
-    A generator that yields JSON Line strings with a delay.
+    A generator that yields JSON Line strings with a delay. Only used for testing.
     """
     START_DATE = datetime(2025, 10, 25, tzinfo=timezone.utc)
     END_DATE = datetime(2025, 10, 31, tzinfo=timezone.utc)
@@ -148,11 +148,11 @@ def records():
 
 @api.errorhandler(Exception)
 def error(e: Exception):
-    if isinstance(e, HTTPException): # display HTTP errors
+    if isinstance(e, HTTPException): # HTTP errors are raised on purpose by the implementation
         msg = f"{e.code} {e.name}: {e.description}\r\n{my_traceback(e)}"
         current_app.logger.error(msg)
-        return e.description, e.code
-    else: # do not return message about unknown errors
+        return e.description, e.code # display HTTP error
+    else: # unknown errors indicate a critical unexpected problem
         msg = f"{e}\r\n{my_traceback(e)}"
         current_app.logger.error(msg)
-        return "Unhandled Error", 500
+        return "Unhandled Error", 500 # do not return message about unknown errors
