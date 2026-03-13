@@ -18,8 +18,8 @@ class SimilarityMatcher:
     This implements a data structure to efficiently match and compare a collection of DataItem. It
     uses a weighted Jaccard matrix to compare two strings. The parameter alpha helps to balance
     between string length and similar junks of words.
-    The data structur of the SimilarityMatcher needs to be filled (load_items) before it can be
-    used. Each comparision gives a similarity score between 0...1
+    The data structure of the SimilarityMatcher needs to be filled (load_items) before it can be
+    used. Each comparison gives a similarity score between 0...1
     """
     def __init__(self, alpha: float = 0.5):
         """
@@ -94,9 +94,9 @@ class SimilarityMatcher:
         alpha low (0.1) ignores extra junk, good for skeleton-only matches.
         """
         vecA, vecB = SimilarityMatcher.vectorize(msgA), SimilarityMatcher.vectorize(msgB)
-        wj = SimilarityMatcher.weighted_jaccard(vecA, vecB)
-        cont = SimilarityMatcher.containment(vecA, vecB)
-        return self.alpha * wj + (1 - self.alpha) * cont
+        jaccard = SimilarityMatcher.weighted_jaccard(vecA, vecB)
+        contain = SimilarityMatcher.containment(vecA, vecB)
+        return self.alpha * jaccard + (1 - self.alpha) * contain
     
     """
     Static Methods
@@ -104,15 +104,38 @@ class SimilarityMatcher:
 
     @staticmethod
     def weight_token(token: str) -> float:
+        """
+        Tells the weight of the given token. Tokens that are natural human words are most likely
+        skeleton tokens and therefore considered more important. They get the weight 1.0. Tokens
+        that are longer than 15 characters (likely no natural word), include numbers or include
+        special characters are considered highly variable tokens. They get the weight 0.1. Other
+        tokens, that do not fall into either of these two categories, get a weight of 0.5.
+        :param token: Token to find the weight for
+        :type token: str
+        :return: Weight of the given token. Skeleton tokens get 1.0. Variable tokens get 0.1.
+        :rtype: float
+        """
         # Simple heuristic: skeleton words get 1.0, variable tokens get 0.1
         if token.isalpha() and len(token) <= 15:
-            return 1.0
+            return 1.0 # very likely a natural word
         if len(token) > 15 or any(c.isdigit() for c in token) or "/" in token or "\\" in token:
-            return 0.1
-        return 0.5
+            return 0.1 # very likely an ID, path, etc.
+        return 0.5 # unsure, return half weight as fallback
 
     @staticmethod
     def vectorize(text: str) -> dict[str, float]:
+        """
+        Takes the given text and splits it into tokens. Each token gets a weight between 0 and 1.
+        More important tokens have a higher weight. A token is essentially a word or a section
+        of the text, separated by whitespaces. A file path ("/my/file/path") is considered a
+        single token. An ID with letters and numbers ("AB123CD") is considered one token. An e-mail
+        address is considered one token.
+
+        :param text: Text to vectorize
+        :type text: str
+        :return: Dictionary of tokens mapped to their weight.
+        :rtype: Dictionary of strings mapped to float weights (0...1)
+        """
         TOKEN_REGEX = re.compile(r"[A-Za-z0-9_/.\-@:]+")
         tokens = TOKEN_REGEX.findall(text)
         vec = {}
@@ -123,13 +146,41 @@ class SimilarityMatcher:
 
     @staticmethod
     def weighted_jaccard(vecA: dict[str, float], vecB: dict[str, float]) -> float:
-        keys = set(vecA) | set(vecB)
+        """
+        The standard Jaccard index usually measures the size of the intersection divided by the
+        size of the union. In a weighted version, we aren't just counting tokens; we are summing
+        their importance.
+        The Numerator (Intersection): sum(min(weightA, weightB)). This calculates the shared "mass"
+        between the two strings. If a word exists in both, it contributes its weight. If it only
+        exists in one, it contributes 0.
+        The Denominator (Union): sum(max(weightA, weightB)). This represents the total "mass"
+        covered by both strings combined.
+
+        :param vecA: vectorized text A
+        :type text: Dictionary of strings mapped to float weights (0...1)
+        :param vecA: vectorized text B
+        :type text: Dictionary of strings mapped to float weights (0...1)
+        :return: weighted jaccard similarity between 0...1
+        :rtype: float
+        """
+        keys = set(vecA) | set(vecB) # join both sets of weighted tokens
         num = sum(min(vecA.get(k, 0), vecB.get(k, 0)) for k in keys)
         den = sum(max(vecA.get(k, 0), vecB.get(k, 0)) for k in keys)
         return num / den if den > 0 else 0.0
 
     @staticmethod
     def containment(vecA: dict[str, float], vecB: dict[str, float]) -> float:
+        """
+        Tells if text B contains the important parts of text A, regardless of how much variable
+        noise there is in B.
+
+        param vecA: vectorized text A
+        :type text: Dictionary of strings mapped to float weights (0...1)
+        :param vecA: vectorized text B
+        :type text: Dictionary of strings mapped to float weights (0...1)
+        :return: containment score between 0...1
+        :rtype: float
+        """
         num = sum(min(vecA.get(k, 0), vecB.get(k, 0)) for k in vecA)
         den = sum(vecA.values())
         return num / den if den > 0 else 0.0
@@ -253,7 +304,7 @@ class Scanner():
                 file = open("/etc/hostname", "r")
                 container_id = file.read().strip()
             except FileNotFoundError:
-                print("Not running inside a Docker container or could not get container ID. Scanning all networks...\r\nTo prevent this pass a network name.")
+                print("Not running inside a Docker container. Scanning all available networks...\r\nTo stop this behavior, pass a network name.")
             else:
                 try: # find networks for this container id
                     container = client.containers.get(container_id)
