@@ -1,0 +1,47 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Scanner",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/backend",
+            "program": "scanner.py",
+            "console": "integratedTerminal",
+            // "args": ["--network", "lognet"],
+            "env": {
+                "DOCKER_HOST": "unix:///home/oliver/.docker/desktop/docker.sock"
+            }
+        },
+        {
+            "name": "Python: Flask Server",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/backend",
+            "python": "${workspaceFolder}/backend/.venv/bin/python",
+            "program": "app.py",
+            "console": "integratedTerminal",
+        },
+        {
+            "name": "Node: Frontend Dev",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/frontend",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run","dev"],
+            "console": "integratedTerminal",
+            "skipFiles": ["<node_internals>/**"]
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Fullstack Debug",
+            "configurations": [
+                "Python: Scanner",
+                "Python: Flask Server",
+                "Node: Frontend Dev"
+            ],
+            "stopAll": true
+        }
+    ]
+}

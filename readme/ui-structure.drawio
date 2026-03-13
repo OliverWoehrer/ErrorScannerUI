@@ -1,0 +1,751 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0" version="29.6.1" pages="3">
+  <diagram id="JFn7U73DRTHOjZDLhj83" name="Composition">
+    <mxGraphModel dx="2852" dy="1554" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-55" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;FileForm&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot; style=&quot;color: rgb(179, 179, 179);&quot;&gt;Forms.jsx&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="120" x="820" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-6" parent="qsLpW7yq9MMB_SkXqiyd-55" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="action: String" vertex="1">
+          <mxGeometry height="30" width="120" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-9" parent="qsLpW7yq9MMB_SkXqiyd-55" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onSuccess: function" vertex="1">
+          <mxGeometry height="30" width="120" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-20" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;SettingsPage&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot; style=&quot;color: rgb(179, 179, 179);&quot;&gt;Pages.jsx&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="820" y="240" as="geometry">
+            <mxRectangle height="40" width="110" x="660" y="280" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-10" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;LogsPage&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot; style=&quot;color: rgb(179, 179, 179);&quot;&gt;Pages.jsx&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="80" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-17" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;RecordsPage&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot; style=&quot;color: rgb(179, 179, 179);&quot;&gt;Pages.jsx&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="200" y="240" as="geometry">
+            <mxRectangle height="40" width="110" x="880" y="270" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-51" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;Filters&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;Filters.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="180" x="70" y="770" as="geometry">
+            <mxRectangle height="40" width="180" x="780" y="600" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-10" parent="qsLpW7yq9MMB_SkXqiyd-51" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="items: List&amp;lt;DataItem&amp;gt;" vertex="1">
+          <mxGeometry height="30" width="180" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-11" parent="qsLpW7yq9MMB_SkXqiyd-51" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="updateFilteredItems: function" vertex="1">
+          <mxGeometry height="30" width="180" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-38" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;LogItemView&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;ItemViews.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="160" x="460" y="350" as="geometry">
+            <mxRectangle height="40" width="130" x="1270" y="620" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-39" parent="qsLpW7yq9MMB_SkXqiyd-38" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="item: DataItem" vertex="1">
+          <mxGeometry height="30" width="160" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-40" parent="qsLpW7yq9MMB_SkXqiyd-38" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onClick: function" vertex="1">
+          <mxGeometry height="30" width="160" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-41" parent="qsLpW7yq9MMB_SkXqiyd-38" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="isSelected: boolean" vertex="1">
+          <mxGeometry height="30" width="160" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-42" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;RecordItemView&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;ItemViews.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="160" x="280" y="350" as="geometry">
+            <mxRectangle height="40" width="130" x="1120" y="620" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-43" parent="qsLpW7yq9MMB_SkXqiyd-42" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="item: DataItem" vertex="1">
+          <mxGeometry height="30" width="160" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-44" parent="qsLpW7yq9MMB_SkXqiyd-42" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onUpdate: function" vertex="1">
+          <mxGeometry height="30" width="160" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-45" parent="qsLpW7yq9MMB_SkXqiyd-42" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onDelete: function" vertex="1">
+          <mxGeometry height="30" width="160" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-46" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;ItemFormView&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;ItemViews.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="160" x="640" y="350" as="geometry">
+            <mxRectangle height="40" width="130" x="1420" y="620" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-47" parent="qsLpW7yq9MMB_SkXqiyd-46" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="item: DataItem" vertex="1">
+          <mxGeometry height="30" width="160" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-48" parent="qsLpW7yq9MMB_SkXqiyd-46" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onSuccess: function" vertex="1">
+          <mxGeometry height="30" width="160" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-49" parent="qsLpW7yq9MMB_SkXqiyd-46" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onReset: function" vertex="1">
+          <mxGeometry height="30" width="160" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-23" edge="1" parent="1" source="qsLpW7yq9MMB_SkXqiyd-10" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" target="qsLpW7yq9MMB_SkXqiyd-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-24" edge="1" parent="1" source="qsLpW7yq9MMB_SkXqiyd-20" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" target="qsLpW7yq9MMB_SkXqiyd-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-25" edge="1" parent="1" source="qsLpW7yq9MMB_SkXqiyd-17" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="qsLpW7yq9MMB_SkXqiyd-6">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="250" y="140" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-52" edge="1" parent="1" source="qsLpW7yq9MMB_SkXqiyd-51" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="xUyRzYsylzXiXw_XhcAR-21">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-30" y="530" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-56" edge="1" parent="1" source="qsLpW7yq9MMB_SkXqiyd-54" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" target="qsLpW7yq9MMB_SkXqiyd-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-57" edge="1" parent="1" source="qsLpW7yq9MMB_SkXqiyd-55" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" target="qsLpW7yq9MMB_SkXqiyd-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-13" edge="1" parent="1" source="qsLpW7yq9MMB_SkXqiyd-54" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="qsLpW7yq9MMB_SkXqiyd-38">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-14" edge="1" parent="1" source="qsLpW7yq9MMB_SkXqiyd-54" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="qsLpW7yq9MMB_SkXqiyd-42">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="295" y="679.9999999999998" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-15" edge="1" parent="1" source="qsLpW7yq9MMB_SkXqiyd-54" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="qsLpW7yq9MMB_SkXqiyd-46">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-27" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;LogItemListView&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;ItemViews.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="150" x="1290" y="350" as="geometry">
+            <mxRectangle height="40" width="130" x="1430" y="330" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-28" parent="qsLpW7yq9MMB_SkXqiyd-27" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="item: DataItem" vertex="1">
+          <mxGeometry height="30" width="150" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-29" parent="qsLpW7yq9MMB_SkXqiyd-27" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onClick: function" vertex="1">
+          <mxGeometry height="30" width="150" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-30" parent="qsLpW7yq9MMB_SkXqiyd-27" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="isSelected: boolean" vertex="1">
+          <mxGeometry height="30" width="150" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-31" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;RecordItemListView&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;ItemViews.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="150" x="1120" y="350" as="geometry">
+            <mxRectangle height="40" width="150" x="1260" y="330" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-32" parent="qsLpW7yq9MMB_SkXqiyd-31" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="item: DataItem" vertex="1">
+          <mxGeometry height="30" width="150" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-33" parent="qsLpW7yq9MMB_SkXqiyd-31" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onClick: function" vertex="1">
+          <mxGeometry height="30" width="150" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-34" parent="qsLpW7yq9MMB_SkXqiyd-31" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="isSelected: boolean" vertex="1">
+          <mxGeometry height="30" width="150" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-2" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;App&lt;/div&gt;&lt;font face=&quot;Courier New&quot; style=&quot;color: rgb(179, 179, 179);&quot;&gt;App.jsx&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="140" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-4" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;Navigation&lt;/div&gt;&lt;font face=&quot;Courier New&quot; style=&quot;color: rgb(179, 179, 179);&quot;&gt;App.jsx&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="80" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-6" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;PageWrapper&lt;/div&gt;&lt;font face=&quot;Courier New&quot; style=&quot;color: rgb(179, 179, 179);&quot;&gt;App.jsx&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="100" x="200" y="100" as="geometry">
+            <mxRectangle height="40" width="110" x="985" y="140" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-7" parent="qsLpW7yq9MMB_SkXqiyd-6" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="path" vertex="1">
+          <mxGeometry height="30" width="100" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-3" edge="1" parent="1" source="qsLpW7yq9MMB_SkXqiyd-4" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;strokeColor=#000000;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" target="qsLpW7yq9MMB_SkXqiyd-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-5" edge="1" parent="1" source="qsLpW7yq9MMB_SkXqiyd-6" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;strokeColor=#000000;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" target="qsLpW7yq9MMB_SkXqiyd-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-29" edge="1" parent="1" source="xUyRzYsylzXiXw_XhcAR-21" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="qsLpW7yq9MMB_SkXqiyd-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-30" edge="1" parent="1" source="xUyRzYsylzXiXw_XhcAR-21" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="qsLpW7yq9MMB_SkXqiyd-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l0Y3DRoC1lEocF4mifvV-2" edge="1" parent="1" source="xUyRzYsylzXiXw_XhcAR-32" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="qsLpW7yq9MMB_SkXqiyd-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-32" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;FeedLayout&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;Pages.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="180" width="180" x="890" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-33" parent="xUyRzYsylzXiXw_XhcAR-32" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="isLoading: Boolean" vertex="1">
+          <mxGeometry height="30" width="180" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-34" parent="xUyRzYsylzXiXw_XhcAR-32" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="items: List&amp;lt;DataItem&amp;gt;" vertex="1">
+          <mxGeometry height="30" width="180" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-35" parent="xUyRzYsylzXiXw_XhcAR-32" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="Header: JSX.Element" vertex="1">
+          <mxGeometry height="30" width="180" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-36" parent="xUyRzYsylzXiXw_XhcAR-32" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="ListView: React.Component" vertex="1">
+          <mxGeometry height="30" width="180" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-37" parent="xUyRzYsylzXiXw_XhcAR-32" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="DetailsView: React.Component" vertex="1">
+          <mxGeometry height="30" width="180" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="qsLpW7yq9MMB_SkXqiyd-54" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;TextForm&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot; style=&quot;color: rgb(179, 179, 179);&quot;&gt;Forms.jsx&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="180" width="160" x="640" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-1" parent="qsLpW7yq9MMB_SkXqiyd-54" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="action: String" vertex="1">
+          <mxGeometry height="30" width="160" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-2" parent="qsLpW7yq9MMB_SkXqiyd-54" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="submitButtonText: String" vertex="1">
+          <mxGeometry height="30" width="160" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-3" parent="qsLpW7yq9MMB_SkXqiyd-54" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="resetButtonText: String" vertex="1">
+          <mxGeometry height="30" width="160" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-4" parent="qsLpW7yq9MMB_SkXqiyd-54" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onSuccess: function" vertex="1">
+          <mxGeometry height="30" width="160" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-5" parent="qsLpW7yq9MMB_SkXqiyd-54" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onReset: function" vertex="1">
+          <mxGeometry height="30" width="160" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-21" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;ListDetailsLayout&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;Pages.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="180" width="180" x="70" y="350" as="geometry">
+            <mxRectangle height="40" width="180" x="780" y="370" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-22" parent="xUyRzYsylzXiXw_XhcAR-21" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="isLoading: Boolean" vertex="1">
+          <mxGeometry height="30" width="180" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-23" parent="xUyRzYsylzXiXw_XhcAR-21" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="items: List&amp;lt;DataItem&amp;gt;" vertex="1">
+          <mxGeometry height="30" width="180" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-24" parent="xUyRzYsylzXiXw_XhcAR-21" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="Header: JSX.Element" vertex="1">
+          <mxGeometry height="30" width="180" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-25" parent="xUyRzYsylzXiXw_XhcAR-21" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="ListView: React.Component" vertex="1">
+          <mxGeometry height="30" width="180" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="xUyRzYsylzXiXw_XhcAR-27" parent="xUyRzYsylzXiXw_XhcAR-21" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="DetailsView: React.Component" vertex="1">
+          <mxGeometry height="30" width="180" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="l0Y3DRoC1lEocF4mifvV-13" edge="1" parent="1" source="l0Y3DRoC1lEocF4mifvV-3" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="qsLpW7yq9MMB_SkXqiyd-51">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="100.04761904761904" y="835" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l0Y3DRoC1lEocF4mifvV-20" edge="1" parent="1" source="l0Y3DRoC1lEocF4mifvV-3" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="l0Y3DRoC1lEocF4mifvV-15">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="410" y="845" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l0Y3DRoC1lEocF4mifvV-3" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;DatePicker&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;Pickers.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="150" width="120" x="100" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="l0Y3DRoC1lEocF4mifvV-4" parent="l0Y3DRoC1lEocF4mifvV-3" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="name: String" vertex="1">
+          <mxGeometry height="30" width="120" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="l0Y3DRoC1lEocF4mifvV-5" parent="l0Y3DRoC1lEocF4mifvV-3" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="readonly: Boolean" vertex="1">
+          <mxGeometry height="30" width="120" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="l0Y3DRoC1lEocF4mifvV-6" parent="l0Y3DRoC1lEocF4mifvV-3" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="datetimeObj: Date" vertex="1">
+          <mxGeometry height="30" width="120" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="l0Y3DRoC1lEocF4mifvV-7" parent="l0Y3DRoC1lEocF4mifvV-3" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onConfirm: function" vertex="1">
+          <mxGeometry height="30" width="120" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="l0Y3DRoC1lEocF4mifvV-14" edge="1" parent="1" source="l0Y3DRoC1lEocF4mifvV-8" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="qsLpW7yq9MMB_SkXqiyd-51">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="215" y="765" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l0Y3DRoC1lEocF4mifvV-21" edge="1" parent="1" source="l0Y3DRoC1lEocF4mifvV-8" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="l0Y3DRoC1lEocF4mifvV-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l0Y3DRoC1lEocF4mifvV-8" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;TimePicker&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;Pickers.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="150" width="120" x="300" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="l0Y3DRoC1lEocF4mifvV-9" parent="l0Y3DRoC1lEocF4mifvV-8" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="name: String" vertex="1">
+          <mxGeometry height="30" width="120" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="l0Y3DRoC1lEocF4mifvV-10" parent="l0Y3DRoC1lEocF4mifvV-8" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="readonly: Boolean" vertex="1">
+          <mxGeometry height="30" width="120" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="l0Y3DRoC1lEocF4mifvV-11" parent="l0Y3DRoC1lEocF4mifvV-8" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="datetimeObj: Date" vertex="1">
+          <mxGeometry height="30" width="120" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="l0Y3DRoC1lEocF4mifvV-12" parent="l0Y3DRoC1lEocF4mifvV-8" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onConfirm: function" vertex="1">
+          <mxGeometry height="30" width="120" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="FiGo-xwpuf1pKscWUQPZ-2" edge="1" parent="1" source="l0Y3DRoC1lEocF4mifvV-15" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="qsLpW7yq9MMB_SkXqiyd-42">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="FiGo-xwpuf1pKscWUQPZ-3" edge="1" parent="1" source="l0Y3DRoC1lEocF4mifvV-15" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="qsLpW7yq9MMB_SkXqiyd-38">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="FiGo-xwpuf1pKscWUQPZ-4" edge="1" parent="1" source="l0Y3DRoC1lEocF4mifvV-15" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="qsLpW7yq9MMB_SkXqiyd-46">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l0Y3DRoC1lEocF4mifvV-15" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;TemplateView&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: light-dark(rgb(179, 179, 179), rgb(83, 83, 83)); font-family: &amp;quot;Courier New&amp;quot;; background-color: transparent;&quot;&gt;ItemViews.jsx&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="180" x="270" y="770" as="geometry">
+            <mxRectangle height="40" width="130" x="990" y="600" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l0Y3DRoC1lEocF4mifvV-16" parent="l0Y3DRoC1lEocF4mifvV-15" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="initialItem: DataItem" vertex="1">
+          <mxGeometry height="30" width="180" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="l0Y3DRoC1lEocF4mifvV-17" parent="l0Y3DRoC1lEocF4mifvV-15" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="readonly: Boolean" vertex="1">
+          <mxGeometry height="30" width="180" y="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="0WoJqE1iPOLZk4p_HDil" name="Injection">
+    <mxGraphModel dx="2593" dy="1413" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="YiVUUJRDAeYKjOAPCBX4-1" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;LogsPage&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;Pages.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="300" width="410" x="40" y="40" as="geometry">
+            <mxRectangle height="40" width="180" x="780" y="370" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="0U0tzAG5SxCv_tlCy0mX-1" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;ListDetailsLayout&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;Pages.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="180" width="180" x="60" y="90" as="geometry">
+            <mxRectangle height="40" width="180" x="780" y="370" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="0U0tzAG5SxCv_tlCy0mX-2" parent="0U0tzAG5SxCv_tlCy0mX-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="isLoading: Boolean" vertex="1">
+          <mxGeometry height="30" width="180" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="0U0tzAG5SxCv_tlCy0mX-3" parent="0U0tzAG5SxCv_tlCy0mX-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="items: List&amp;lt;DataItem&amp;gt;" vertex="1">
+          <mxGeometry height="30" width="180" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="0U0tzAG5SxCv_tlCy0mX-4" parent="0U0tzAG5SxCv_tlCy0mX-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="Header: JSX.Element" vertex="1">
+          <mxGeometry height="30" width="180" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="0U0tzAG5SxCv_tlCy0mX-5" parent="0U0tzAG5SxCv_tlCy0mX-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="ListView: React.Component" vertex="1">
+          <mxGeometry height="30" width="180" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="0U0tzAG5SxCv_tlCy0mX-6" parent="0U0tzAG5SxCv_tlCy0mX-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="DetailsView: React.Component" vertex="1">
+          <mxGeometry height="30" width="180" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-6" edge="1" parent="1" source="IH_pJKN0rES_DJNO8qiQ-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;curved=1;" target="0U0tzAG5SxCv_tlCy0mX-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=none;" value="LogItemListView&lt;div&gt;&lt;span style=&quot;color: rgb(179, 179, 179); font-family: &amp;quot;Courier New&amp;quot;;&quot;&gt;ItemViews.jsx&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="120" x="310" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-8" edge="1" parent="1" source="IH_pJKN0rES_DJNO8qiQ-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;curved=1;dashed=1;" target="0U0tzAG5SxCv_tlCy0mX-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=none;" value="LogItemView&lt;div&gt;&lt;span style=&quot;color: rgb(179, 179, 179); font-family: &amp;quot;Courier New&amp;quot;;&quot;&gt;ItemViews.jsx&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="120" x="310" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-11" edge="1" parent="1" source="IH_pJKN0rES_DJNO8qiQ-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;curved=1;dashed=1;" target="0U0tzAG5SxCv_tlCy0mX-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-10" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=none;" value="HeaderElement" vertex="1">
+          <mxGeometry height="40" width="120" x="310" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-13" edge="1" parent="1" source="IH_pJKN0rES_DJNO8qiQ-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;curved=1;dashed=1;" target="0U0tzAG5SxCv_tlCy0mX-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-12" parent="1" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=2;" value="isLoading" vertex="1">
+          <mxGeometry height="40" width="120" x="310" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-15" edge="1" parent="1" source="IH_pJKN0rES_DJNO8qiQ-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;curved=1;dashed=1;" target="0U0tzAG5SxCv_tlCy0mX-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-14" parent="1" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=2;" value="items" vertex="1">
+          <mxGeometry height="40" width="120" x="310" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-17" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;ListDetailsLayout&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;Pages.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="180" width="180" x="60" y="440" as="geometry">
+            <mxRectangle height="40" width="180" x="780" y="370" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-18" parent="IH_pJKN0rES_DJNO8qiQ-17" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="isLoading: Boolean" vertex="1">
+          <mxGeometry height="30" width="180" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-19" parent="IH_pJKN0rES_DJNO8qiQ-17" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="items: List&amp;lt;DataItem&amp;gt;" vertex="1">
+          <mxGeometry height="30" width="180" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-20" parent="IH_pJKN0rES_DJNO8qiQ-17" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="Header: JSX.Element" vertex="1">
+          <mxGeometry height="30" width="180" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-21" parent="IH_pJKN0rES_DJNO8qiQ-17" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="ListView: React.Component" vertex="1">
+          <mxGeometry height="30" width="180" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-22" parent="IH_pJKN0rES_DJNO8qiQ-17" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="DetailsView: React.Component" vertex="1">
+          <mxGeometry height="30" width="180" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-23" edge="1" parent="1" source="IH_pJKN0rES_DJNO8qiQ-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;curved=1;" target="IH_pJKN0rES_DJNO8qiQ-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-24" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=none;" value="RecordItemListView&lt;div&gt;&lt;span style=&quot;color: rgb(179, 179, 179); font-family: &amp;quot;Courier New&amp;quot;;&quot;&gt;ItemViews.jsx&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="120" x="310" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-25" edge="1" parent="1" source="IH_pJKN0rES_DJNO8qiQ-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;curved=1;dashed=1;" target="IH_pJKN0rES_DJNO8qiQ-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-26" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=none;" value="RecordItemView&lt;div&gt;&lt;span style=&quot;color: rgb(179, 179, 179); font-family: &amp;quot;Courier New&amp;quot;;&quot;&gt;ItemViews.jsx&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="120" x="310" y="630" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-27" edge="1" parent="1" source="IH_pJKN0rES_DJNO8qiQ-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;curved=1;dashed=1;" target="IH_pJKN0rES_DJNO8qiQ-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-28" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=none;" value="HeaderElement" vertex="1">
+          <mxGeometry height="40" width="120" x="310" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-29" edge="1" parent="1" source="IH_pJKN0rES_DJNO8qiQ-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;curved=1;dashed=1;" target="IH_pJKN0rES_DJNO8qiQ-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-30" parent="1" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=2;" value="isLoading" vertex="1">
+          <mxGeometry height="40" width="120" x="310" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-31" edge="1" parent="1" source="IH_pJKN0rES_DJNO8qiQ-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;curved=1;dashed=1;" target="IH_pJKN0rES_DJNO8qiQ-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-32" parent="1" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=2;" value="items" vertex="1">
+          <mxGeometry height="40" width="120" x="310" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="IH_pJKN0rES_DJNO8qiQ-33" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;RecordsPage&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;Pages.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="300" width="410" x="40" y="390" as="geometry">
+            <mxRectangle height="40" width="180" x="780" y="370" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="Relations" id="ErNrVSWYI5ygVgWO1Qv8">
+    <mxGraphModel dx="1678" dy="935" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-0" />
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-1" parent="xk1u-lFs81wmfqHtKH9Q-0" />
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-2" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;FileForm&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot; style=&quot;color: rgb(179, 179, 179);&quot;&gt;Forms.jsx&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="120" x="870" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-3" parent="xk1u-lFs81wmfqHtKH9Q-2" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="action: String" vertex="1">
+          <mxGeometry height="30" width="120" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-4" parent="xk1u-lFs81wmfqHtKH9Q-2" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onSuccess: function" vertex="1">
+          <mxGeometry height="30" width="120" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-5" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;SettingsPage&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot; style=&quot;color: rgb(179, 179, 179);&quot;&gt;Pages.jsx&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="740" y="240" as="geometry">
+            <mxRectangle height="40" width="110" x="660" y="280" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-6" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;LogsPage&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot; style=&quot;color: rgb(179, 179, 179);&quot;&gt;Pages.jsx&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="30" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-7" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;RecordsPage&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot; style=&quot;color: rgb(179, 179, 179);&quot;&gt;Pages.jsx&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="150" y="240" as="geometry">
+            <mxRectangle height="40" width="110" x="880" y="270" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-8" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;Filters&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;Filters.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="180" x="50" y="770" as="geometry">
+            <mxRectangle height="40" width="180" x="780" y="600" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-9" parent="xk1u-lFs81wmfqHtKH9Q-8" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="items: List&amp;lt;DataItem&amp;gt;" vertex="1">
+          <mxGeometry height="30" width="180" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-10" parent="xk1u-lFs81wmfqHtKH9Q-8" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="updateFilteredItems: function" vertex="1">
+          <mxGeometry height="30" width="180" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-11" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;curved=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=8 8;" target="xk1u-lFs81wmfqHtKH9Q-71">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="230" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-12" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;LogItemView&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;ItemViews.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="150" x="430" y="590" as="geometry">
+            <mxRectangle height="40" width="130" x="1270" y="620" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-13" parent="xk1u-lFs81wmfqHtKH9Q-12" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="item: DataItem" vertex="1">
+          <mxGeometry height="30" width="150" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-14" parent="xk1u-lFs81wmfqHtKH9Q-12" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onClick: function" vertex="1">
+          <mxGeometry height="30" width="150" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-15" parent="xk1u-lFs81wmfqHtKH9Q-12" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="isSelected: boolean" vertex="1">
+          <mxGeometry height="30" width="150" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-16" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;curved=1;dashed=1;dashPattern=8 8;" target="xk1u-lFs81wmfqHtKH9Q-71">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-17" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;RecordItemView&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;ItemViews.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="150" x="265" y="590" as="geometry">
+            <mxRectangle height="40" width="130" x="1120" y="620" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-18" parent="xk1u-lFs81wmfqHtKH9Q-17" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="item: DataItem" vertex="1">
+          <mxGeometry height="30" width="150" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-19" parent="xk1u-lFs81wmfqHtKH9Q-17" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onUpdate: function" vertex="1">
+          <mxGeometry height="30" width="150" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-20" parent="xk1u-lFs81wmfqHtKH9Q-17" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onDelete: function" vertex="1">
+          <mxGeometry height="30" width="150" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-21" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;curved=1;dashPattern=8 8;" target="xk1u-lFs81wmfqHtKH9Q-71">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="230" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-22" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;ItemFormView&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;ItemViews.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="150" x="600" y="590" as="geometry">
+            <mxRectangle height="40" width="130" x="1420" y="620" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-23" parent="xk1u-lFs81wmfqHtKH9Q-22" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="item: DataItem" vertex="1">
+          <mxGeometry height="30" width="150" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-24" parent="xk1u-lFs81wmfqHtKH9Q-22" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onSuccess: function" vertex="1">
+          <mxGeometry height="30" width="150" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-25" parent="xk1u-lFs81wmfqHtKH9Q-22" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onReset: function" vertex="1">
+          <mxGeometry height="30" width="150" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-26" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-6" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" target="xk1u-lFs81wmfqHtKH9Q-47">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-27" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-5" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" target="xk1u-lFs81wmfqHtKH9Q-47">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-28" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-7" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="xk1u-lFs81wmfqHtKH9Q-47">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="200" y="140" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-29" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-8" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="xk1u-lFs81wmfqHtKH9Q-66">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="250" y="530" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-30" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-60" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" target="xk1u-lFs81wmfqHtKH9Q-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-31" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-2" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" target="xk1u-lFs81wmfqHtKH9Q-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-32" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-60" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" target="xk1u-lFs81wmfqHtKH9Q-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-33" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-60" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" target="xk1u-lFs81wmfqHtKH9Q-20">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="575" y="679.9999999999998" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-34" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-60" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" target="xk1u-lFs81wmfqHtKH9Q-25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-35" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-36" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;edgeStyle=orthogonalEdgeStyle;curved=1;dashPattern=8 8;" target="xk1u-lFs81wmfqHtKH9Q-70">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-36" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;LogItemListView&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;ItemViews.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="150" x="450" y="290" as="geometry">
+            <mxRectangle height="40" width="130" x="1430" y="330" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-37" parent="xk1u-lFs81wmfqHtKH9Q-36" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="item: DataItem" vertex="1">
+          <mxGeometry height="30" width="150" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-38" parent="xk1u-lFs81wmfqHtKH9Q-36" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onClick: function" vertex="1">
+          <mxGeometry height="30" width="150" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-39" parent="xk1u-lFs81wmfqHtKH9Q-36" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="isSelected: boolean" vertex="1">
+          <mxGeometry height="30" width="150" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-40" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-41" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;edgeStyle=orthogonalEdgeStyle;curved=1;dashPattern=8 8;" target="xk1u-lFs81wmfqHtKH9Q-70">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-41" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;RecordItemListView&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;ItemViews.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="150" x="280" y="290" as="geometry">
+            <mxRectangle height="40" width="150" x="1260" y="330" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-42" parent="xk1u-lFs81wmfqHtKH9Q-41" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="item: DataItem" vertex="1">
+          <mxGeometry height="30" width="150" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-43" parent="xk1u-lFs81wmfqHtKH9Q-41" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onClick: function" vertex="1">
+          <mxGeometry height="30" width="150" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-44" parent="xk1u-lFs81wmfqHtKH9Q-41" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="isSelected: boolean" vertex="1">
+          <mxGeometry height="30" width="150" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-45" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;App&lt;/div&gt;&lt;font face=&quot;Courier New&quot; style=&quot;color: rgb(179, 179, 179);&quot;&gt;App.jsx&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="90" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-46" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;Navigation&lt;/div&gt;&lt;font face=&quot;Courier New&quot; style=&quot;color: rgb(179, 179, 179);&quot;&gt;App.jsx&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="30" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-47" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;PageWrapper&lt;/div&gt;&lt;font face=&quot;Courier New&quot; style=&quot;color: rgb(179, 179, 179);&quot;&gt;App.jsx&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="100" x="150" y="100" as="geometry">
+            <mxRectangle height="40" width="110" x="985" y="140" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-48" parent="xk1u-lFs81wmfqHtKH9Q-47" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="path" vertex="1">
+          <mxGeometry height="30" width="100" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-49" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-46" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;strokeColor=#000000;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" target="xk1u-lFs81wmfqHtKH9Q-45">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-50" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-47" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;strokeColor=#000000;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" target="xk1u-lFs81wmfqHtKH9Q-45">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-51" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-66" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" target="xk1u-lFs81wmfqHtKH9Q-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-52" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-66" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" target="xk1u-lFs81wmfqHtKH9Q-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-53" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-54" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" target="xk1u-lFs81wmfqHtKH9Q-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-54" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;FeedLayout&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;Pages.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="180" width="180" x="850" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-55" parent="xk1u-lFs81wmfqHtKH9Q-54" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="isLoading: Boolean" vertex="1">
+          <mxGeometry height="30" width="180" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-56" parent="xk1u-lFs81wmfqHtKH9Q-54" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="items: List&amp;lt;DataItem&amp;gt;" vertex="1">
+          <mxGeometry height="30" width="180" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-57" parent="xk1u-lFs81wmfqHtKH9Q-54" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="Header: JSX.Element" vertex="1">
+          <mxGeometry height="30" width="180" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-58" parent="xk1u-lFs81wmfqHtKH9Q-54" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="ListView: React.Component" vertex="1">
+          <mxGeometry height="30" width="180" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-59" parent="xk1u-lFs81wmfqHtKH9Q-54" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="DetailsView: React.Component" vertex="1">
+          <mxGeometry height="30" width="180" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-60" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;TextForm&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot; style=&quot;color: rgb(179, 179, 179);&quot;&gt;Forms.jsx&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="180" width="160" x="690" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-61" parent="xk1u-lFs81wmfqHtKH9Q-60" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="action: String" vertex="1">
+          <mxGeometry height="30" width="160" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-62" parent="xk1u-lFs81wmfqHtKH9Q-60" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="submitButtonText: String" vertex="1">
+          <mxGeometry height="30" width="160" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-63" parent="xk1u-lFs81wmfqHtKH9Q-60" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="resetButtonText: String" vertex="1">
+          <mxGeometry height="30" width="160" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-64" parent="xk1u-lFs81wmfqHtKH9Q-60" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onSuccess: function" vertex="1">
+          <mxGeometry height="30" width="160" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-65" parent="xk1u-lFs81wmfqHtKH9Q-60" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onReset: function" vertex="1">
+          <mxGeometry height="30" width="160" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-66" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;ListDetailsLayout&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;Pages.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="180" width="180" x="50" y="350" as="geometry">
+            <mxRectangle height="40" width="180" x="780" y="370" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-67" parent="xk1u-lFs81wmfqHtKH9Q-66" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="isLoading: Boolean" vertex="1">
+          <mxGeometry height="30" width="180" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-68" parent="xk1u-lFs81wmfqHtKH9Q-66" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="items: List&amp;lt;DataItem&amp;gt;" vertex="1">
+          <mxGeometry height="30" width="180" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-69" parent="xk1u-lFs81wmfqHtKH9Q-66" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="Header: JSX.Element" vertex="1">
+          <mxGeometry height="30" width="180" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-70" parent="xk1u-lFs81wmfqHtKH9Q-66" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="ListView: React.Component" vertex="1">
+          <mxGeometry height="30" width="180" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-71" parent="xk1u-lFs81wmfqHtKH9Q-66" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="DetailsView: React.Component" vertex="1">
+          <mxGeometry height="30" width="180" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-72" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-74" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;curved=1;" target="xk1u-lFs81wmfqHtKH9Q-8">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="70.04761904761904" y="835" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-73" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-74" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" target="xk1u-lFs81wmfqHtKH9Q-91">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="380" y="845" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-74" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;DatePicker&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;Pickers.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="150" width="120" x="80" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-75" parent="xk1u-lFs81wmfqHtKH9Q-74" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="name: String" vertex="1">
+          <mxGeometry height="30" width="120" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-76" parent="xk1u-lFs81wmfqHtKH9Q-74" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="readonly: Boolean" vertex="1">
+          <mxGeometry height="30" width="120" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-77" parent="xk1u-lFs81wmfqHtKH9Q-74" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="datetimeObj: Date" vertex="1">
+          <mxGeometry height="30" width="120" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-78" parent="xk1u-lFs81wmfqHtKH9Q-74" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onConfirm: function" vertex="1">
+          <mxGeometry height="30" width="120" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-79" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-81" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" target="xk1u-lFs81wmfqHtKH9Q-10">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="185" y="765" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-80" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-81" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;curved=1;" target="xk1u-lFs81wmfqHtKH9Q-89">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-81" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;TimePicker&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Courier New&quot;&gt;&lt;span style=&quot;color: rgb(179, 179, 179);&quot;&gt;Pickers.jsx&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="150" width="120" x="280" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-82" parent="xk1u-lFs81wmfqHtKH9Q-81" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="name: String" vertex="1">
+          <mxGeometry height="30" width="120" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-83" parent="xk1u-lFs81wmfqHtKH9Q-81" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="readonly: Boolean" vertex="1">
+          <mxGeometry height="30" width="120" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-84" parent="xk1u-lFs81wmfqHtKH9Q-81" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="datetimeObj: Date" vertex="1">
+          <mxGeometry height="30" width="120" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-85" parent="xk1u-lFs81wmfqHtKH9Q-81" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="onConfirm: function" vertex="1">
+          <mxGeometry height="30" width="120" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-86" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-89" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="xk1u-lFs81wmfqHtKH9Q-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-87" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-89" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" target="xk1u-lFs81wmfqHtKH9Q-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-88" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="xk1u-lFs81wmfqHtKH9Q-89" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" target="xk1u-lFs81wmfqHtKH9Q-25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-89" parent="xk1u-lFs81wmfqHtKH9Q-1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontFamily=Ubuntu;strokeWidth=2;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;TemplateView&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: light-dark(rgb(179, 179, 179), rgb(83, 83, 83)); font-family: &amp;quot;Courier New&amp;quot;; background-color: transparent;&quot;&gt;ItemViews.jsx&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="180" x="250" y="770" as="geometry">
+            <mxRectangle height="40" width="130" x="990" y="600" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-90" parent="xk1u-lFs81wmfqHtKH9Q-89" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="initialItem: DataItem" vertex="1">
+          <mxGeometry height="30" width="180" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xk1u-lFs81wmfqHtKH9Q-91" parent="xk1u-lFs81wmfqHtKH9Q-89" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;" value="readonly: Boolean" vertex="1">
+          <mxGeometry height="30" width="180" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="-j3YE0CRwGoHgZqr3g-1-0" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="-j3YE0CRwGoHgZqr3g-1-1" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="910" y="60" as="sourcePoint" />
+            <mxPoint x="790" y="45" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-j3YE0CRwGoHgZqr3g-1-1" parent="xk1u-lFs81wmfqHtKH9Q-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;fontSize=16;fontStyle=1" value="&lt;font data-font-src=&quot;https://fonts.googleapis.com/css?family=Ubuntu&quot;&gt;Composition&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="110" x="920" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="-j3YE0CRwGoHgZqr3g-1-3" edge="1" parent="xk1u-lFs81wmfqHtKH9Q-1" source="-j3YE0CRwGoHgZqr3g-1-4" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;exitX=0;exitY=0.5;exitDx=0;exitDy=0;dashed=1;dashPattern=8 8;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="910" y="90" as="sourcePoint" />
+            <mxPoint x="790" y="75" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-j3YE0CRwGoHgZqr3g-1-4" parent="xk1u-lFs81wmfqHtKH9Q-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontFamily=Ubuntu;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DUbuntu;fontSize=16;fontStyle=1" value="&lt;font&gt;Injection&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="110" x="920" y="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

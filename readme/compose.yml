@@ -1,0 +1,14 @@
+services:
+    error_scanner:
+        container_name: error_scanner
+        environment: # set socket path
+        - DOCKER_HOST=unix:///var/run/docker.sock
+        volumes: # connect socket paths
+        - /var/run/docker.sock:/var/run/docker.sock
+        networks:
+            - your-docker-network
+
+networks:
+    your-docker-network:
+        driver: bridge
+        external: true # connect to an existing external network
