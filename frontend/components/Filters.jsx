@@ -20,7 +20,7 @@ import { DataItem } from "../assets/DataItem.js";
 import "../assets/DatePicker.js"
 import "../assets/TimePicker.js"
 
-function Filters({items, updateFilteredItems}) {
+function Filters({items, onFiltered}) {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Helper Functions:
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -202,7 +202,7 @@ function Filters({items, updateFilteredItems}) {
     // Update Filtered Items:
     useEffect(() => {
         const filteredItems = applyFilters();
-        updateFilteredItems(filteredItems);
+        onFiltered(filteredItems);
     }, [items, filters]);
 
     return(

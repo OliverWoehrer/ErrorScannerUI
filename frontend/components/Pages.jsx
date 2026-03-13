@@ -184,7 +184,7 @@ function ListDetailsLayout({ isLoading, items, Header, ListView, DetailsView }) 
                             <mdui-button ref={triggerRef} id="showFilters" variant="text" end-icon="keyboard_arrow_down">Use filters</mdui-button>
                         </div>
                         <div style={{padding:"0 0.5rem"}}>
-                            <ItemFilters items={items} updateFilteredItems={setFilteredItems} />
+                            <ItemFilters items={items} onFiltered={setFilteredItems} />
                         </div>
                     </mdui-collapse-item>
                 </mdui-collapse>
