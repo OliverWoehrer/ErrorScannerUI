@@ -12,7 +12,7 @@ def init_config_data() -> ConfigHandler:
 
 def init_logs_data() -> LogsCollection:
     return LogsSQL(filename="logs.db")
-    return LogsFile("logs.jsonl")
+    #return LogsFile("logs.jsonl")
 
 def init_records_data() -> RecordsCollection:
     # Build Connection URL:
@@ -48,7 +48,7 @@ def init_records_data() -> RecordsCollection:
         return RecordsSQL(db_url=url)
     else: # use local file as fallback
         return RecordsSQL(filename="records.db")
-        return LogsFile("records.jsonl")
+        #return LogsFile("records.jsonl")
 
 config_data = init_config_data()
 logs_data = init_logs_data()
