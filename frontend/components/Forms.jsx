@@ -96,7 +96,7 @@ export function TextForm({ action, submitButtonText, resetButtonText, onSuccess,
 
 export function FileForm({ action, onSuccess, children }) {
     function handleSubmit(event) {
-        event.preventDefault(); // prevent automatic form submisson
+        event.preventDefault(); // prevent automatic form submission
         sendData(event, true, onSuccess);
     }
 
