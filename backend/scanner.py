@@ -247,7 +247,7 @@ class Scanner():
 
             for container in watchlist:
                 # Read New Logs:
-                since_time = last_scanned.get(container.name, datetime.min.replace(tzinfo=timezone.utc)) # use posix timestamp 0 as fallback
+                since_time = last_scanned.get(container.name, datetime.fromtimestamp(0, timezone.utc)) # use posix timestamp 0 as fallback
                 log_items = self._get_log_items(container, since=since_time)
                 if not log_items:
                     continue # no logs, skip to the next container
@@ -386,8 +386,7 @@ class Scanner():
 
         # Fetch Logs as String:
         try:
-            start = since.timestamp() if since.timestamp() else 0.0001 # smallest possible timestamp
-            logs_text = container.logs(stream=False, timestamps=True, since=start).decode("utf-8")
+            logs_text = container.logs(stream=False, timestamps=True, since=since).decode("utf-8")
             lines = logs_text.splitlines()
         except Exception as e:
             print(f"Error retrieving logs for {container.name}: {e}")
@@ -462,7 +461,7 @@ class Scanner():
     def _scan_log_items(self, items: list[DataItem]) -> datetime:
         BAR_WIDTH = 50
         total_length = len(items)
-        latest_timestamp = datetime.min.replace(tzinfo=timezone.utc) # will hold the timestamp of the latest log item
+        latest_timestamp = datetime.fromtimestamp(0, timezone.utc) # holds timestamp of latest log item, init with zero
         for idx,item in enumerate(items):
             progress = ((idx+1)/total_length) * BAR_WIDTH
             print(f"\r[{ f"{'':=<{progress}}"    }{   f"{'': <{BAR_WIDTH-progress}}"     }]", end="", flush=True)
