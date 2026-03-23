@@ -15,7 +15,7 @@ RUN npm run build
 
 # Stage 2: Python Backend
 FROM python:3.12-alpine AS requirements-stage
-WORKDIR /backend
+WORKDIR /app
 
 # Do not compile files to __pycache__
 ENV PYTHONDONTWRITEBYTECODE=1

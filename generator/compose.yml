@@ -1,0 +1,20 @@
+services:
+    loggen-app: # log generator within network
+        image: loggen:1.4
+        deploy:
+            replicas: 3 # run identical container instances
+        environment:
+        - GENERATOR_INTERVAL=10000
+        networks:
+            - lognet
+    loggen-app-lost: # log generator with no network
+        image: loggen:1.4
+        deploy:
+            replicas: 3 # run identical container instances
+        environment:
+        - GENERATOR_INTERVAL=10000
+
+networks:
+    lognet:
+        driver: bridge
+        external: true # connect to an existing external network
