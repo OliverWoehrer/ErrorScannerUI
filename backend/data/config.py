@@ -25,14 +25,14 @@ class ConfigHandler:
         return docker_interface.get("network", "")
     def docker_interface_whitelist(self, whitelist: list[str] | None = None) -> list[str] | None:
         docker_interface = self.docker_interface()
-        if whitelist:
+        if whitelist is not None:
             docker_interface["whitelist"] = whitelist
             self.docker_interface(docker_interface)
             return None
         return docker_interface.get("whitelist", [])
     def docker_interface_blacklist(self, blacklist: str | None = None) -> str | None:
         docker_interface = self.docker_interface()
-        if blacklist:
+        if blacklist is not None:
             docker_interface["blacklist"] = blacklist
             self.docker_interface(docker_interface)
             return None
