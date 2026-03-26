@@ -44,7 +44,7 @@ Users can narrow down items using multi-word keyword searches, timestamp ranges,
 
 ### Settings & Configuration
 The Settings page manages the application's behavior:
-- **Docker Interface**: Defines the "Universe" (the pool of containers to scan) via network auto-detection or manual overrides.
+- **Docker Interface**: Defines the "Docker Community" via network auto-detection or manual overrides. The community is the pool of relevant containers within the same docker network.
 - **Watchlist**: Uses **Whitelists** and **Blacklists** to filter specific containers for scanning. See [watchlist section](./../backend/README.md.md#watchlist) for more details.
 - **Disk Usage**: Sets limits on the local SQLite log database to prevent uncontrolled growth.
 - **Database**: Allows configuration of remote database URLs (e.g., PostgreSQL) for permanent record storage.
@@ -113,7 +113,7 @@ The React components essentially act as wrapper for the custom web components im
     ```
     <ExampleComponent
         isLoading={loading}
-        onFiltered={filtedItems => handleUpdate(filteredItems)}
+        onFiltered={filteredItems => handleUpdate(filteredItems)}
     />
     ```
 
