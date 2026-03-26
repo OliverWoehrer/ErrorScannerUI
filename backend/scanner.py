@@ -200,17 +200,14 @@ class Scanner():
         self.stop_event = Event()
 
         # Initialize Docker Client:
-        host = os.environ.get("DOCKER_HOST")
+        host = os.getenv("DOCKER_HOST")
         if not host:
             raise RuntimeWarning(f"Environment variable 'DOCKER_HOST' is not set. Make sure it points to your Docker daemon. If you are using Docker Desktop for example: 'unix:///home/<user>/.docker/desktop/docker.sock'.")
         try:
-            docker.from_env()
+            self.client = docker.from_env()
         except docker.errors.DockerException:
-            host = os.environ.get("DOCKER_HOST")
-            raise RuntimeError(f"Could not initialize the docker client! Here are things to check:\r\n" \
-                f"> Make sure the Docker daemon is running.\r\n" \
-                f"> Make sure the environment variable 'DOCKER_HOST' points to your Docker daemon.\r\n" \
-                f"  current variable: DOCKER_HOST = '{host}'") from None
+            host = os.getenv("DOCKER_HOST")
+            raise RuntimeError(f"Could not initialize the docker client. Make sure the Docker daemon is running.") from None
         
         # Initialize Data Collections:
         logs_data.clear() # clear previous logs
@@ -247,14 +244,14 @@ class Scanner():
 
             for container in watchlist:
                 # Read New Logs:
-                since_time = last_scanned.get(container.name, datetime.fromtimestamp(0, timezone.utc)) # use posix timestamp 0 as fallback
+                since_time = last_scanned.get(container.name)
                 log_items = self._get_log_items(container, since=since_time)
                 if not log_items:
                     continue # no logs, skip to the next container
 
                                 
                 # Check Which Item to Log and Record:
-                print(f"Scanning {len(log_items)} item from {container.name}:")
+                print(f"Scanning {len(log_items)} item from {container.name}")
                 start = time.time()
                 latest_timestamp = self._scan_log_items(items=log_items)
                 stop = time.time()
@@ -278,6 +275,17 @@ class Scanner():
     Private Methods
     """
 
+    def _find_docker_containers(self, network_name: str = None) -> set[docker.models.containers.Container]:
+        try: # get containers connected to this network
+            network = self.client.networks.get(network_name)
+            return set(network.containers) # set of Docker containers
+        except docker.errors.NotFound:
+            print(f"Network {network_name} not found.")
+            return set()
+        except docker.errors.APIError as e:
+            print(f"Error accessing network {network_name}. {e}.")
+            return set()
+
     def _build_watchlist(self, network_name: str, whitelist: list[str], blacklist: list[str]) -> set[docker.models.containers.Container]:
         """
         The watchlist is a list of Docker containers (names or IDs) to read from. The watchlist
@@ -288,73 +296,56 @@ class Scanner():
         watchlist. Without a network name we use network(s) this container is part of. If no
         networks can be found, all containers on the entire system are considered.
         """
-        # Initalize Docker Client:
-        try:
-            client = docker.from_env()
-        except docker.errors.DockerException:
-            print(f"Could not connect to docker daemon!")
-            return set()
-        
-        # Find Docker Network(s):
-        network_names = set()
-        if network_name: # use the given network
-            network_names.add(network_name)
-        else: # no network given, use all networks this containers is part of
-            try: # find hostname (first 12 characters of the ID) of this Docker container
+        # Blacklist This Docker Container:
+        # Add this container to the blacklist, to prevent the scanner from reading its own log messages.
+        container = None # object of this container
+        is_inside_container = os.getenv("AM_I_IN_A_DOCKER_CONTAINER")
+        if is_inside_container: # running inside a container
+            try: # find hostname (=first 12 characters of this Docker container ID)
                 file = open("/etc/hostname", "r")
                 hostname = file.read().strip()
-            except FileNotFoundError: # no id found, not running inside a container
-                print("Not running inside a Docker container. Scanning all available networks...")
-            else:
-                # Blacklist This Docker Container:
-                # This Docker container itself can be part of the network. To prevent this scanner
-                # to read its own log messages, we add it to the blacklist.
-                blacklist.append(hostname)
-
-                # Find Networks For This Container:
-                try: # find networks for this container id
-                    container = client.containers.get(hostname)
-                except docker.errors.NotFound:
-                    print(f"Could not find container '{hostname}'")
-                else:
-                    network_settings = container.attrs['NetworkSettings']['Networks']
-                    print(f"Container '{container.name}' is connected to the following network:")
-                    for network_name in network_settings.keys():
-                        print(f"- {network_name}")
-                        network_names.add(network_name)
-            finally: # cleanup host file
+                container = self.client.containers.get(hostname)
+                blacklist.append(container.name) # add container to blacklist
+            except FileNotFoundError:
+                raise RuntimeError("Failed to find hostname of this Docker container.") from None
+            except docker.errors.NotFound:
+                raise RuntimeError(f"Could not find container '{hostname}'") from None
+            finally:
                 file.close()
         
         # [INFO]
-        # Each network has multiple containers connected to it. We call this the 'galaxy' of
-        # this network. Multiple galaxies make our universe. The universe is all possibly relevant
-        # containers. One container can be part of multiple networks (i.e. multiple galaxies). The
-        # watchlist is all containers from the universe filtered through white- and blacklist.
+        # Each network has multiple containers connected to it. We call this a 'club' of
+        # containers. Multiple clubs make our 'community'. The community is all possibly relevant
+        # containers. One container can be part of multiple clubs (i.e. multiple networks). The
+        # watchlist is all containers from the community filtered through white- and blacklist.
 
-        # Access Docker Network(s):
-        universe = set() # set of all containers part of our networks
-        for network_name in network_names:
-            try: # get containers connected to this network
-                network = client.networks.get(network_name)
-                galaxy = network.containers # each network has its galaxy of containers
-                universe = universe | set(galaxy) # add containers from this network to our universe
-            except docker.errors.NotFound:
-                print(f"Network {network_name} not found, skipping.")
-            except docker.errors.APIError as e:
-                print(f"Error accessing network {network_name}: {e}.")
-        if not universe: # no networks found, consider all containers as a fallback
-            all_containers = client.containers
+        # Find Docker Community:
+        community = set()
+        if network_name: # use the given network
+            # Find Containers for Given Network:
+            club = self._find_docker_containers(network_name)
+            community = club
+        elif container: # no network name but running inside a container
+            # Find Networks For This Container:
+            network_settings = container.attrs['NetworkSettings']['Networks']
+            network_names = network_settings.keys()
+            for network_name in network_names:
+                club = self._find_docker_containers(network_name) # each network has its club of containers
+                community = community | set(club) # add containers from this network to our community
+        else: # no network name and not running inside a container
+            # Consider All Containers As a Fallback:
+            all_containers = self.client.containers
             assert isinstance(all_containers, docker.models.containers.ContainerCollection)
-            universe = set(all_containers.list()) # all running containers are our universe now
+            community = set(all_containers.list()) # all running containers are our community now
 
         # Build Watchlist:
         watchlist = set() # set of all containers to watch (no duplicates)
-        for container in universe: # filter for white- and blacklist
-            if not whitelist: # no whitelist, consider all containers in the universe
+        for container in community: # filter for white- and blacklist
+            if not whitelist: # no whitelist, consider all containers in the community
                 watchlist.add(container)
-            if container.name in whitelist or any(container.id.startswith(w) for w in whitelist):
+            if container.name in whitelist:
                 watchlist.add(container)
-            if container.name in blacklist or any(container.id.startswith(b) for b in blacklist):
+            if container.name in blacklist:
                 watchlist.discard(container)
         
         # Display Watchlist:
@@ -382,11 +373,14 @@ class Scanner():
         # to consider nanosecond resolution if the 'since' parameter is passed as float in seconds
 
         # Assert Type:
+        if not since: # use posix timestamp 0 as fallback
+            since = datetime.fromtimestamp(0, timezone.utc)
         assert isinstance(since, datetime) and since.timestamp() >= 0, "Given timestamp has to be positive."
 
         # Fetch Logs as String:
         try:
-            logs_text = container.logs(stream=False, timestamps=True, since=since).decode("utf-8")
+            start = since.timestamp() or None # timestamp with microseconds as decimal digits
+            logs_text = container.logs(stream=False, timestamps=True, since=start).decode("utf-8")
             lines = logs_text.splitlines()
         except Exception as e:
             print(f"Error retrieving logs for {container.name}: {e}")
@@ -416,11 +410,11 @@ class Scanner():
             assert timestamp, f"Expected parsable timestamp from Docker log: \"{original_line}\"."
             if timestamp == since:
                 continue # skip this log, it was previously parsed
-            assert timestamp > since, f"Expected timestamp bigger then {since}: {original_line}"
+            assert timestamp > since, f"Expected {timestamp} > {since} from line \"{original_line}\""
             
             # Clean Remaining Line:
             try: # remove remaining timestamps with dateutil parser
-                if True: # set to False to stop auto-parsing timestamps
+                if False: # set to True to auto-remove timestamps from message string
                     # parse with fuzzy tokens return format = (datetime_obj, unused_tokens)
                     # datetime_obj: datetime object parsed
                     # unused_tokens: tokens not used for parsing
@@ -460,47 +454,53 @@ class Scanner():
 
     def _scan_log_items(self, items: list[DataItem]) -> datetime:
         BAR_WIDTH = 50
-        total_length = len(items)
         latest_timestamp = datetime.fromtimestamp(0, timezone.utc) # holds timestamp of latest log item, init with zero
-        for idx,item in enumerate(items):
-            progress = ((idx+1)/total_length) * BAR_WIDTH
-            print(f"\r[{ f"{'':=<{progress}}"    }{   f"{'': <{BAR_WIDTH-progress}}"     }]", end="", flush=True)
+        for item in enumerate(items):
             latest_timestamp = max(item.timestamp, latest_timestamp)
             if self.stop_event.is_set():
                 break
 
-            # 1. check if its category should be logged
-            if item.category in self.categories_to_log:
-                logs_data.add(item) # store this item to logs collection
-            elif item.category not in self.categories_to_record:
-                continue # skip, do not further process this item
-            
-            # [INFO]
-            # At this point we need to record log_item. Check if the same log was already
-            # recorded. If it was recorded previously, update its timestamp. If it was not
-            # recorded previously, we automatically add it to the records.
+            best_match = None
+            best_score = 0.0
 
-            # 2 check if log message was already recorded previously
-            # 2.1 check if there are candidates (possibly similar items)
-            candidates = records_data.candidates(item)
-            if not candidates:
-                records_data.add(item) # add item as new record
-                continue # skip rest of loop
-            
-            # 2.2 find best candidate
-            matcher = SimilarityMatcher(alpha=0.5)
-            matcher.load_items(candidates)
-            best_match, best_score = matcher.find_match(item)
+            # 1. check if log message was already recorded previously
+            should_be_logged = item.category in self.categories_to_log
+            should_be_recorded = item.category in self.categories_to_record
+            if should_be_recorded or should_be_logged:
+                # calculate the match once (if needed by either logic branch)
+                candidates = records_data.candidates(item)
+                if candidates:
+                    matcher = SimilarityMatcher(alpha=0.5)
+                    matcher.load_items(candidates)
+                    best_match, best_score = matcher.find_match(item)
 
-            # 3. update records
-            if best_score > self.similarity_threshold:
-                if item.timestamp > best_match.timestamp: # check if item is actually newer then existing record
-                    best_match.timestamp = item.timestamp
-                    records_data.update(best_match)
-            else:
-                records_data.add(item)
+            # 2. record this item
+            if should_be_recorded:
+                # [INFO]
+                # At this point we want to record the item. We check if the same log message was
+                # previously recorded. If it was recorded, we update the timestamp of the matching
+                # record. If it was not recorded, we automatically add it to the records.
+                if best_match and best_score > self.similarity_threshold: # check if its a good match (high similarity score)
+                    if item.timestamp > best_match.timestamp: # check if item is actually newer then existing record
+                        best_match.timestamp = item.timestamp
+                        records_data.update(best_match)
+                else: # no candidates or poor match, add as a brand new record
+                    best_match = records_data.add(item)
+                    best_match = item # capture the new record so we can link it in the log step if needed
+                    best_score = 1.0 # it is a perfect match for itself
 
-        print(f"\r\n", end="", flush=True) # add final linebreak
+            # 3. log this item
+            if should_be_logged:
+                # [INFO]
+                # At this point we check if the same log message was previously recorded. If it was
+                # recorded, we mark it as "recorded" by storing the ID of the matching record as
+                # the solution. This allows us to link the log item to the matching record item. If
+                # it was not recorded, we automatically add it to the logs database.
+                if best_match and best_score > self.similarity_threshold: # check if there is a matching record
+                    item.solution = best_match.id # link the matching record via ID
+                
+                logs_data.add(item)
+
         return latest_timestamp
 
 

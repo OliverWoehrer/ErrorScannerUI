@@ -19,10 +19,12 @@ WORKDIR /app
 
 # Do not compile files to __pycache__
 ENV PYTHONDONTWRITEBYTECODE=1
-# ENV PYTHONUNBUFFERED=1
 
 # Set path of Docker host so the scanner can access it
 ENV DOCKER_HOST=unix:///var/run/docker.sock
+
+# Tell Python it runs inside a container
+ENV AM_I_IN_A_DOCKER_CONTAINER=yes
 
 # Install Python requirements
 COPY backend/requirements.txt .
