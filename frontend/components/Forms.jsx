@@ -73,23 +73,15 @@ async function sendData(event, isFileUpload, onSuccess) {
     }
 }
 
-export function TextForm({ action, submitButtonText, resetButtonText, onSuccess, onReset, children }) {
-    const submitText = submitButtonText || "Confirm changes";
-    const resetText = resetButtonText || "Discard changes";
-
+export function TextForm({ action, onSuccess, children }) {
     function handleSubmit(event) {
+        event.preventDefault(); // prevent automatic form submission
         sendData(event, false, onSuccess);
     }
 
     return(
-        <form name="my-form" action={action} onSubmit={defaultSubmit} className="flex-column">
-            <main>
-                {children}
-            </main>
-            <footer>
-                <mdui-button type="submit" onClick={handleSubmit}>{submitText}</mdui-button>
-                <mdui-button type="reset" onClick={onReset} variant="text">{resetText}</mdui-button>
-            </footer>
+        <form name="my-form" action={action} onSubmit={handleSubmit} className="flex-column">
+            {children}
         </form>
     );
 }
