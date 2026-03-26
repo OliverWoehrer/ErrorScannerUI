@@ -1,6 +1,6 @@
 // React Components:
-import { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router"
+import { useEffect, useRef } from "react";
+import { BrowserRouter, useLocation, useNavigate } from "react-router"
 import { LogsPage, RecordsPage, SettingsPage } from "./Pages.jsx";
 
 // Material Components:
@@ -26,31 +26,39 @@ const ROUTES = {
  * @returns React JSX element
  */
 function Navigation() {
-    // Redirect Pages:
-    useEffect(() => {
-        if(currentRoute === ROUTES.home) { // redirect home path "/" to "/logs"
-            navigate(ROUTES.logs, { replace:true })
-        }
-    }, []);
-
-    // Get Current Path:
+    // Handle Tabs and Search Params:
     const location = useLocation();
-    const currentRoute = location.pathname;
     function getValueByRoute(routes, route) {
         return Object.keys(routes).find(key => routes[key] === route);
     }
-    const selectedValue = getValueByRoute(ROUTES, currentRoute);
-        
-    // Navigate Paths:
+    const selectedValue = getValueByRoute(ROUTES, location.pathname);
+    const lastPaths = useRef({ logs: ROUTES.logs, records: ROUTES.records, settings: ROUTES.settings });
+    useEffect(() => {
+        const currentPath = location.pathname;
+        const currentSearch = location.search; // This includes the ?id=1234
+        if(currentPath.startsWith(ROUTES.logs)) {
+            lastPaths.current.logs = currentPath + currentSearch;
+        } else if(currentPath.startsWith(ROUTES.records)) {
+            lastPaths.current.records = currentPath + currentSearch;
+        } else if(currentPath.startsWith(ROUTES.settings)) {
+            lastPaths.current.settings = currentPath + currentSearch;
+        }
+    }, [location]);
+
+    // Navigation:
     const navigate = useNavigate();
-    function handleNavigate(path) {
-        if(currentRoute === path) { return; } // dont navigate to the same page
-        
-        navigate({
-            pathname: path, // e.g., /settings
-            search: '',     // Explicitly sets the query string to empty
-        }); 
+    function handleNavigate(tabName) {
+        const targetFullUrl = lastPaths.current[tabName];
+        if(location.pathname + location.search === targetFullUrl) return; // don't navigate to the same page
+        navigate(targetFullUrl); 
     };
+
+    // Redirect Homepage:
+    useEffect(() => {
+        if(location.pathname === ROUTES.home) { // redirect home path "/" to "/logs"
+            navigate(ROUTES.logs, { replace:true })
+        }
+    }, []);
 
     // Responsive Design Based On Screen Size:
     const { isAtLeast } = useScreenSize();
@@ -58,13 +66,13 @@ function Navigation() {
     if(isBiggerScreen) { // return navigation rail on the side of the screen
         return (
             <mdui-navigation-rail value={selectedValue}>
-                <mdui-navigation-rail-item onClick={() => handleNavigate(ROUTES.logs)} value="logs" icon="featured_play_list--outlined" active-icon="featured_play_list">
+                <mdui-navigation-rail-item onClick={() => handleNavigate("logs")} value="logs" icon="featured_play_list--outlined" active-icon="featured_play_list">
                     Logs
                 </mdui-navigation-rail-item>
-                <mdui-navigation-rail-item onClick={() => handleNavigate(ROUTES.records)} value="records" icon="folder--outlined" active-icon="folder">
+                <mdui-navigation-rail-item onClick={() => handleNavigate("records")} value="records" icon="fact_check--outlined" active-icon="fact_check">
                     Records
                 </mdui-navigation-rail-item>
-                <mdui-navigation-rail-item onClick={() => handleNavigate(ROUTES.settings)} value="settings" icon="settings--outlined" active-icon="settings">
+                <mdui-navigation-rail-item onClick={() => handleNavigate("settings")} value="settings" icon="settings--outlined" active-icon="settings">
                     Settings
                 </mdui-navigation-rail-item>
             </mdui-navigation-rail>
@@ -72,13 +80,13 @@ function Navigation() {
     } else { // return navigation bar on the bottom of the screen
         return (
             <mdui-navigation-bar value={selectedValue}>
-                <mdui-navigation-bar-item onClick={() => handleNavigate(ROUTES.logs)} value="logs" icon="featured_play_list--outlined" active-icon="featured_play_list">
+                <mdui-navigation-bar-item onClick={() => handleNavigate("logs")} value="logs" icon="featured_play_list--outlined" active-icon="featured_play_list">
                     Logs
                 </mdui-navigation-bar-item>
-                <mdui-navigation-bar-item onClick={() => handleNavigate(ROUTES.records)} value="records" icon="folder--outlined" active-icon="folder">
+                <mdui-navigation-bar-item onClick={() => handleNavigate("records")} value="records" icon="fact_check--outlined" active-icon="fact_check">
                     Records
                 </mdui-navigation-bar-item>
-                <mdui-navigation-bar-item onClick={() => handleNavigate(ROUTES.settings)} value="settings" icon="settings--outlined" active-icon="settings">
+                <mdui-navigation-bar-item onClick={() => handleNavigate("settings")} value="settings" icon="settings--outlined" active-icon="settings">
                     Settings
                 </mdui-navigation-bar-item>
             </mdui-navigation-bar>
@@ -94,10 +102,10 @@ function Navigation() {
  */
 function PageWrapper({ path, children }) {
     const location = useLocation();
-    const currentRoute = location.pathname;
+    const isMatch = location.pathname === path;
 
     return (
-        <main style={{height:"100%"}} hidden={currentRoute !== path}>
+        <main style={{height:"100%"}} hidden={!isMatch}>
             {children}
         </main>
     );
@@ -109,7 +117,7 @@ function PageWrapper({ path, children }) {
  */
 function App() {
     return(
-        <>
+        <BrowserRouter> {/* <-- wrapped inside a router component to enable access to location paths */}
             <nav>
                 <Navigation />
             </nav>
@@ -122,7 +130,7 @@ function App() {
             <PageWrapper path={ROUTES.settings}>
                 <SettingsPage />
             </PageWrapper>
-        </>
+        </BrowserRouter>
     );
 }
 
