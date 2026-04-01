@@ -1,17 +1,19 @@
 services:
     log_generator:
+        build: . # build image from Dockerfile in current folder
         image: log-generator:latest
         deploy:
             replicas: 3 # run identical container instances
-        environment:
+        environment: # interval to generate log message in milliseconds
         - GENERATOR_INTERVAL=10000
 
     error_scanner:
+        build: ../. # build image from Dockerfile in root folder
         image: error-scanner:latest
         environment: # set socket path
         - DOCKER_HOST=unix:///var/run/docker.sock
         volumes: # connect socket paths
         - /var/run/docker.sock:/var/run/docker.sock
-        ports:
+        ports: # expose port
             - "5000:5000"
 
