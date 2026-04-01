@@ -292,7 +292,7 @@ class RecordsSQL(RecordsCollection):
         :param filename: Used only when db_url is None for the SQLite file name.
         """
         if db_url is None:
-            self.filename = Path(__file__).parent / filename
+            self.filename = Path(__file__).parent / "docker_exchange" / filename
             db_url = f"sqlite:///{self.filename}"
         print(f"Using records database: {db_url}")
 

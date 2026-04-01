@@ -14,10 +14,8 @@ frontend/package-lock.json
 __pycache__
 
 # Data Files:
-data/*.db
-data/*.json
-data/*.jsonl
-data/*.txt
+*/data/**/*.db
+*/data/**/*.json
 
 # Build Files:
 static

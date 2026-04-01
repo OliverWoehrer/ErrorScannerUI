@@ -5,7 +5,7 @@ import portalocker
 class ConfigHandler:
     def __init__(self, filename: str = "config.json"):
         assert isinstance(filename, str), "Given filename has to be of type 'str'"
-        self.filename = Path(__file__).parent / filename
+        self.filename = Path(__file__).parent / "docker_exchange" / filename
 
 
     # --- Docker Interface ---
