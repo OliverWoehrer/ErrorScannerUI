@@ -455,7 +455,7 @@ class Scanner():
     def _scan_log_items(self, items: list[DataItem]) -> datetime:
         BAR_WIDTH = 50
         latest_timestamp = datetime.fromtimestamp(0, timezone.utc) # holds timestamp of latest log item, init with zero
-        for item in enumerate(items):
+        for item in items:
             latest_timestamp = max(item.timestamp, latest_timestamp)
             if self.stop_event.is_set():
                 break
