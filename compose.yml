@@ -1,6 +1,6 @@
 services:
     log_generator:
-        build: . # build image from Dockerfile in current folder
+        build: ./generator/. # build image from Dockerfile in generator folder
         image: log-generator:latest
         deploy:
             replicas: 3 # run identical container instances
@@ -8,12 +8,12 @@ services:
         - GENERATOR_INTERVAL=10000
 
     error_scanner:
-        build: ../. # build image from Dockerfile in root folder
+        build: . # build from Dockerfile in current folder
         image: error-scanner:latest
         environment: # set socket path
         - DOCKER_HOST=unix:///var/run/docker.sock
-        volumes: # connect socket paths
-        - /var/run/docker.sock:/var/run/docker.sock
+        volumes: # map paths from host machine to container path
+        - "/var/run/docker.sock:/var/run/docker.sock"
+        - "./backend/data/docker_exchange/records.db:/app/data/docker_exchange/records.db"
         ports: # expose port
             - "5000:5000"
-

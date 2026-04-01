@@ -93,13 +93,15 @@ $$\text{similarity}=\alpha \cdot J + (1-\alpha) \cdot C$$
 
 
 ## Data Handlers
-Data access is abstracted through shared handlers in the `/data` directory, which manage three distinct concerns:
+Data access is abstracted through shared handlers in the `data/` directory, which manage three distinct concerns: Configurations, logs and records.
+
+Configurations and records are stored in the `data/docker_exchange/` sub-folder. This sub-folder is mapped (bind mount) from the path on the host machine to the path inside the Docker container. When using `docker compose down`, the data is not deleted but persists on the host machine.
 
 
 
 
 ### 1. Configurations (`config.py`)
-Settings are stored in `config.json`. The handler provides methods that follow the JSON hierarchy (e.g., `scanner_tags_critical()` maps to `scanner.tags.critical`). Methods are polymorphic: calling them without arguments performs a read, while passing arguments performs a write.
+Settings are stored in `config.json`. This file is created when the user makes changes other then the default values. The handler provides methods that follow the JSON hierarchy (e.g., `scanner_tags_critical()` maps to `scanner.tags.critical`). Methods are polymorphic: calling them without arguments performs a read, while passing arguments performs a write.
 ```
 "scanner": {
     "interval": 5,

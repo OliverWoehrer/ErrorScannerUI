@@ -43,8 +43,17 @@ Before this Docker container can read logs of other Docker containers, a little 
 | MacOS | /var/run/docker.sock | /var/run/docker.sock |
 | Windows | //./pipe/docker_engine | /var/run/docker.sock |
 
-> Here you can find an example for a [compose file](./readme/compose.yml) and how to integrate your newly build image into your existing docker compose!
+> Here you can find an example for a [compose file](./compose.yml) and how to integrate your newly build image into your existing docker compose!
 
+
+
+
+### Running The Application
+To see the application running with test data, simply type the command below within the project root directory. This uses a [random log message generator](./generator/README.md) to create a compose of multiple log generators and one instance of this error scanner. 
+```
+docker compose up --build
+```
+You can use [this compose file](./compose.yml) as a reference on how to integrate your newly build image into your existing docker compose!
 
 
 
